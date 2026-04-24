@@ -3,16 +3,19 @@ import 'package:campus_ai/features/home_feature/presentation/widgets/welcome_sec
 import 'package:flutter/material.dart';
 
 class ServicesHeader extends StatelessWidget {
-  const ServicesHeader(
-      {super.key,
-      required this.titleName,
-      required this.subTitle,
-      required this.description});
+  const ServicesHeader({
+    super.key,
+    required this.titleName,
+    required this.subTitle,
+    required this.description,
+    this.height,
+  });
   final String titleName, subTitle, description;
+  final double? height;
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: height ?? 400,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
