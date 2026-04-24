@@ -2,11 +2,15 @@
 import 'package:campus_ai/core/theme/app_theme.dart';
 import 'package:campus_ai/core/utils/constants.dart';
 import 'package:campus_ai/features/splash_feature/presentation/view/splash_screen.dart';
+import 'package:campus_ai/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   runApp(
     const AICampusGuideApp(),
   );
