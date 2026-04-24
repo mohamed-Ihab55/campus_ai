@@ -8,7 +8,7 @@ class ChatRemoteService {
   ChatRemoteService()
       : _dio = Dio(
           BaseOptions(
-            baseUrl: dotenv.env['CHAT_BOT_API_KEY'] ?? '',
+            // baseUrl: dotenv.env['CHAT_BOT_API_KEY'] ?? '',
             connectTimeout: const Duration(seconds: 15),
             receiveTimeout: const Duration(seconds: 30),
             headers: {'Content-Type': 'application/json'},
