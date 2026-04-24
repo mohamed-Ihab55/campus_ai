@@ -1,74 +1,89 @@
 import 'package:bloc/bloc.dart';
 import 'package:campus_ai/features/chat_bot_feature/data/model/chat_model.dart';
+import 'package:campus_ai/features/chat_bot_feature/data/services/chat_service.dart';
+import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 
 part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
-  ChatCubit() : super(ChatInitial());
+  final ChatRepository _repository;
+  final ChatRemoteService _remoteService;
+
+  ChatCubit({
+    ChatRepository? repository,
+    ChatRemoteService? remoteService,
+  })  : _repository = repository ?? ChatRepository(),
+        _remoteService = remoteService ?? ChatRemoteService(),
+        super(const ChatInitial());
+
+  Future<void> loadMessages() async {
+    try {
+      final messages = await _repository.loadMessages();
+      emit(ChatSuccess(messages));
+    } catch (e) {
+      emit(ChatError(const [], 'Failed to load messages: ${e.toString()}'));
+    }
+  }
 
   Future<void> sendMessage(String message) async {
     if (message.trim().isEmpty) return;
 
     final trimmedMessage = message.trim();
+    final currentMessages = List<ChatMessage>.from(state.messages);
 
     final userMessage = ChatMessage(
       content: trimmedMessage,
       role: MessageRole.user,
-      timestamp: DateTime.now(),
     );
 
-    final currentMessages = List<ChatMessage>.from(state.messages);
-
-    // 🔹 Emit loading with user message
     emit(ChatLoading([...currentMessages, userMessage]));
 
-    // try {
-    //   /// 🔹 Save user message
-    //   await ChatRepository().saveMessage(
-    //     content: userMessage.content,
-    //     role: MessageRole.user,
-    //     userId: userId,
-    //   );
+    try {
+      await _repository.saveMessage(
+        content: userMessage.content,
+        role: MessageRole.user,
+        isError: false,
+      );
 
-    /// 🔹 Call Gemini API
-    // final response = await geminiService.sendMessage(
-    //   message: trimmedMessage,
-    //   conversationHistory: currentMessages,
-    // );
+      final reply = await _remoteService.sendMessage(
+        message: trimmedMessage,
+        conversationHistory: currentMessages,
+      );
 
-    // final assistantMessage = ChatMessage(
-    //   content: response,
-    //   role: MessageRole.assistant,
-    //   timestamp: DateTime.now(),
-    // );
+      final assistantMessage = ChatMessage(
+        content: reply,
+        role: MessageRole.assistant,
+      );
 
-    /// 🔹 Save assistant message
-    // await ChatRepository().saveMessage(
-    //   content: assistantMessage.content,
-    //   role: MessageRole.assistant,
-    //   userId: userId,
-    // );
+      await _repository.saveMessage(
+        content: assistantMessage.content,
+        role: MessageRole.assistant,
+        isError: false,
+      );
 
-    //   emit(ChatSuccess([
-    //     ...currentMessages,
-    //     userMessage,
-    //     assistantMessage,
-    //   ]));
-    // } catch (e) {
-    //   /// 🔥 تحسين: اعرض error message كويس
-    //   final errorMessage = ChatMessage(
-    //     content: "Something went wrong. Please try again.",
-    //     role: MessageRole.assistant,
-    //     timestamp: DateTime.now(),
-    //     isError: true,
-    //   );
+      emit(ChatSuccess([
+        ...currentMessages,
+        userMessage,
+        assistantMessage,
+      ]));
+    } catch (e) {
+      final errorMessage = ChatMessage(
+        content: 'Something went wrong. Please try again.',
+        role: MessageRole.assistant,
+        isError: true,
+      );
 
-    // emit(ChatError(
-    //   [...currentMessages, userMessage, errorMessage],
-    //   e.toString(),
-    // ));
-    // }
+      await _repository.saveMessage(
+        content: errorMessage.content,
+        role: MessageRole.assistant,
+        isError: true,
+      );
+
+      emit(ChatError(
+        [...currentMessages, userMessage, errorMessage],
+        e.toString(),
+      ));
+    }
   }
 }
