@@ -1,37 +1,37 @@
-import 'package:campus_ai/features/chat_bot_feature/data/model/chat_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:campus_ai/features/chat_bot_feature/data/model/chat_model.dart';
 
 class ChatRepository {
-  final _messagesRef = FirebaseFirestore.instance.collection('messages');
+  final FirebaseFirestore _firestore;
 
-
-  Stream<List<ChatMessage>> getMessages({String? userId}) {
-
-
-    return _messagesRef
-        .orderBy('timestamp', descending: false)
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            final data = doc.data();
-            return ChatMessage.fromJson({
-              ...data,
-              'timestamp': data['timestamp'] ?? Timestamp.now(),
-            });
-          }).toList();
-        });
-  }
+  ChatRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<void> saveMessage({
     required String content,
     required MessageRole role,
-    String? userId,
+    required bool isError,
   }) async {
+    final message = ChatMessage(
+      content: content,
+      role: role,
+      isError: isError,
+    );
 
-    await _messagesRef.add({
-      'content': content.trim(),
-      'role': role.name,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+    await _firestore
+        .collection('messages')
+        .doc(message.id)
+        .set(message.toJson());
+  }
+
+  Future<List<ChatMessage>> loadMessages() async {
+    final snapshot = await _firestore
+        .collection('messages')
+        .orderBy('timestamp')
+        .get();
+
+    return snapshot.docs
+        .map((doc) => ChatMessage.fromJson(doc.data()))
+        .toList();
   }
 }
