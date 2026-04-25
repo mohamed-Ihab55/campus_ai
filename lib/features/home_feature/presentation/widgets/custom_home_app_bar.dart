@@ -29,7 +29,7 @@ class CustomHomeAppBar extends StatelessWidget {
             children: [
               AnimatedBuilder(
                 animation: blinkAnim,
-                builder: (_, __) => Opacity(
+                builder: (_, _) => Opacity(
                   opacity: blinkAnim.value,
                   child: Container(
                     width: 7,

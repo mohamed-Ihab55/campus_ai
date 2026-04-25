@@ -5,12 +5,17 @@ class QuickCard extends StatefulWidget {
   final IconData icon;
   final String label;
   final Color bgColor, borderColor;
-  const QuickCard({super.key, 
+  final VoidCallback onTap;
+
+  const QuickCard({
+    super.key,
     required this.icon,
     required this.label,
     required this.bgColor,
     required this.borderColor,
+    required this.onTap,
   });
+
   @override
   State<QuickCard> createState() => QuickCardState();
 }
@@ -24,14 +29,17 @@ class QuickCardState extends State<QuickCard>
   @override
   void initState() {
     super.initState();
+
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
     )..forward();
+
     _slide = Tween<Offset>(
       begin: const Offset(0, 0.4),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+
     _opacity = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
   }
 
@@ -48,7 +56,7 @@ class QuickCardState extends State<QuickCard>
       child: FadeTransition(
         opacity: _opacity,
         child: GestureDetector(
-          onTap: () {},
+          onTap: widget.onTap,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -67,9 +75,7 @@ class QuickCardState extends State<QuickCard>
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Icon(widget.icon, size: 24),
-                ),
+                child: Center(child: Icon(widget.icon, size: 24)),
               ),
               const SizedBox(height: 8),
               Text(

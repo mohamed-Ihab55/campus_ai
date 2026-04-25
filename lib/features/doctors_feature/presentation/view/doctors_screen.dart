@@ -44,7 +44,7 @@ class _DoctorsViewState extends State<_DoctorsView> {
           DoctorsInitial() || DoctorsLoading() => const _LoadingView(),
           DoctorsError(:final message)        => _ErrorView(message: message),
           DoctorsLoaded()                     => _LoadedView(
-              state: state as DoctorsLoaded,
+              state: state,
               searchController: _searchController,
             ),
         },

@@ -1,9 +1,11 @@
-
 import 'package:campus_ai/core/theme/app_colors.dart';
+import 'package:campus_ai/features/home_feature/data/cubit/quick_cubit.dart';
+import 'package:campus_ai/features/home_feature/data/services/quick_repo.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/feature_label.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/quick_access_row.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/stats_strip.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccessSection extends StatelessWidget {
   const AccessSection({super.key, required this.fadeAnimation});
@@ -35,9 +37,11 @@ class AccessSection extends StatelessWidget {
               ),
             ),
 
-            // Quick Access
             const FeatureLabel(label: 'Access Quick Links'),
-            const QuickAccessRow(),
+            BlocProvider(
+              create: (context) => QuickCubit(QuickRepo())..load(),
+              child: const QuickAccessRow(),
+            ),
             const SizedBox(height: 18),
 
             // Stats

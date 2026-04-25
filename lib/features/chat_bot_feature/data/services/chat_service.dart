@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:campus_ai/features/chat_bot_feature/data/model/chat_model.dart';
 
 class ChatRemoteService {

@@ -45,7 +45,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                   initialZoom: 17,
                   minZoom: 3,
                   maxZoom: 19,
-                  onTap: (_, __) => context.read<MapCubit>().clearSelection(),
+                  onTap: (_, _) => context.read<MapCubit>().clearSelection(),
                 ),
                 children: [
                   TileLayer(
