@@ -140,7 +140,7 @@ class _DoctorListCardState extends State<DoctorListCard>
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${doc.title}',
+                          doc.title,
                           style: TextStyle(
                             fontSize: 11,
                             color: AppColors.textTertiary,
