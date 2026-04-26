@@ -3,21 +3,23 @@ import 'package:campus_ai/features/doctors_feature/data/services/doctor_repo.dar
 import 'doctor_state.dart';
 
 class DoctorsCubit extends Cubit<DoctorsState> {
-  final DoctorsRepository _repo;
+  final DoctorsRepository repo;
 
   DoctorsCubit({DoctorsRepository? repo})
-      : _repo = repo ?? DoctorsRepository(),
+      : repo = repo ?? DoctorsRepository(),
         super(const DoctorsInitial());
 
   Future<void> load() async {
     emit(const DoctorsLoading());
 
     try {
-      final doctors = await _repo.fetchAll();
+      final doctors = await repo.fetchAll();
 
       final departments = [
         'All',
-        ...doctors.map((d) => d.department).toSet(),
+        ...{
+          for (var d in doctors) d.department.trim()
+        }
       ];
 
       emit(DoctorsLoaded(
@@ -31,17 +33,17 @@ class DoctorsCubit extends Cubit<DoctorsState> {
     }
   }
 
-  void selectDepartment(String dept) {
-    final current = state;
-    if (current is DoctorsLoaded) {
-      emit(current.copyWith(selectedDept: dept));
-    }
-  }
-
   void search(String query) {
     final current = state;
     if (current is DoctorsLoaded) {
       emit(current.copyWith(query: query));
+    }
+  }
+
+  void selectDepartment(String dept) {
+    final current = state;
+    if (current is DoctorsLoaded) {
+      emit(current.copyWith(selectedDept: dept));
     }
   }
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class SearchSection extends StatelessWidget {
-  const SearchSection({
+class SearchTextField extends StatelessWidget {
+  const SearchTextField({
     super.key,
     required this.fillColor,
     this.border,
     required this.hintText,
     this.iconAndTextColor,
     this.cursorColor,
-    this.textColor,
+    this.textColor, this.onChanged,
   });
   final Color fillColor;
   final InputBorder? border;
@@ -16,6 +16,7 @@ class SearchSection extends StatelessWidget {
   final Color? iconAndTextColor;
   final Color? cursorColor;
   final Color? textColor;
+  final Function(String)? onChanged;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,14 +24,14 @@ class SearchSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.13),
         borderRadius: BorderRadius.circular(16),
-        border:
-            Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1.5),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.22),
+          width: 1.5,
+        ),
       ),
       child: TextField(
-        style: TextStyle(
-          fontSize: 13,
-          color: textColor ?? Colors.white,
-        ),
+        onChanged: onChanged,
+        style: TextStyle(fontSize: 13, color: textColor ?? Colors.white),
         cursorColor: cursorColor ?? Colors.white,
         decoration: InputDecoration(
           enabledBorder: border ?? InputBorder.none,
@@ -42,9 +43,11 @@ class SearchSection extends StatelessWidget {
             fontSize: 13,
             color: iconAndTextColor ?? Colors.white.withValues(alpha: 0.22),
           ),
-          prefixIcon: Icon(Icons.search,
-              size: 16,
-              color: iconAndTextColor ?? Colors.white.withValues(alpha: 0.7)),
+          prefixIcon: Icon(
+            Icons.search,
+            size: 16,
+            color: iconAndTextColor ?? Colors.white.withValues(alpha: 0.7),
+          ),
         ),
       ),
     );

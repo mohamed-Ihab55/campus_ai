@@ -1,4 +1,4 @@
-import 'package:campus_ai/features/home_feature/presentation/widgets/dots_grid.dart';
+import 'package:campus_ai/core/utils/dots_grid.dart';
 import 'package:flutter/material.dart';
 
 class DecorationBackgroungStackHomeScreen extends StatelessWidget {
@@ -20,7 +20,6 @@ class DecorationBackgroungStackHomeScreen extends StatelessWidget {
             ),
           ),
         ),
-        // decorative circle bottom-right
         Positioned(
           bottom: -60,
           right: -40,
@@ -33,7 +32,6 @@ class DecorationBackgroungStackHomeScreen extends StatelessWidget {
             ),
           ),
         ),
-        // ring
         Positioned(
           bottom: 20,
           left: 40,
@@ -49,12 +47,7 @@ class DecorationBackgroungStackHomeScreen extends StatelessWidget {
             ),
           ),
         ),
-        // dots grid
-        const Positioned(
-          top: 80,
-          right: 28,
-          child: DotsGrid(),
-        ),
+        const Positioned(top: 80, right: 28, child: DotsGrid()),
       ],
     );
   }

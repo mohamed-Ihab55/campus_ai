@@ -25,16 +25,20 @@ class DoctorsLoaded extends DoctorsState {
     required this.query,
   });
 
-  List<Doctor> get filtered => all.where((d) {
-        final matchDept =
-            selectedDept == 'All' || d.department == selectedDept;
+  List<Doctor> get filtered {
+    final q = query.trim().toLowerCase();
 
-        final matchQuery =
-            d.name.toLowerCase().contains(query.toLowerCase()) ||
-            d.specialty.toLowerCase().contains(query.toLowerCase());
+    return all.where((d) {
+      final matchDept = selectedDept == 'All' ||
+          d.department.toLowerCase() == selectedDept.toLowerCase();
 
-        return matchDept && matchQuery;
-      }).toList();
+      final matchQuery = q.isEmpty ||
+          d.name.toLowerCase().contains(q) ||
+          d.department.toLowerCase().contains(q);
+
+      return matchDept && matchQuery;
+    }).toList();
+  }
 
   DoctorsLoaded copyWith({
     List<Doctor>? all,

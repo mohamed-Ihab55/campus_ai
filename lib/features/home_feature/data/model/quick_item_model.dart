@@ -18,9 +18,9 @@ class QuickItem {
   factory QuickItem.fromJson(Map<String, dynamic> json, String id) {
     return QuickItem(
       id: id,
-      label: json['label'],
-      icon: json['icon'],
-      route: json['route'],
+      label: json['label'] ?? '',
+      icon: json['icon'] ?? '',
+      route: json['route'] ?? '',
       bgColor: int.parse(json['bgcolor']),
       borderColor: int.parse(json['bordercolor']),
     );

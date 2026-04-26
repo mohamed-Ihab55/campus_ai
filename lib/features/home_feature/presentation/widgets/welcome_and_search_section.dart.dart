@@ -1,6 +1,6 @@
 import 'package:campus_ai/features/home_feature/presentation/widgets/custom_home_app_bar.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/decoration_backgroung_stack_home_screen.dart';
-import 'package:campus_ai/features/home_feature/presentation/widgets/search_section.dart';
+import 'package:campus_ai/features/home_feature/presentation/widgets/search_text_field.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/welcome_section_home_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +39,7 @@ class WelcomeAndSearchSection extends StatelessWidget {
                         'University of Ain Shams — Everything you need in one place',
                   ),
                   const SizedBox(height: 18),
-                  const SearchSection(
+                  const SearchTextField(
                     fillColor: Colors.transparent,
                     hintText: 'Search for places, services...',
                   ),

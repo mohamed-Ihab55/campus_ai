@@ -26,7 +26,7 @@ class AICampusGuideApp extends StatelessWidget {
       routes: {
         '/splash': (context) => const SplashScreen(),
         '/': (context) => const HomeScreen(),
-        '/doctors': (context) => const DoctorsScreen(),
+        '/doctor': (context) => const DoctorsScreen(),
         '/map': (context) => const MapScreen(),
         // '/services': (context) => const ServicesScreen(),
         // '/departments': (context) => const DepartmentsScreen(),

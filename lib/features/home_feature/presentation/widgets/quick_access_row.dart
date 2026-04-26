@@ -11,12 +11,16 @@ class QuickAccessRow extends StatelessWidget {
     switch (icon) {
       case 'doctor':
         return Icons.person;
-      case 'map':
-        return Icons.map;
-      case 'lab':
+      case 'globe':
+        return Icons.public;
+      case 'computer':
         return Icons.computer;
-      case 'department':
-        return Icons.domain;
+      case 'apartment':
+        return Icons.apartment;
+      case 'calculate':
+        return Icons.calculate;
+      case 'newspaper':
+        return Icons.newspaper;
       default:
         return Icons.circle;
     }
