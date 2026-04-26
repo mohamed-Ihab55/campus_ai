@@ -1,3 +1,4 @@
+import 'package:campus_ai/app.dart';
 import 'package:campus_ai/core/utils/constants.dart';
 import 'package:campus_ai/features/doctors_feature/presentation/view/doctors_screen.dart';
 import 'package:campus_ai/features/gpa_feature/presentation/view/gpa_calculator_screen.dart';
@@ -27,7 +28,7 @@ class AICampusGuideApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
-        '/': (context) => const HomeScreen(),
+        '/': (context) => const MainNavigationScreen(),
         '/doctor': (context) => const DoctorsScreen(),
         '/map': (context) => const MapScreen(),
         '/gpa': (context) => const GpaCalculatorScreen(),
