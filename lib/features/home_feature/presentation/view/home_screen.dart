@@ -1,7 +1,7 @@
-
 import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:campus_ai/core/utils/custom_button.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/access_section.dart';
+import 'package:campus_ai/features/home_feature/presentation/widgets/feature_label.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/welcome_and_search_section.dart.dart';
 import 'package:campus_ai/features/map_feature/presentation/view/map_screen.dart';
 import 'package:flutter/material.dart';
@@ -29,15 +29,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    _blinkAnimation =
-        Tween<double>(begin: 1.0, end: 0.3).animate(_blinkController);
+    _blinkAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.3,
+    ).animate(_blinkController);
 
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     )..forward();
-    _fadeAnimation =
-        CurvedAnimation(parent: _fadeController, curve: Curves.easeOut);
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    );
   }
 
   @override
@@ -66,19 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             child: WelcomeAndSearchSection(blinkAnim: _blinkAnimation),
           ),
           SliverToBoxAdapter(
-            child: AccessSection(
-              fadeAnimation: _fadeAnimation,
-            ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 24)),
-          SliverToBoxAdapter(
-            child: CustomButton(
-              text: 'Open Campus Map',
-              backgroundColor: AppColors.primary,
-              onTap: _openMap,
-              fontSize: 18,
-              borderRadius: 12,
-            ),
+            child: AccessSection(fadeAnimation: _fadeAnimation),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],

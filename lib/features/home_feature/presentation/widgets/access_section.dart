@@ -4,6 +4,7 @@ import 'package:campus_ai/features/home_feature/data/services/quick_repo.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/feature_label.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/quick_access_row.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/stats_strip.dart';
+import 'package:campus_ai/features/home_feature/presentation/widgets/time_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -43,10 +44,11 @@ class AccessSection extends StatelessWidget {
               child: const QuickAccessRow(),
             ),
             const SizedBox(height: 18),
-
-            // Stats
             const FeatureLabel(label: 'Campus Stats'),
             const StatsStrip(),
+            const SizedBox(height: 18),
+            const FeatureLabel(label: 'Time Map'),
+            const TimeMap(),
             const SizedBox(height: 18),
           ],
         ),
