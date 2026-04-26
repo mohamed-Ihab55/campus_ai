@@ -3,7 +3,9 @@ import 'package:campus_ai/features/doctors_feature/presentation/view/doctors_scr
 import 'package:campus_ai/features/gpa_feature/presentation/view/gpa_calculator_screen.dart';
 import 'package:campus_ai/features/home_feature/presentation/view/home_screen.dart';
 import 'package:campus_ai/features/map_feature/presentation/view/map_screen.dart';
+import 'package:campus_ai/features/news_feature/presentation/view/news_web_view.dart';
 import 'package:campus_ai/features/splash_feature/presentation/view/splash_screen.dart';
+import 'package:campus_ai/features/ums_webview_feature/presentation/view/ums_web_view.dart';
 import 'package:campus_ai/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +31,8 @@ class AICampusGuideApp extends StatelessWidget {
         '/doctor': (context) => const DoctorsScreen(),
         '/map': (context) => const MapScreen(),
         '/gpa': (context) => const GpaCalculatorScreen(),
+        '/ums': (context) => const UmsWebView(),
+        '/news': (context) => const NewsWebView(),
         // '/services': (context) => const ServicesScreen(),
         // '/departments': (context) => const DepartmentsScreen(),
         // '/labs': (context) => const LabsScreen(),
