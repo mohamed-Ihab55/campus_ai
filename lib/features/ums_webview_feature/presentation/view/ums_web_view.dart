@@ -1,3 +1,4 @@
+import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -23,9 +24,8 @@ class _UmsWebViewState extends State<UmsWebView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Expanded(child: WebViewWidget(controller: controller)),
-      ),
+      backgroundColor: AppColors.surface2,
+      body: SafeArea(child: WebViewWidget(controller: controller)),
     );
   }
 }
