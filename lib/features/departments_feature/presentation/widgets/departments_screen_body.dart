@@ -1,0 +1,127 @@
+import 'package:campus_ai/core/theme/app_colors.dart';
+import 'package:campus_ai/features/departments_feature/data/cubit/department_cubit.dart';
+import 'package:campus_ai/features/service_feature/presentation/widgets/services_header.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class DepartmentsScreenBody extends StatelessWidget {
+  const DepartmentsScreenBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.surface2,
+      body: BlocBuilder<DepartmentCubit, DepartmentState>(
+        builder: (context, state) {
+          if (state is DepartmentLoading) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.textSecondary),
+            );
+          }
+          if (state is DepartmentError) {
+            return Center(child: Text(state.message));
+          }
+          if (state is DepartmentSuccess) {
+            if (state.departments.isEmpty) {
+              return const Center(
+                child: Text(
+                  "No Departments Found",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              );
+            }
+            return Column(
+              children: [
+                ServicesHeader(
+                  height: 250,
+                  titleName: 'College',
+                  subTitle: 'Departments',
+                  description:
+                      'Explore the various departments and their specialties.',
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: state.departments.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 14),
+                    itemBuilder: (context, index) {
+                      final dept = state.departments[index];
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.surface2,
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: const [
+                            BoxShadow(
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                              color: Colors.black12,
+                            ),
+                          ],
+                        ),
+                        child: ExpansionTile(
+                          collapsedIconColor: AppColors.primaryDeep,
+                          iconColor: AppColors.primary,
+                          tilePadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 6,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          collapsedShape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          leading: CircleAvatar(
+                            backgroundColor: AppColors.primary,
+                            radius: 24,
+                            child: Text(
+                              dept.deptName.isNotEmpty ? dept.deptName[0] : "?",
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textTertiary,
+                              ),
+                            ),
+                          ),
+                          title: Text(
+                            dept.deptName,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "${dept.subFields.length} Specialties",
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 13,
+                            ),
+                          ),
+                          children: dept.subFields.map((item) {
+                            return ListTile(
+                              leading: const Icon(
+                                Icons.arrow_right,
+                                color: AppColors.primary,
+                              ),
+                              title: Text(item),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          }
+          return const SizedBox();
+        },
+      ),
+    );
+  }
+}
