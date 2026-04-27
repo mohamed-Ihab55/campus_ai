@@ -27,7 +27,7 @@ List<ServiceItem> getServices(BuildContext context) {
       subtitle: 'Your current academic status',
       bgColor: Color(0xFFCCFBF1),
       borderColor: Color(0xFF99F6E4),
-      accentColor: Colors.black,
+      accentColor: Color(0xff000000),
     ),
     ServiceItem(
       onTap: () => Navigator.push(

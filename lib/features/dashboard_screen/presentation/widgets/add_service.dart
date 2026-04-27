@@ -28,8 +28,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       await FirebaseFirestore.instance.collection('services').add({
         'title': titleController.text.trim(),
         'subTitle': subTitleController.text.trim(),
-        'borderColor': borderColorController.text.trim(),
-        'accentColor': accentColorController.text.trim(),
+        'borderColor': '0xFF99F6E4',
+        'accentColor': '0xff000000',
         'route': routeController.text.trim(),
       });
 
@@ -59,16 +59,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             children: [
               buildField(titleController, "Title"),
               buildField(subTitleController, "Subtitle"),
-              buildField(
-                borderColorController,
-                "Border Color (e.g. 0x70FF5733)",
-              ),
-              buildField(
-                accentColorController,
-                "Accent Color (e.g. 0x9033C1FF)",
-              ),
               buildField(routeController, "Route (e.g. /departments)"),
-
               const SizedBox(height: 20),
 
               ElevatedButton(
