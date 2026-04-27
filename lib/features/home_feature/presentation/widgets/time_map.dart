@@ -60,7 +60,7 @@ class TimeMap extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: data.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   const Divider(height: 1, color: AppColors.border),
               itemBuilder: (context, index) {
                 final item = data[index];
