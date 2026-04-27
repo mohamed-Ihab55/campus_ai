@@ -24,17 +24,14 @@ class DepartmentTabs extends StatelessWidget {
             onTap: () => onSelect(d),
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 6),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: isActive ? Colors.blue : Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 d.label,
-                style: TextStyle(
-                  color: isActive ? Colors.white : Colors.black,
-                ),
+                style: TextStyle(color: isActive ? Colors.white : Colors.black),
               ),
             ),
           );

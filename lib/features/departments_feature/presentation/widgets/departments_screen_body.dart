@@ -52,13 +52,13 @@ class DepartmentsScreenBody extends StatelessWidget {
                       final dept = state.departments[index];
                       return Container(
                         decoration: BoxDecoration(
-                          color: AppColors.surface2,
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: const [
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
                             BoxShadow(
-                              blurRadius: 10,
-                              offset: Offset(0, 4),
-                              color: Colors.black12,
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
@@ -75,15 +75,30 @@ class DepartmentsScreenBody extends StatelessWidget {
                           collapsedShape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18),
                           ),
-                          leading: CircleAvatar(
-                            backgroundColor: AppColors.primary,
-                            radius: 24,
-                            child: Text(
-                              dept.deptName.isNotEmpty ? dept.deptName[0] : "?",
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textTertiary,
+                          leading: Container(
+                            height: 52,
+                            width: 52,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.primaryDeep,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Center(
+                              child: Text(
+                                dept.deptName.isNotEmpty
+                                    ? dept.deptName[0]
+                                    : "?",
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
