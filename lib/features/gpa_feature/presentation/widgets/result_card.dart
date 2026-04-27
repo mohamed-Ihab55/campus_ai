@@ -45,7 +45,6 @@ class ResultCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // الإيموجي والـ GPA
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -64,7 +63,7 @@ class ResultCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'out of 4.00  /  من 4.00',
+                    'out of 4.00  / 4.00',
                     style: TextStyle(
                       fontSize: 11,
                       color: borderColor.withValues(alpha: 0.7),
@@ -78,9 +77,8 @@ class ResultCard extends StatelessWidget {
           Divider(color: borderColor.withValues(alpha: 0.25)),
           const SizedBox(height: 10),
 
-          // المستوى
           Text(
-            '${status.emoji}  ${status.labelEn}  —  ${status.labelAr}',
+            '${status.emoji}  ${status.labelEn}',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w800,
@@ -90,7 +88,6 @@ class ResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
 
-          // هل يحق التخرج (فقط في التراكمي)
           if (!isSemester)
             Container(
               margin: const EdgeInsets.only(top: 8),
@@ -106,8 +103,8 @@ class ResultCard extends StatelessWidget {
               ),
               child: Text(
                 status.canGraduate
-                    ? '✅  Eligible to Graduate  —  يحق له التخرج'
-                    : '⚠️  Not Eligible to Graduate  —  لا يحق له التخرج',
+                    ? '✅  Eligible to Graduate'
+                    : '⚠️  Not Eligible to Graduate',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
