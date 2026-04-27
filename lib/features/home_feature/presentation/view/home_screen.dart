@@ -70,6 +70,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               child: Text('Dashboard'),
             ),
           ),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
+          // SliverToBoxAdapter(
+          //   child: TextButton(
+          //     onPressed: () {
+          //       Navigator.pushNamed(context, '/edit-avatar-colors');
+          //     },
+          //     child: Text('edit avatar colors'),
+          //   ),
+          // ),
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),

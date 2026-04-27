@@ -16,16 +16,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController departmentController = TextEditingController();
+
   final TextEditingController initialsController = TextEditingController();
+
   final TextEditingController roomController = TextEditingController();
+
   final TextEditingController titleController = TextEditingController();
-  final TextEditingController avatarColorController = TextEditingController();
 
   bool isLoading = false;
 
+  String? selectedDepartment;
+  int? selectedColor;
+
+  final List<String> departments = [
+    "CS",
+    "Mathematics",
+    "Statistics",
+    "Physics",
+    "Chemistry",
+  ];
+
+  final Map<String, Color> avatarColors = {
+    "CS": const Color(0xFF2196F3),
+    "Mathematics": const Color(0xff000B58),
+    "Statistics": const Color(0xFFE91E63),
+    "Physics": const Color(0xff006A67),
+    "Chemistry": const Color(0xffFF9F00),
+  };
+
   Future<void> addDoctor() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
     setState(() {
       isLoading = true;
@@ -34,11 +56,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       await doctors.add({
         'name': nameController.text.trim(),
-        'department': departmentController.text.trim(),
+        'department': selectedDepartment,
         'initials': initialsController.text.trim(),
         'room': roomController.text.trim(),
         'title': titleController.text.trim(),
-        'avatarColor': int.parse(avatarColorController.text.trim()),
+        'avatarColor': selectedColor,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,11 +68,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
 
       nameController.clear();
-      departmentController.clear();
       initialsController.clear();
       roomController.clear();
       titleController.clear();
-      avatarColorController.clear();
+
+      setState(() {
+        selectedDepartment = null;
+        selectedColor = null;
+      });
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -65,13 +90,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget buildField({
     required String label,
     required TextEditingController controller,
-    TextInputType type = TextInputType.text,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
         controller: controller,
-        keyboardType: type,
         validator: (value) {
           if (value == null || value.trim().isEmpty) {
             return "Required Field";
@@ -86,14 +109,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Widget buildDropdownDepartment() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: DropdownButtonFormField<String>(
+        value: selectedDepartment, // ✅ بدل initialValue
+        decoration: InputDecoration(
+          labelText: "Department",
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        items: departments.map((dept) {
+          return DropdownMenuItem<String>(value: dept, child: Text(dept));
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            selectedDepartment = value;
+
+            // ✅ يحدد اللون تلقائيًا
+            selectedColor = avatarColors[value]?.toARGB32();
+          });
+        },
+        validator: (value) {
+          if (value == null) {
+            return "Choose Department";
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget buildDropdownColor() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: DropdownButtonFormField<int>(
+        value: selectedColor, // ✅ بدل initialValue
+        decoration: InputDecoration(
+          labelText: "Avatar Color",
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        items: avatarColors.entries.map((entry) {
+          return DropdownMenuItem<int>(
+            value: entry.value.toARGB32(),
+            child: Row(
+              children: [
+                CircleAvatar(radius: 8, backgroundColor: entry.value),
+                const SizedBox(width: 10),
+                Text(entry.key),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            selectedColor = value;
+          });
+        },
+        validator: (value) {
+          if (value == null) {
+            return "Choose Color";
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
   @override
   void dispose() {
     nameController.dispose();
-    departmentController.dispose();
     initialsController.dispose();
     roomController.dispose();
     titleController.dispose();
-    avatarColorController.dispose();
     super.dispose();
   }
 
@@ -108,15 +195,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: ListView(
             children: [
               buildField(label: "Doctor Name", controller: nameController),
-              buildField(label: "Department", controller: departmentController),
+              buildDropdownDepartment(),
               buildField(label: "Initials", controller: initialsController),
               buildField(label: "Room", controller: roomController),
               buildField(label: "Title", controller: titleController),
-              buildField(
-                label: "Avatar Color (Number)",
-                controller: avatarColorController,
-                type: TextInputType.number,
-              ),
+              buildDropdownColor(),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: isLoading ? null : addDoctor,
