@@ -79,6 +79,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           //     child: Text('edit avatar colors'),
           //   ),
           // ),
+          SliverToBoxAdapter(
+            child: TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/add_services');
+              },
+              child: Text('Add Services'),
+            ),
+          ),
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:campus_ai/app.dart';
 import 'package:campus_ai/core/utils/constants.dart';
 import 'package:campus_ai/features/dashboard_screen/presentation/view/dashboard_screen.dart';
+import 'package:campus_ai/features/dashboard_screen/presentation/widgets/add_service.dart';
 import 'package:campus_ai/features/departments_feature/presentation/view/departments_screen.dart';
 import 'package:campus_ai/features/doctors_feature/presentation/view/doctors_screen.dart';
 import 'package:campus_ai/features/gpa_feature/presentation/view/gpa_calculator_screen.dart';
@@ -41,6 +42,7 @@ class AICampusGuideApp extends StatelessWidget {
         '/labs': (context) => const LabsScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         // '/edit-avatar-colors': (context) => const EditAvatarColorScreen(),
+        '/add_services': (context) => const AddServiceScreen(),
       },
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,

@@ -30,8 +30,10 @@ List<ServiceItem> getServices(BuildContext context) {
       accentColor: Colors.black,
     ),
     ServiceItem(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const GpaCalculatorScreen())),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const GpaCalculatorScreen()),
+      ),
       icon: Icons.calculate,
       title: 'Gpa Calculator',
       subtitle: 'Calculate your current GPA',

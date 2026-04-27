@@ -17,7 +17,7 @@ class ServiceCardState extends State<ServiceCard>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.item.onTap, // ← التغيير الوحيد: بدل () {} بقت item.onTap
+      onTap: widget.item.onTap,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
