@@ -1,5 +1,5 @@
 import 'package:campus_ai/core/theme/app_colors.dart';
-import 'package:campus_ai/features/home_feature/data/cubit/quick_cubit.dart';
+import 'package:campus_ai/features/home_feature/data/cubits/quick_access_cubit/quick_cubit.dart';
 import 'package:campus_ai/features/home_feature/data/services/quick_repo.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/feature_label.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/quick_access_row.dart';

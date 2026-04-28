@@ -1,5 +1,5 @@
-import 'package:campus_ai/features/home_feature/data/cubit/quick_cubit.dart';
-import 'package:campus_ai/features/home_feature/data/cubit/quick_state.dart';
+import 'package:campus_ai/features/home_feature/data/cubits/quick_access_cubit/quick_cubit.dart';
+import 'package:campus_ai/features/home_feature/data/cubits/quick_access_cubit/quick_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'quick_card.dart';
