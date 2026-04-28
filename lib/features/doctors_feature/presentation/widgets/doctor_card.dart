@@ -10,6 +10,7 @@ class DoctorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: AppColors.surface,
       margin: const EdgeInsets.only(left: 14, right: 14, bottom: 12),
       child: Material(
         borderRadius: BorderRadius.circular(18),

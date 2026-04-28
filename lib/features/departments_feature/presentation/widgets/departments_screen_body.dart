@@ -15,7 +15,7 @@ class DepartmentsScreenBody extends StatelessWidget {
         builder: (context, state) {
           if (state is DepartmentLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: AppColors.textSecondary),
+              child: CircularProgressIndicator(color: AppColors.primaryDeep),
             );
           }
           if (state is DepartmentError) {

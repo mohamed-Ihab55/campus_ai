@@ -16,6 +16,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final TextEditingController borderColorController = TextEditingController();
   final TextEditingController accentColorController = TextEditingController();
   final TextEditingController routeController = TextEditingController();
+  final TextEditingController iconControllar = TextEditingController();
 
   bool isLoading = false;
 
@@ -26,10 +27,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     try {
       await FirebaseFirestore.instance.collection('services').add({
+        'icon': iconControllar.text.trim(),
         'title': titleController.text.trim(),
         'subTitle': subTitleController.text.trim(),
-        'borderColor': '0xFF99F6E4',
-        'accentColor': '0xff000000',
+        'borderColor': '0xFFC7D2FE',
+        'accentColor': '0xFF0D2680',
         'route': routeController.text.trim(),
       });
 
@@ -59,6 +61,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             children: [
               buildField(titleController, "Title"),
               buildField(subTitleController, "Subtitle"),
+              buildField(iconControllar, "Icon (e.g. home)"),
               buildField(routeController, "Route (e.g. /departments)"),
               const SizedBox(height: 20),
 

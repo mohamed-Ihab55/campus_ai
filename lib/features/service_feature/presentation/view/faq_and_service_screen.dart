@@ -1,11 +1,11 @@
-
 import 'package:campus_ai/core/theme/app_colors.dart';
+import 'package:campus_ai/features/service_feature/data/cubit/services_cubit.dart';
 import 'package:campus_ai/features/service_feature/data/model/faq_item.dart';
-import 'package:campus_ai/features/service_feature/data/static/static_data.dart';
 import 'package:campus_ai/features/service_feature/presentation/view/faq_part_screen.dart';
 import 'package:campus_ai/features/service_feature/presentation/view/services_part_screen.dart';
 import 'package:campus_ai/features/service_feature/presentation/widgets/services_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FaqScreen extends StatefulWidget {
   const FaqScreen({super.key});
@@ -59,15 +59,15 @@ class _FaqScreenState extends State<FaqScreen>
 
   @override
   Widget build(BuildContext context) {
-    final services = getServices(context);
-
     return Scaffold(
       backgroundColor: AppColors.surface2,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           ServicesAppBar(
             tabController: _tabCtrl,
-            forceElevated: innerBoxIsScrolled, tab1: 'Services', tab2: 'FAQ',
+            forceElevated: innerBoxIsScrolled,
+            tab1: 'Services',
+            tab2: 'FAQ',
             titleName: 'Services',
             subTitle: 'Affairs',
             description: 'Every service you need in one place',
@@ -76,12 +76,33 @@ class _FaqScreenState extends State<FaqScreen>
         body: TabBarView(
           controller: _tabCtrl,
           children: [
-            ServicesTab(services: services),
+            BlocProvider(
+              create: (_) => ServicesCubit()..getServices(),
+              child: BlocBuilder<ServicesCubit, ServicesState>(
+                builder: (context, state) {
+                  if (state is ServicesLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state is ServicesError) {
+                    return Center(child: Text(state.message));
+                  }
+
+                  if (state is ServicesSuccess) {
+                    return ServicesTab(services: state.services);
+                  }
+
+                  return const SizedBox();
+                },
+              ),
+            ),
+
             FaqPartScreen(
-                faqs: _faqs,
-                onToggle: (i) {
-                  setState(() => _faqs[i].isOpen = !_faqs[i].isOpen);
-                }),
+              faqs: _faqs,
+              onToggle: (i) {
+                setState(() => _faqs[i].isOpen = !_faqs[i].isOpen);
+              },
+            ),
           ],
         ),
       ),

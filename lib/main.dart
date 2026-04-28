@@ -4,6 +4,7 @@ import 'package:campus_ai/features/dashboard_screen/presentation/view/dashboard_
 import 'package:campus_ai/features/dashboard_screen/presentation/widgets/add_service.dart';
 import 'package:campus_ai/features/departments_feature/presentation/view/departments_screen.dart';
 import 'package:campus_ai/features/doctors_feature/presentation/view/doctors_screen.dart';
+import 'package:campus_ai/features/elearn_web_view_feature/presentation/view/elearning_screen.dart';
 import 'package:campus_ai/features/gpa_feature/presentation/view/gpa_calculator_screen.dart';
 import 'package:campus_ai/features/lab_feature/presentation/view/labs_screen.dart';
 import 'package:campus_ai/features/map_feature/presentation/view/map_screen.dart';
@@ -37,7 +38,7 @@ class AICampusGuideApp extends StatelessWidget {
         '/gpa': (context) => const GpaCalculatorScreen(),
         '/ums': (context) => const UmsWebView(),
         '/news': (context) => const NewsWebView(),
-        // '/elearn': (context) => const ElearningScreen(),
+        '/elearn': (context) => const ElearningScreen(),
         '/department': (context) => const DepartmentsScreen(),
         '/labs': (context) => const LabsScreen(),
         '/dashboard': (context) => const DashboardScreen(),

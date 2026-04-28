@@ -38,7 +38,6 @@ class LabScreenBody extends StatelessWidget {
     );
   }
 
-
   Widget _buildLabsList(List labs) {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -52,7 +51,7 @@ class LabScreenBody extends StatelessWidget {
   Widget _buildLoadingState() {
     return const Center(
       child: CircularProgressIndicator.adaptive(
-        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryDeep),
       ),
     );
   }

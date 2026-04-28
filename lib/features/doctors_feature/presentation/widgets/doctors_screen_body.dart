@@ -17,7 +17,9 @@ class DoctorsScreenBody extends StatelessWidget {
       body: BlocBuilder<DoctorsCubit, DoctorsState>(
         builder: (context, state) {
           if (state is DoctorsLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primaryDeep),
+            );
           }
 
           if (state is DoctorsError) {
