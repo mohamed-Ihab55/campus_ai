@@ -59,11 +59,15 @@ class GpaCourseRow extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.redLight,
                     borderRadius: BorderRadius.circular(8),
-                    border:
-                        Border.all(color: AppColors.red.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: AppColors.red.withValues(alpha: 0.3),
+                    ),
                   ),
-                  child:
-                      const Icon(Icons.close, size: 14, color: AppColors.red),
+                  child: const Icon(
+                    Icons.close,
+                    size: 14,
+                    color: AppColors.red,
+                  ),
                 ),
               ),
             ],
@@ -84,14 +88,18 @@ class GpaCourseRow extends StatelessWidget {
                 flex: 2,
                 child: TextFormField(
                   initialValue: course.hours.toStringAsFixed(
-                      course.hours == course.hours.roundToDouble() ? 0 : 1),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                    course.hours == course.hours.roundToDouble() ? 0 : 1,
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                   ],
                   style: const TextStyle(
-                      fontSize: 13, color: AppColors.textPrimary),
+                    fontSize: 13,
+                    color: AppColors.textPrimary,
+                  ),
                   decoration: _inputDecoration('Hours'),
                   onChanged: (v) {
                     final parsed = double.tryParse(v);
@@ -110,7 +118,7 @@ class GpaCourseRow extends StatelessWidget {
                   height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: AppColors.surface2,
+                    color: AppColors.bgColor,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppColors.border),
                   ),
@@ -118,20 +126,26 @@ class GpaCourseRow extends StatelessWidget {
                     child: DropdownButton<String>(
                       value: course.grade,
                       isExpanded: true,
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                          size: 18, color: AppColors.textTertiary),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 18,
+                        color: AppColors.textTertiary,
+                      ),
                       style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
                       items: selectableGrades
-                          .map((g) => DropdownMenuItem(
-                                value: g,
-                                child: Text(
-                                  '$g  (${gradePoints[g]!.toStringAsFixed(2)})',
-                                  style: const TextStyle(fontSize: 13),
-                                ),
-                              ))
+                          .map(
+                            (g) => DropdownMenuItem(
+                              value: g,
+                              child: Text(
+                                '$g  (${gradePoints[g]!.toStringAsFixed(2)})',
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
+                          )
                           .toList(),
                       onChanged: (v) {
                         if (v != null) onChanged(course.copyWith(grade: v));
@@ -152,7 +166,7 @@ class GpaCourseRow extends StatelessWidget {
       hintText: hint,
       hintStyle: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
       filled: true,
-      fillColor: AppColors.surface2,
+      fillColor: AppColors.bgColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),

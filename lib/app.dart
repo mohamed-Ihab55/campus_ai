@@ -40,7 +40,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface2,
+      backgroundColor: AppColors.bgColor,
 
       body: PageView(
         controller: _controller,

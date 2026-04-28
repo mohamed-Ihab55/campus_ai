@@ -19,7 +19,7 @@ class AccessSection extends StatelessWidget {
       opacity: fadeAnimation,
       child: Container(
         decoration: const BoxDecoration(
-          color: AppColors.surface2,
+          color: AppColors.bgColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(

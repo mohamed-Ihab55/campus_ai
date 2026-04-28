@@ -12,7 +12,7 @@ class LabsScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => LabCubit()..getDepartments(),
       child: const Scaffold(
-        backgroundColor: AppColors.surface2,
+        backgroundColor: AppColors.bgColor,
         body: LabScreenBody(),
       ),
     );

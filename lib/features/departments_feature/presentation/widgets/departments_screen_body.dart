@@ -10,7 +10,7 @@ class DepartmentsScreenBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface2,
+      backgroundColor: AppColors.bgColor,
       body: BlocBuilder<DepartmentCubit, DepartmentState>(
         builder: (context, state) {
           if (state is DepartmentLoading) {

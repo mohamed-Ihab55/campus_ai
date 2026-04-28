@@ -60,7 +60,7 @@ class _FaqScreenState extends State<FaqScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface2,
+      backgroundColor: AppColors.bgColor,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           ServicesAppBar(

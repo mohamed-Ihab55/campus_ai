@@ -14,7 +14,7 @@ class ServicesTab extends StatelessWidget {
     return BlocProvider(
       create: (_) => ServicesCubit()..getServices(),
       child: Scaffold(
-        backgroundColor: AppColors.surface2,
+        backgroundColor: AppColors.bgColor,
         body: BlocBuilder<ServicesCubit, ServicesState>(
           builder: (context, state) {
             if (state is ServicesLoading) {

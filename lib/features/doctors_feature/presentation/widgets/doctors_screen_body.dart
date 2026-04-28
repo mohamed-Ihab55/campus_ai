@@ -13,7 +13,7 @@ class DoctorsScreenBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface2,
+      backgroundColor: AppColors.bgColor,
       body: BlocBuilder<DoctorsCubit, DoctorsState>(
         builder: (context, state) {
           if (state is DoctorsLoading) {

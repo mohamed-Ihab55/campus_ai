@@ -28,7 +28,7 @@ class FaqCard extends StatelessWidget {
                     color: AppColors.primary.withValues(alpha: 0.08),
                     blurRadius: 16,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ]
               : [],
         ),
@@ -46,7 +46,7 @@ class FaqCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: item.isOpen
                           ? AppColors.primaryLight
-                          : AppColors.surface2,
+                          : AppColors.bgColor,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: item.isOpen

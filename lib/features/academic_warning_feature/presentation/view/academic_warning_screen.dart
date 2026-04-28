@@ -9,7 +9,7 @@ class AcademicWarningScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface2,
+      backgroundColor: AppColors.bgColor,
       body: ListView(
         padding: EdgeInsets.zero,
         children: const [

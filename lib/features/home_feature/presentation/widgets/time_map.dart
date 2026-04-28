@@ -35,7 +35,7 @@ class TimeMap extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Card(
-        color: AppColors.surface2,
+        color: AppColors.bgColor,
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         child: Column(

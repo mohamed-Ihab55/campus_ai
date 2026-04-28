@@ -17,7 +17,6 @@ class AppColors {
   static const textSecondary = Color(0xFF4A5578);
   static const textTertiary = Color(0xFF9BA8C4);
   static const surface = Color(0xFFFFFFFF);
-  static const surface2 = Color(0xFFF4F7FF);
+  static const bgColor = Color(0xFFF4F7FF);
   static const border = Color(0xFFE6EAF4);
-  static const bgPage = Color(0xFFEEF2FF);
 }

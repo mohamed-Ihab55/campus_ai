@@ -28,7 +28,7 @@ class ChatInputField extends StatelessWidget {
               hintText: 'Type your message...',
               hintStyle: TextStyle(color: AppColors.textTertiary),
               border: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.surface2),
+                borderSide: BorderSide(color: AppColors.bgColor),
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
@@ -63,13 +63,13 @@ class ChatInputField extends StatelessWidget {
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: AppColors.surface2,
+                        color: AppColors.bgColor,
                       ),
                     )
                   : const Icon(
                       Icons.send_rounded,
                       key: ValueKey("send"),
-                      color: AppColors.surface2,
+                      color: AppColors.bgColor,
                       size: 24,
                     ),
             ),

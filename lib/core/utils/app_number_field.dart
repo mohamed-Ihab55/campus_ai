@@ -22,10 +22,7 @@ class AppNumberField extends StatelessWidget {
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
       ],
-      style: const TextStyle(
-        fontSize: 13,
-        color: AppColors.textPrimary,
-      ),
+      style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
       decoration: _decoration(),
       onChanged: onChanged,
     );
@@ -34,12 +31,9 @@ class AppNumberField extends StatelessWidget {
   InputDecoration _decoration() {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(
-        fontSize: 11,
-        color: AppColors.textTertiary,
-      ),
+      hintStyle: const TextStyle(fontSize: 11, color: AppColors.textTertiary),
       filled: true,
-      fillColor: AppColors.surface2,
+      fillColor: AppColors.bgColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       border: _border(),
       enabledBorder: _border(),

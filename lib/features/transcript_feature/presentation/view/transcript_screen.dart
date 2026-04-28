@@ -24,7 +24,7 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface2,
+      backgroundColor: AppColors.bgColor,
       body: SafeArea(child: WebViewWidget(controller: controller)),
     );
   }

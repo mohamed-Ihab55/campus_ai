@@ -31,7 +31,7 @@ class DownloadAndOpenFilePart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.surface2,
+        color: AppColors.bgColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: AppColors.primaryDeep.withValues(alpha: 0.2),
