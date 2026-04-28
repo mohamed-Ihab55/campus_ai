@@ -9,6 +9,8 @@ class QuickAccessRow extends StatelessWidget {
 
   IconData _mapIcon(String icon) {
     switch (icon) {
+      case 'school':
+        return Icons.school;
       case 'doctor':
         return Icons.person;
       case 'globe':
