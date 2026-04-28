@@ -62,31 +62,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           SliverToBoxAdapter(
             child: AccessSection(fadeAnimation: _fadeAnimation),
           ),
-          SliverToBoxAdapter(
-            child: TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/dashboard');
-              },
-              child: Text('Dashboard'),
-            ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 12)),
-          // SliverToBoxAdapter(
-          //   child: TextButton(
-          //     onPressed: () {
-          //       Navigator.pushNamed(context, '/edit-avatar-colors');
-          //     },
-          //     child: Text('edit avatar colors'),
-          //   ),
-          // ),
-          SliverToBoxAdapter(
-            child: TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/add_services');
-              },
-              child: Text('Add Services'),
-            ),
-          ),
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
