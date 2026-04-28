@@ -2,10 +2,7 @@ import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomHomeAppBar extends StatelessWidget {
-  const CustomHomeAppBar({
-    super.key,
-    required this.blinkAnim,
-  });
+  const CustomHomeAppBar({super.key, required this.blinkAnim});
 
   final Animation<double> blinkAnim;
 
@@ -16,13 +13,11 @@ class CustomHomeAppBar extends StatelessWidget {
       children: [
         // semester badge
         Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 12, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-                color: Colors.white.withValues(alpha: 0.2)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -53,7 +48,7 @@ class CustomHomeAppBar extends StatelessWidget {
             ],
           ),
         ),
-    
+
         // notification button
         Stack(
           clipBehavior: Clip.none,
@@ -64,11 +59,14 @@ class CustomHomeAppBar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.18)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
               ),
               child: const Center(
-                child: Text('🔔', style: TextStyle(fontSize: 16)),
+                child: Icon(
+                  Icons.dark_mode_outlined,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
               ),
             ),
             Positioned(
@@ -80,8 +78,7 @@ class CustomHomeAppBar extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.red,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                      color: const Color(0xFF1338A8), width: 2),
+                  border: Border.all(color: const Color(0xFF1338A8), width: 2),
                 ),
                 child: const Center(
                   child: Text(
