@@ -1,15 +1,16 @@
+import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
-enum LocationCategory { admin, dept, lab, service }
+enum LocationCategory { studentAffairs, dept, lab, doctorOffice }
 
 extension LocationCategoryExt on LocationCategory {
   String get label => switch (this) {
-        LocationCategory.admin => 'Administration',
-        LocationCategory.dept => 'Departments',
-        LocationCategory.lab => 'Labs',
-        LocationCategory.service => 'Services',
-      };
+    LocationCategory.doctorOffice => 'Doctor\'s Office',
+    LocationCategory.studentAffairs => 'Student Affairs',
+    LocationCategory.dept => 'Departments',
+    LocationCategory.lab => 'Labs',
+  };
 }
 
 class CampusLocation {
@@ -42,8 +43,8 @@ final campusLocations = [
     name: 'مبنى A',
     floor: '1–4',
     emoji: '🏛️',
-    color: Colors.blue,
-    category: LocationCategory.admin,
+    color: AppColors.primary,
+    category: LocationCategory.studentAffairs,
     position: LatLng(30.0265, 31.2098),
     rooms: ['Dean Office', 'Registration'],
   ),

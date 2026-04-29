@@ -10,29 +10,34 @@ part 'services_state.dart';
 
 class ServicesCubit extends Cubit<ServicesState> {
   ServicesCubit() : super(ServicesInitial());
-Future<void> getServices() async {
+
+  Future<void> getServices() async {
     emit(ServicesLoading());
 
     try {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('services').get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('services')
+          .get();
 
-      final services = snapshot.docs
-          .map((doc) => ServiceModel.fromJson(doc.data()))
-          .map((model) => ServiceItem(
-                title: model.title,
-                subtitle: model.subTitle,
-                borderColor: hexToColor(model.borderColor),
-                accentColor: hexToColor(model.accentColor),
-                icon: getIcon(model.icon),
-                route: model.route,
-              ))
-          .toList();
+      // Check if the Cubit was closed during the 'await'
+      if (isClosed) return;
+
+      final services = snapshot.docs.map((doc) {
+        final model = ServiceModel.fromJson(doc.data());
+        return ServiceItem(
+          title: model.title,
+          subtitle: model.subTitle,
+          borderColor: hexToColor(model.borderColor),
+          accentColor: hexToColor(model.accentColor),
+          icon: getIcon(model.icon),
+          route: model.route,
+        );
+      }).toList();
 
       emit(ServicesSuccess(services));
     } catch (e) {
+      if (isClosed) return;
       emit(ServicesError(e.toString()));
     }
   }
-
 }

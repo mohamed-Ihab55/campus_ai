@@ -13,10 +13,10 @@ class ServicesLoading extends ServicesState {}
 
 class ServicesSuccess extends ServicesState {
   final List<ServiceItem> services;
-  ServicesSuccess(this.services);
+  const ServicesSuccess(this.services);
 }
 
 class ServicesError extends ServicesState {
   final String message;
-  ServicesError(this.message);
+  const ServicesError(this.message);
 }

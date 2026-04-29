@@ -113,7 +113,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: DropdownButtonFormField<String>(
-        value: selectedDepartment, // ✅ بدل initialValue
+        initialValue: selectedDepartment, // ✅ بدل initialValue
         decoration: InputDecoration(
           labelText: "Department",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
@@ -143,7 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: DropdownButtonFormField<int>(
-        value: selectedColor, // ✅ بدل initialValue
+        initialValue: selectedColor, // ✅ بدل initialValue
         decoration: InputDecoration(
           labelText: "Avatar Color",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),

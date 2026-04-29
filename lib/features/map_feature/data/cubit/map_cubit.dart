@@ -47,8 +47,11 @@ class MapCubit extends Cubit<MapState> {
 
       if (permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
-        emit(state.copyWith(
-            error: 'Open app settings to grant location permission'));
+        emit(
+          state.copyWith(
+            error: 'Open app settings to grant location permission',
+          ),
+        );
         return;
       }
 
@@ -73,10 +76,12 @@ class MapCubit extends Cubit<MapState> {
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: locationSettings,
       );
-      emit(state.copyWith(
-        userLocation: LatLng(pos.latitude, pos.longitude),
-        error: null,
-      ));
+      emit(
+        state.copyWith(
+          userLocation: LatLng(pos.latitude, pos.longitude),
+          error: null,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(error: 'error to detect the location'));
     }

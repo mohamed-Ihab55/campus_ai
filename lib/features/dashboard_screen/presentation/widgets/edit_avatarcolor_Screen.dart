@@ -57,7 +57,7 @@ class _EditAvatarColorScreenState extends State<EditAvatarColorScreen> {
 
   Widget buildDepartmentDropdown() {
     return DropdownButtonFormField<String>(
-      value: selectedDepartment, // ✅ بدل initialValue
+      initialValue: selectedDepartment, // ✅ بدل initialValue
       decoration: InputDecoration(
         labelText: "Choose Department",
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),

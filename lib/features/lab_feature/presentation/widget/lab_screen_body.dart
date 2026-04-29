@@ -43,7 +43,7 @@ class LabScreenBody extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       physics: const BouncingScrollPhysics(),
       itemCount: labs.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      separatorBuilder: (_, _) => const SizedBox(height: 16),
       itemBuilder: (context, index) => LabCard(lab: labs[index]),
     );
   }
