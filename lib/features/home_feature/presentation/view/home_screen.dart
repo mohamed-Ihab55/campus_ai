@@ -52,7 +52,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [

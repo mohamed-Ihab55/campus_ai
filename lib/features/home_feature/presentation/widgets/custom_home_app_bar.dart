@@ -1,5 +1,8 @@
 import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/theme/theme_provider.dart';
 
 class CustomHomeAppBar extends StatelessWidget {
   const CustomHomeAppBar({super.key, required this.blinkAnim});
@@ -61,11 +64,15 @@ class CustomHomeAppBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
               ),
-              child: const Center(
+              child:  GestureDetector(
+                onTap: () {
+                  context.read<ThemeProvider>().toggleTheme();
+                },
                 child: Icon(
-                  Icons.dark_mode_outlined,
+                  context.watch<ThemeProvider>().isDarkMode
+                      ? Icons.light_mode
+                      : Icons.dark_mode_outlined,
                   size: 16,
-                  color: AppColors.primary,
                 ),
               ),
             ),
