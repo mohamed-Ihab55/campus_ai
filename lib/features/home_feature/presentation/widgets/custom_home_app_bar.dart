@@ -4,6 +4,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 
+String getCurrentSeason() {
+  final month = DateTime.now().month;
+
+  if (month >= 3 && month <= 5) {
+    return "Spring";
+  } else if (month >= 6 && month <= 8) {
+    return "Summer";
+  } else if (month >= 9 && month <= 11) {
+    return "Autumn";
+  } else {
+    return "Winter";
+  }
+}
+
+String getSeasonWithYear() {
+  final now = DateTime.now();
+  final season = getCurrentSeason();
+  return "$season ${now.year}";
+}
+
 class CustomHomeAppBar extends StatelessWidget {
   const CustomHomeAppBar({super.key, required this.blinkAnim});
 
@@ -41,7 +61,7 @@ class CustomHomeAppBar extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Spring 2026',
+                getSeasonWithYear(),
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -64,9 +84,9 @@ class CustomHomeAppBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
               ),
-              child:  GestureDetector(
+              child: GestureDetector(
                 onTap: () {
-                  context.read<ThemeProvider>().toggleTheme();
+                  // context.read<ThemeProvider>().toggleTheme();
                 },
                 child: Icon(
                   context.watch<ThemeProvider>().isDarkMode
