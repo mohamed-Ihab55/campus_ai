@@ -10,80 +10,107 @@ import 'map_state.dart';
 class MapCubit extends Cubit<MapState> {
   MapCubit() : super(MapState(locations: campusLocations));
 
-  void selectLocation(CampusLocation loc) {
-    emit(state.copyWith(selected: loc));
+  void selectLocation(CampusLocation location) {
+    emit(state.copyWith(selected: location, clearError: true));
   }
 
   void clearSelection() {
-    emit(state.copyWith(selected: null));
+    emit(state.copyWith(clearSelected: true));
   }
 
   void setFilter(LocationCategory? category) {
-    emit(state.copyWith(filter: category));
+    emit(
+      state.copyWith(
+        filter: category,
+        clearFilter: category == null,
+      ),
+    );
   }
 
-  void search(String value) {
-    emit(state.copyWith(search: value));
+  void search(String text) {
+    emit(state.copyWith(search: text));
   }
 
   Future<void> locateUser() async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        emit(state.copyWith(error: 'Open GPS to get your location'));
+      final enabled =
+      await Geolocator.isLocationServiceEnabled();
+
+      if (!enabled) {
+        emit(state.copyWith(error: 'Please enable GPS.'));
         return;
       }
 
-      LocationPermission permission = await Geolocator.checkPermission();
+      LocationPermission permission =
+      await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-
-        if (permission == LocationPermission.denied) {
-          emit(state.copyWith(error: 'The premission was denied'));
-          return;
-        }
+        permission =
+        await Geolocator.requestPermission();
       }
 
-      if (permission == LocationPermission.deniedForever) {
-        await Geolocator.openAppSettings();
+      if (permission == LocationPermission.denied) {
         emit(
           state.copyWith(
-            error: 'Open app settings to grant location permission',
+            error: 'Location permission denied.',
           ),
         );
         return;
       }
 
-      final LocationSettings locationSettings;
+      if (permission ==
+          LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
 
-      if (Platform.isAndroid) {
-        locationSettings = AndroidSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 10,
+        emit(
+          state.copyWith(
+            error:
+            'Permission denied forever. Open settings.',
+          ),
         );
-      } else if (Platform.isIOS) {
-        locationSettings = AppleSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 10,
-        );
-      } else {
-        locationSettings = const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        );
+        return;
       }
 
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: locationSettings,
+      final position =
+      await Geolocator.getCurrentPosition(
+        locationSettings: _settings,
       );
+
       emit(
         state.copyWith(
-          userLocation: LatLng(pos.latitude, pos.longitude),
-          error: null,
+          userLocation: LatLng(
+            position.latitude,
+            position.longitude,
+          ),
+          clearError: true,
         ),
       );
-    } catch (e) {
-      emit(state.copyWith(error: 'error to detect the location'));
+    } catch (_) {
+      emit(
+        state.copyWith(
+          error: 'Failed to get location.',
+        ),
+      );
     }
+  }
+
+  LocationSettings get _settings {
+    if (Platform.isAndroid) {
+      return AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      );
+    }
+
+    if (Platform.isIOS) {
+      return AppleSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      );
+    }
+
+    return const LocationSettings(
+      accuracy: LocationAccuracy.high,
+    );
   }
 }

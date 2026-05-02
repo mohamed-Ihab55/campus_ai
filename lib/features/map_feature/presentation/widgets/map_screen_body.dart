@@ -2,52 +2,58 @@
 import 'package:campus_ai/features/map_feature/data/cubit/map_cubit.dart';
 import 'package:campus_ai/features/map_feature/data/cubit/map_state.dart';
 import 'package:campus_ai/features/map_feature/data/model/compus_data.dart';
-import 'package:campus_ai/features/map_feature/presentation/widgets/map_in_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 class MapScreenBody extends StatefulWidget {
   const MapScreenBody({super.key});
-
   @override
   State<MapScreenBody> createState() => _MapScreenBodyState();
 }
 
 class _MapScreenBodyState extends State<MapScreenBody> {
-  late final MapController _mapController;
-  late final TextEditingController _searchController;
-
+  late final MapController mapController;
+  late final TextEditingController searchController;
   @override
   void initState() {
     super.initState();
-    _mapController = MapController();
-    _searchController = TextEditingController();
+    mapController = MapController();
+    searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgColor,
-      // Use ResizeToAvoidBottomInset to prevent search bar from breaking the map
-      resizeToAvoidBottomInset: false,
       body: BlocConsumer<MapCubit, MapState>(
         listener: (context, state) {
-          // If a location is selected from search, move the camera there
           if (state.selected != null) {
-            _mapController.move(state.selected!.position, 18);
+            mapController.move(state.selected!.position, 18);
+          }
+          if (state.error != null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.error!)));
           }
         },
         builder: (context, state) {
           return Stack(
             children: [
-              // 1. THE MAP
               FlutterMap(
-                mapController: _mapController,
+                mapController: mapController,
                 options: MapOptions(
                   initialCenter: campusCenter,
                   initialZoom: 17,
-                  onTap: (_, __) => context.read<MapCubit>().clearSelection(),
+                  onTap: (_, __) {
+                    context.read<MapCubit>().clearSelection();
+                  },
                 ),
                 children: [
                   TileLayer(
@@ -55,8 +61,6 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                         'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
                     subdomains: const ['a', 'b', 'c', 'd'],
                   ),
-
-                  // User Location Marker
                   if (state.userLocation != null)
                     MarkerLayer(
                       markers: [
@@ -72,74 +76,74 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                         ),
                       ],
                     ),
-
-                  // Campus Locations Markers
                   MarkerLayer(
                     markers: state.filtered.map((loc) {
-                      final isSelected = state.selected?.id == loc.id;
+                      final selected = state.selected?.id == loc.id;
                       return Marker(
                         point: loc.position,
-                        width: isSelected ? 60 : 45,
-                        height: isSelected ? 60 : 45,
+                        width: selected ? 60 : 45,
+                        height: selected ? 60 : 45,
                         child: GestureDetector(
-                          onTap: () =>
-                              context.read<MapCubit>().selectLocation(loc),
-                          child: _buildMarkerWidget(loc, isSelected),
+                          onTap: () {
+                            context.read<MapCubit>().selectLocation(loc);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            decoration: BoxDecoration(
+                              color: selected ? loc.color : loc.color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: selected ? 3 : 2,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                loc.emoji,
+                                style: TextStyle(fontSize: selected ? 24 : 18),
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     }).toList(),
                   ),
                 ],
               ),
-
-              // 2. TOP SEARCH & FILTER SECTION
               Positioned(
                 top: MediaQuery.of(context).padding.top + 10,
                 left: 16,
                 right: 16,
                 child: Column(
                   children: [
-                    _buildSearchBar(context),
+                    _searchBar(context),
                     const SizedBox(height: 10),
-                    _buildFilterChips(context, state),
+                    _filters(context, state),
                   ],
                 ),
               ),
-
-              // 3. SELECTION DETAIL CARD (Appears when marker is tapped)
               if (state.selected != null)
                 Positioned(
-                  bottom: 100,
                   left: 16,
                   right: 16,
-                  child: _buildLocationDetailCard(state.selected!),
+                  bottom: 100,
+                  child: _detailsCard(context, state.selected!),
                 ),
-
-              // 4. FLOATING ACTION BUTTONS
               Positioned(
+                right: 16,
                 bottom: 30,
-                right: 16,
                 child: FloatingActionButton(
-                  heroTag: "locate_btn", // ✅ unique
                   backgroundColor: AppColors.primary,
-                  onPressed: () => _handleLocateUser(context),
-                  child: const Icon(Icons.my_location, color: Colors.white),
-                ),
-              ),
-
-              Positioned(
-                bottom: 100,
-                right: 16,
-                child: FloatingActionButton(
-                  heroTag: "map_btn",
-                  backgroundColor: AppColors.primary,
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MapInText()),
-                  ),
+                  onPressed: () async {
+                    await context.read<MapCubit>().locateUser();
+                    final user = context.read<MapCubit>().state.userLocation;
+                    if (user != null) {
+                      mapController.move(user, 17);
+                    }
+                  },
                   child: const Icon(
-                    Icons.maps_home_work_outlined,
-                    color: Colors.white,
+                    color: AppColors.bgColor,
+                    Icons.gps_fixed_outlined,
                   ),
                 ),
               ),
@@ -150,65 +154,66 @@ class _MapScreenBodyState extends State<MapScreenBody> {
     );
   }
 
-  Widget _buildMarkerWidget(CampusLocation loc, bool isSelected) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      decoration: BoxDecoration(
-        color: isSelected ? loc.color : loc.color.withValues(alpha: 0.8),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: isSelected ? 3 : 2),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
-      ),
-      child: Center(
-        child: Text(
-          loc.emoji,
-          style: TextStyle(fontSize: isSelected ? 24 : 18),
+  Widget _searchBar(BuildContext context) {
+    return TextField(
+      controller: searchController,
+      onChanged: context.read<MapCubit>().search,
+      decoration: InputDecoration(
+        hintText: 'Search...',
+        hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+        prefixIcon: const Icon(Icons.search),
+        filled: true,
+        fillColor: Colors.transparent,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: AppColors.primaryDeep),
         ),
       ),
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20),
-        ],
-      ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: context.read<MapCubit>().search,
-        decoration: InputDecoration(
-          hintText: 'Search departments, labs...',
-          prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChips(BuildContext context, MapState state) {
+  Widget _filters(BuildContext context, MapState state) {
     return SizedBox(
-      height: 40,
+      height: 48,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        children: LocationCategory.values.map((cat) {
-          final isSelected = state.filter == cat;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
+        children: LocationCategory.values.map((category) {
+          final selected = state.filter == category;
+          final backgroundColor = selected
+              ? AppColors.primary
+              : AppColors.bgColor;
+          final textColor = selected ? Colors.white : AppColors.primary;
+          final borderColor = selected
+              ? AppColors.primary
+              : AppColors.primary.withOpacity(0.25);
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeInOut,
+            margin: const EdgeInsets.only(right: 8),
             child: FilterChip(
-              backgroundColor: AppColors.surface,
-              label: Text(cat.label),
-              selected: isSelected,
-              onSelected: (val) =>
-                  context.read<MapCubit>().setFilter(val ? cat : null),
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              checkmarkColor: AppColors.primary,
+              showCheckmark: false,
+              selected: selected,
+              disabledColor: Colors.transparent,
+              backgroundColor: backgroundColor,
+              selectedColor: backgroundColor,
+              side: BorderSide(color: borderColor, width: 1.2),
+              elevation: selected ? 6 : 0,
+              pressElevation: 0,
+              shadowColor: AppColors.primary.withOpacity(0.18),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              label: AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 14,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+                child: Text(category.label),
+              ),
+              onSelected: (_) {
+                context.read<MapCubit>().setFilter(selected ? null : category);
+              },
             ),
           );
         }).toList(),
@@ -216,57 +221,55 @@ class _MapScreenBodyState extends State<MapScreenBody> {
     );
   }
 
-  Widget _buildLocationDetailCard(CampusLocation loc) {
+  Widget _detailsCard(BuildContext context, CampusLocation location) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 8,
+      color: AppColors.bgColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: loc.color.withOpacity(0.1),
-                shape: BoxShape.circle,
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: location.color,
+              child: Text(
+                location.emoji,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 22,
+                ),
               ),
-              child: Text(loc.emoji, style: const TextStyle(fontSize: 24)),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    loc.name,
+                    location.name,
                     style: const TextStyle(
+                      color: AppColors.textSecondary,
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: 17,
                     ),
                   ),
                   Text(
-                    "Floor: ${loc.floor}",
-                    style: const TextStyle(color: Colors.grey),
+                    'Floor: ${location.floor}',
+                    style: TextStyle(color: AppColors.textSecondary),
                   ),
                 ],
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => context.read<MapCubit>().clearSelection(),
+              onPressed: () {
+                context.read<MapCubit>().clearSelection();
+              },
+              icon: const Icon(color: AppColors.textSecondary, Icons.close),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _handleLocateUser(BuildContext context) async {
-    final cubit = context.read<MapCubit>();
-    await cubit.locateUser();
-    if (cubit.state.userLocation != null) {
-      _mapController.move(cubit.state.userLocation!, 17);
-    }
   }
 }
