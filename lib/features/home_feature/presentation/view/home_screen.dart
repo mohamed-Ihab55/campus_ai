@@ -1,4 +1,3 @@
-import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/access_section.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/welcome_and_search_section.dart.dart';
 import 'package:flutter/material.dart';

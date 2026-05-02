@@ -1,8 +1,15 @@
-import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/theme/theme_provider.dart';
+
+
+String getSeason() {
+  final month = DateTime.now().month;
+
+  if (month >= 3 && month <= 5) return 'Spring';
+  if (month >= 6 && month <= 8) return 'Summer';
+  if (month >= 9 && month <= 11) return 'Autumn';
+  return 'Winter';
+}
 
 class CustomHomeAppBar extends StatelessWidget {
   const CustomHomeAppBar({super.key, required this.blinkAnim});
@@ -41,7 +48,7 @@ class CustomHomeAppBar extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Spring 2026',
+                '${getSeason()} ${DateTime.now().year}',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -50,33 +57,6 @@ class CustomHomeAppBar extends StatelessWidget {
               ),
             ],
           ),
-        ),
-
-        // notification button
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-              ),
-              child:  GestureDetector(
-                onTap: () {
-                  context.read<ThemeProvider>().toggleTheme();
-                },
-                child: Icon(
-                  context.watch<ThemeProvider>().isDarkMode
-                      ? Icons.light_mode
-                      : Icons.dark_mode_outlined,
-                  size: 16,
-                ),
-              ),
-            ),
-          ],
         ),
       ],
     );

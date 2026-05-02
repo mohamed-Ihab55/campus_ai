@@ -8,7 +8,7 @@ class SearchTextField extends StatelessWidget {
     required this.hintText,
     this.iconAndTextColor,
     this.cursorColor,
-    this.textColor, this.onChanged,
+    this.textColor, this.onChanged, this.controller,
   });
   final Color fillColor;
   final InputBorder? border;
@@ -17,6 +17,7 @@ class SearchTextField extends StatelessWidget {
   final Color? cursorColor;
   final Color? textColor;
   final Function(String)? onChanged;
+  final TextEditingController? controller;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -30,6 +31,7 @@ class SearchTextField extends StatelessWidget {
         ),
       ),
       child: TextField(
+        controller: controller,
         onChanged: onChanged,
         style: TextStyle(fontSize: 13, color: textColor ?? Colors.white),
         cursorColor: cursorColor ?? Colors.white,

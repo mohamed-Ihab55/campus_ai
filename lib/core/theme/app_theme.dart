@@ -24,7 +24,7 @@ class AppTheme {
       colorScheme: base.colorScheme.copyWith(
         primary: AppColors.primary,
         secondary: AppColors.textSecondary,
-        tertiary: AppColors.textTertiary!.withValues(alpha: 0.3),
+        tertiary: AppColors.textTertiary.withValues(alpha: 0.3),
 
         surface: Colors.blueGrey[50],
         onSurface: AppColors.textPrimary,
