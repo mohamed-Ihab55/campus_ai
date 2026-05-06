@@ -7,7 +7,10 @@ import 'package:campus_ai/features/chat_bot_feature/data/model/chat_model.dart';
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
 
-  const MessageBubble({super.key, required this.message});
+  const MessageBubble({
+    super.key,
+    required this.message,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,10 @@ class MessageBubble extends StatelessWidget {
 
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
               decoration: BoxDecoration(
                 color: isUser
                     ? AppColors.primary
@@ -47,10 +53,14 @@ class MessageBubble extends StatelessWidget {
                   bottomRight: Radius.circular(isUser ? 4 : 20),
                 ),
               ),
+
               child: isUser
                   ? Text(
                 message.content,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
               )
                   : MarkdownBody(
                 data: message.content,
@@ -58,9 +68,6 @@ class MessageBubble extends StatelessWidget {
 
                 builders: {
                   'table': _ProTableBuilder(),
-                  'tr': _ProTableBuilder(),
-                  'td': _ProTableBuilder(),
-                  'th': _ProTableBuilder(),
                 },
 
                 styleSheet: MarkdownStyleSheet(
@@ -72,15 +79,18 @@ class MessageBubble extends StatelessWidget {
                         ?.color,
                     height: 1.5,
                   ),
+
                   code: TextStyle(
                     fontSize: 13,
                     backgroundColor: Colors.grey.shade200,
                     fontFamily: 'monospace',
                   ),
+
                   codeblockDecoration: BoxDecoration(
                     color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(10),
                   ),
+
                   listBullet: TextStyle(
                     fontSize: 14,
                     color: AppColors.textPrimary,
@@ -95,82 +105,119 @@ class MessageBubble extends StatelessWidget {
   }
 }
 
-/// 🚀 PROFESSIONAL TABLE BUILDER (ChatGPT style)
+/// ===============================
+/// 🚀 PROFESSIONAL TABLE BUILDER
+/// ===============================
 class _ProTableBuilder extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     if (element.tag != 'table') return null;
 
-    final List<TableRow> rows = [];
-    bool isHeader = true;
+    final rows = element.children
+        ?.whereType<md.Element>()
+        .where((e) => e.tag == 'tr')
+        .toList() ??
+        [];
 
-    for (final row in element.children ?? []) {
-      if (row is md.Element && row.tag == 'tr') {
-        final cells = row.children!
-            .whereType<md.Element>()
-            .map((e) => e.textContent)
-            .toList();
+    if (rows.isEmpty) return const SizedBox();
 
-        rows.add(
-          TableRow(
-            decoration: BoxDecoration(
-              color: isHeader
-                  ? Colors.grey.shade200
-                  : rows.length.isEven
-                  ? Colors.grey.shade50
-                  : Colors.white,
-            ),
-            children: cells
-                .map(
-                  (cell) => Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 10, horizontal: 12),
-                child: Text(
-                  cell,
-                  textAlign:
-                  isHeader ? TextAlign.center : TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    fontWeight:
-                    isHeader ? FontWeight.bold : FontWeight.normal,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            )
-                .toList(),
-          ),
-        );
+    // أول صف = Header
+    final headerCells = rows.first.children
+        ?.whereType<md.Element>()
+        .where((e) => e.tag == 'th' || e.tag == 'td')
+        .toList() ??
+        [];
 
-        isHeader = false;
-      }
-    }
+    final bodyRows = rows.skip(1).toList();
 
     return Container(
-      margin: const EdgeInsets.only(top: 10),
+      margin: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultColumnWidth: const IntrinsicColumnWidth(),
-            border: TableBorder(
-              horizontalInside:
-              BorderSide(color: Colors.grey.shade300, width: 0.8),
-            ),
-            children: rows,
+          child: Column(
+            children: [
+              // ================= HEADER =================
+              Container(
+                color: Colors.blueGrey.shade50,
+                child: Row(
+                  children: headerCells.map((cell) {
+                    return _buildCell(
+                      text: cell.textContent.trim(),
+                      isHeader: true,
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              // ================= BODY =================
+              ...bodyRows.asMap().entries.map((entry) {
+                final index = entry.key;
+                final row = entry.value;
+
+                final cells = row.children
+                    ?.whereType<md.Element>()
+                    .where((e) => e.tag == 'td')
+                    .toList() ??
+                    [];
+
+                return Container(
+                  color: index.isEven
+                      ? Colors.white
+                      : Colors.grey.shade50,
+                  child: Row(
+                    children: cells.map((cell) {
+                      return _buildCell(
+                        text: cell.textContent.trim(),
+                        isHeader: false,
+                      );
+                    }).toList(),
+                  ),
+                );
+              }),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCell({
+    required String text,
+    required bool isHeader,
+  }) {
+    return Container(
+      width: 160, // 👈 fixed column width = real table feel
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 12,
+      ),
+      decoration: BoxDecoration(
+        border: Border(
+          right: BorderSide(color: Colors.grey.shade300, width: 0.8),
+          bottom: BorderSide(color: Colors.grey.shade300, width: 0.8),
+        ),
+      ),
+      child: Text(
+        text,
+        textAlign: isHeader ? TextAlign.center : TextAlign.start,
+        style: TextStyle(
+          fontSize: 13.5,
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.w500,
+          color: isHeader ? Colors.black87 : Colors.black87,
         ),
       ),
     );
