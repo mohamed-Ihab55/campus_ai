@@ -43,7 +43,10 @@ class CampusLocation {
     required this.position,
   });
 }
-const campusCenter = LatLng(30.0260, 31.2100);
+const LatLng campusCenter = LatLng(
+  30.0777111,
+  31.283907,
+);
 
 final List<CampusLocation> campusLocations = [
   CampusLocation(
@@ -53,7 +56,7 @@ final List<CampusLocation> campusLocations = [
     emoji: '🏛️',
     color: AppColors.primary,
     category: LocationCategory.studentAffairs,
-    position: LatLng(30.0265, 31.2098),
+    position: LatLng(30.0779, 31.2842),
   ),
   CampusLocation(
     id: 2,
@@ -62,7 +65,7 @@ final List<CampusLocation> campusLocations = [
     emoji: '💻',
     color: AppColors.green,
     category: LocationCategory.department,
-    position: LatLng(30.0258, 31.2105),
+    position: LatLng(30.0775, 31.2835),
   ),
   CampusLocation(
     id: 3,
@@ -71,7 +74,7 @@ final List<CampusLocation> campusLocations = [
     emoji: '🤖',
     color: AppColors.amber,
     category: LocationCategory.lab,
-    position: LatLng(30.0262, 31.2108),
+    position: LatLng(30.0781, 31.2845),
   ),
   CampusLocation(
     id: 4,
@@ -80,6 +83,6 @@ final List<CampusLocation> campusLocations = [
     emoji: '👨‍🏫',
     color: AppColors.red,
     category: LocationCategory.doctorOffice,
-    position: LatLng(30.0269, 31.2102),
+    position: LatLng(30.0773, 31.2832),
   ),
 ];
