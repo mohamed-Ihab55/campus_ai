@@ -62,41 +62,46 @@ class MessageBubble extends StatelessWidget {
                   fontSize: 14,
                 ),
               )
-                  : MarkdownBody(
-                data: message.content,
-                selectable: true,
+                  : Directionality(
+                textDirection: TextDirection.rtl,
+                    child: MarkdownBody(
+                                    data: message.content.replaceAll("\u200B", ''),
+                                    selectable: true,
 
-                builders: {
-                  'table': _ProTableBuilder(),
-                },
+                                    builders: {
+                    'table': _ProTableBuilder(),
+                                    },
 
-                styleSheet: MarkdownStyleSheet(
-                  p: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.color,
-                    height: 1.5,
+                                    styleSheet: MarkdownStyleSheet(
+                                      tableCellsPadding: const EdgeInsets.all(12),
+                    tableBorder: TableBorder.all(color: Colors.red),
+                    p: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color,
+                      height: 1.5,
+                    ),
+
+                    code: TextStyle(
+                      fontSize: 13,
+                      backgroundColor: Colors.grey.shade200,
+                      fontFamily: 'monospace',
+                    ),
+
+                    codeblockDecoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+
+                    listBullet: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
+                                    ),
+                                  ),
                   ),
-
-                  code: TextStyle(
-                    fontSize: 13,
-                    backgroundColor: Colors.grey.shade200,
-                    fontFamily: 'monospace',
-                  ),
-
-                  codeblockDecoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-
-                  listBullet: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
             ),
           ),
         ],
