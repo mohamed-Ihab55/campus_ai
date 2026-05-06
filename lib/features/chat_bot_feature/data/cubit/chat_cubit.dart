@@ -3,12 +3,14 @@ import 'package:campus_ai/features/chat_bot_feature/data/model/chat_model.dart';
 import 'package:campus_ai/features/chat_bot_feature/data/services/chat_service.dart';
 import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid/uuid.dart';
 
 part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
   final ChatRepository _repository;
   final ChatRemoteService _remoteService;
+  final String _sessionId = const Uuid().v4(); // session ثابت للمستخدم
 
   ChatCubit({
     ChatRepository? repository,
@@ -37,7 +39,13 @@ class ChatCubit extends Cubit<ChatState> {
       role: MessageRole.user,
     );
 
-    emit(ChatLoading([...currentMessages, userMessage]));
+    // placeholder للـ assistant وهو بيكتب
+    final streamingMessage = ChatMessage(
+      content: '',
+      role: MessageRole.assistant,
+    );
+
+    emit(ChatLoading([...currentMessages, userMessage, streamingMessage]));
 
     try {
       await _repository.saveMessage(
@@ -46,36 +54,66 @@ class ChatCubit extends Cubit<ChatState> {
         isError: false,
       );
 
-      final reply = await _remoteService.sendMessage(
+      final StringBuffer responseBuffer = StringBuffer();
+
+      await _remoteService.sendMessageStreaming(
         message: trimmedMessage,
-        conversationHistory: currentMessages,
-      );
+        sessionId: _sessionId,
+        onToken: (token) {
+          responseBuffer.write(token);
 
-      final assistantMessage = ChatMessage(
-        content: reply,
-        role: MessageRole.assistant,
-      );
+          // حدّث الـ streaming message بكل token جديد
+          final updatedMessages = List<ChatMessage>.from(
+            [...currentMessages, userMessage],
+          )..add(ChatMessage(
+            content: responseBuffer.toString(),
+            role: MessageRole.assistant,
+          ));
 
-      await _repository.saveMessage(
-        content: assistantMessage.content,
-        role: MessageRole.assistant,
-        isError: false,
-      );
+          emit(ChatStreaming(updatedMessages));
+        },
+        onDone: () async {
+          final fullReply = responseBuffer.toString().trim();
 
-      emit(ChatSuccess([
-        ...currentMessages,
-        userMessage,
-        assistantMessage,
-      ]));
+          final assistantMessage = ChatMessage(
+            content: fullReply,
+            role: MessageRole.assistant,
+          );
+
+          await _repository.saveMessage(
+            content: fullReply,
+            role: MessageRole.assistant,
+            isError: false,
+          );
+
+          emit(ChatSuccess([
+            ...currentMessages,
+            userMessage,
+            assistantMessage,
+          ]));
+        },
+        onError: (error) async {
+          final errorMessage = ChatMessage(
+            content: 'حدث خطأ، حاول مرة أخرى.',
+            role: MessageRole.assistant,
+            isError: true,
+          );
+
+          await _repository.saveMessage(
+            content: errorMessage.content,
+            role: MessageRole.assistant,
+            isError: true,
+          );
+
+          emit(ChatError(
+            [...currentMessages, userMessage, errorMessage],
+            error,
+          ));
+        },
+      );
     } catch (e) {
       final errorMessage = ChatMessage(
-        content: 'Something went wrong. Please try again.',
-        role: MessageRole.assistant,
-        isError: true,
-      );
-
-      await _repository.saveMessage(
-        content: errorMessage.content,
+        content: 'حدث خطأ، حاول مرة أخرى.',
         role: MessageRole.assistant,
         isError: true,
       );

@@ -18,7 +18,6 @@ class ChatMessage {
   }) : id = id ?? DateTime.now().millisecondsSinceEpoch.toString(),
       timestamp = timestamp ?? DateTime.now();
 
-  /// 🔹 Convert object to Firestore JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
