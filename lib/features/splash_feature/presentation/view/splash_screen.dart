@@ -111,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen>
                           width: 110,
                           height: 110,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            // color: Colors.white,
                             borderRadius: BorderRadius.circular(28),
                             boxShadow: [
                               BoxShadow(
@@ -121,11 +121,7 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.school_rounded,
-                            size: 60,
-                            color: AppColors.primary,
-                          ),
+                          child: Image.asset('assets/images/icon_splash.png',height: 40,width: 40,),
                         ),
                       ),
                     ),
