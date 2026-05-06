@@ -64,19 +64,27 @@ class _ChatBotScreenBodyState extends State<ChatBotScreenBody> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.smart_toy,
-                              size: 64,
-                              color: AppColors.primary,
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              "Start a conversation with the AI",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: AppColors.textPrimary,
+                            Image.asset('assets/images/d3bs.png',width: 160,),
+                            // const SizedBox(height: 16),
+                             RichText(
+                              text: TextSpan(
+                                text: "Start a conversation with ",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: AppColors.textSecondary,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: "D3bs",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
+                            )
                           ],
                         ),
                       )

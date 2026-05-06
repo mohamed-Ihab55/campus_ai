@@ -1,5 +1,6 @@
 import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -39,24 +40,24 @@ class BottomNavBar extends StatelessWidget {
 
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          activeIcon: Icon(Icons.home),
+          icon: FaIcon(FontAwesomeIcons.house),
+          activeIcon: FaIcon(FontAwesomeIcons.house),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.category_outlined),
-          activeIcon: Icon(Icons.category),
+          icon: FaIcon(FontAwesomeIcons.gear),
+          activeIcon: FaIcon(FontAwesomeIcons.gear),
           label: 'Services',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.map_outlined),
-          activeIcon: Icon(Icons.map),
+          icon: FaIcon(FontAwesomeIcons.earthAfrica),
+          activeIcon: FaIcon(FontAwesomeIcons.earthAfrica),
           label: 'Map',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.smart_toy_outlined),
-          activeIcon: Icon(Icons.smart_toy),
-          label: 'AI Guide',
+          icon: FaIcon(FontAwesomeIcons.openai),
+          activeIcon: FaIcon(FontAwesomeIcons.openai),
+          label: 'D3bs',
         ),
       ],
     );
