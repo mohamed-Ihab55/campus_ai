@@ -73,12 +73,11 @@ class ChatRemoteService {
 
       await for (final chunk in stream) {
         final decoded = utf8.decode(chunk);
-
-        final lines = decoded.split('\n');
-
-        for (final line in lines) {
-          if (line.trim().isEmpty || line == '\u200b') continue;
-          onToken(line);
+        // Strip only zero-width-space heartbeat characters.
+        // MUST preserve newlines (\n) — they are structural for Markdown tables.
+        final cleaned = decoded.replaceAll('\u200b', '');
+        if (cleaned.isNotEmpty) {
+          onToken(cleaned);
         }
       }
 
