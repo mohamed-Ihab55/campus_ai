@@ -3,6 +3,8 @@ import 'package:campus_ai/features/home_feature/presentation/widgets/feature_lab
 import 'package:campus_ai/features/service_feature/data/model/service_item.dart';
 import 'package:campus_ai/features/service_feature/presentation/widgets/service_card.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 class ServicesGrid extends StatelessWidget {
   final List<ServiceItem> services;
 
@@ -30,7 +32,6 @@ class ServicesGrid extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 18),
-
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: FeatureLabel(label: 'ACADEMIC SERVICES'),
@@ -66,3 +67,5 @@ class ServicesGrid extends StatelessWidget {
     );
   }
 }
+
+
