@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ContainerLoadingState extends StatelessWidget {
-  const ContainerLoadingState({super.key});
+class CampusStateLoading extends StatelessWidget {
+  const CampusStateLoading({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,8 +10,8 @@ class ContainerLoadingState extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 120,
+            height: 80,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(22),
@@ -20,12 +20,15 @@ class ContainerLoadingState extends StatelessWidget {
                 width: 1.2,
               ),
             ),
-            child: Center(
-              child: _line(width: 20, height: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _line(width: 20, height: 8),
+                const SizedBox(height: 7,),
+                _line(width: 25, height: 8),
+              ],
             ),
           ),
-          const SizedBox(height: 8,),
-          _line(width: 25, height: 10)
         ],
       ),
     );

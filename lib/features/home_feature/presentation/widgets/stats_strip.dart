@@ -3,6 +3,8 @@ import 'package:campus_ai/features/home_feature/data/cubits/stats_cubit/stats_cu
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/helper/campus_state_loading.dart';
+
 class StatsStrip extends StatelessWidget {
   const StatsStrip({super.key});
 
@@ -20,7 +22,20 @@ class StatsStrip extends StatelessWidget {
       child: BlocBuilder<StatsCubit, StatsState>(
         builder: (context, state) {
           if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return SizedBox(
+              height: 110,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 4,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemBuilder: (context, i) {
+                  return const Padding(
+                    padding: EdgeInsets.only(right: 12),
+                    child: CampusStateLoading(),
+                  );
+                },
+              ),
+            );
           }
 
           return Padding(
