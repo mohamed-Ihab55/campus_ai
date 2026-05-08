@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -9,24 +10,30 @@ class ChatRemoteService {
   ChatRemoteService()
       : _dio = Dio(
     BaseOptions(
-        baseUrl: dotenv.env['CHAT_BOT_API_KEY'] ?? '',
+      baseUrl: dotenv.env['CHAT_BOT_API_KEY'] ?? '',
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 60),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+      },
     ),
   );
 
   Future<String> sendMessage({
     required String message,
     required String sessionId,
+    required String userId,
   }) async {
     final buffer = StringBuffer();
+
     final completer = Completer<void>();
+
     String? errorMsg;
 
     await sendMessageStreaming(
       message: message,
       sessionId: sessionId,
+      userId: userId,
       onToken: (token) => buffer.write(token),
       onDone: () => completer.complete(),
       onError: (e) {
@@ -37,10 +44,15 @@ class ChatRemoteService {
 
     await completer.future;
 
-    if (errorMsg != null) throw Exception(errorMsg);
+    if (errorMsg != null) {
+      throw Exception(errorMsg);
+    }
 
     final reply = buffer.toString().trim();
-    if (reply.isEmpty) throw Exception('Empty response from API');
+
+    if (reply.isEmpty) {
+      throw Exception('Empty response from API');
+    }
 
     return reply;
   }
@@ -48,9 +60,11 @@ class ChatRemoteService {
   Future<void> sendMessageStreaming({
     required String message,
     required String sessionId,
+    required String userId,
     required void Function(String token) onToken,
     required void Function() onDone,
     required void Function(String error) onError,
+    void Function(String messageId)? onMessageId,
   }) async {
     try {
       final response = await _dio.post(
@@ -58,8 +72,11 @@ class ChatRemoteService {
         data: {
           'question': message,
           'session_id': sessionId,
+          'user_id': userId,
         },
-        options: Options(responseType: ResponseType.stream),
+        options: Options(
+          responseType: ResponseType.stream,
+        ),
       );
 
       final responseBody = response.data;
@@ -73,10 +90,36 @@ class ChatRemoteService {
 
       await for (final chunk in stream) {
         final decoded = utf8.decode(chunk);
-        // Strip only zero-width-space heartbeat characters.
-        // MUST preserve newlines (\n) — they are structural for Markdown tables.
+
         final cleaned = decoded.replaceAll('\u200b', '');
-        if (cleaned.isNotEmpty) {
+
+        if (cleaned.isEmpty) continue;
+
+        /// لو الـ API بيرجع JSON
+        /// مثال:
+        /// {
+        ///   "message_id":"123",
+        ///   "token":"hello"
+        /// }
+
+        try {
+          final data = jsonDecode(cleaned);
+
+          if (data is Map<String, dynamic>) {
+            if (data['message_id'] != null) {
+              onMessageId?.call(
+                data['message_id'].toString(),
+              );
+            }
+
+            if (data['token'] != null) {
+              onToken(
+                data['token'].toString(),
+              );
+            }
+          }
+        } catch (_) {
+          /// fallback لو الرد text مباشر
           onToken(cleaned);
         }
       }
@@ -87,14 +130,19 @@ class ChatRemoteService {
         case DioExceptionType.connectionTimeout:
           onError('Connection timeout');
           break;
+
         case DioExceptionType.receiveTimeout:
           onError('Response timeout');
           break;
+
         case DioExceptionType.connectionError:
           onError('No internet connection');
           break;
+
         default:
-          onError('Request failed: ${e.message}');
+          onError(
+            'Request failed: ${e.message}',
+          );
       }
     } catch (e) {
       onError('Unexpected error: $e');
