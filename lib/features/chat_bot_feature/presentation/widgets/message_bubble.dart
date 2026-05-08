@@ -58,7 +58,7 @@ class MessageBubble extends StatelessWidget {
                   ? Text(
                 message.content,
                 style: const TextStyle(
-                  color: AppColors.textPrimary,
+                  color: AppColors.surface,
                   fontSize: 14,
                 ),
               )
