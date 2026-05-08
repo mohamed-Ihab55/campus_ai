@@ -1,3 +1,4 @@
+import 'package:campus_ai/core/helper/container_loading_state.dart';
 import 'package:campus_ai/features/home_feature/data/cubits/quick_access_cubit/quick_cubit.dart';
 import 'package:campus_ai/features/home_feature/data/cubits/quick_access_cubit/quick_state.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,20 @@ class QuickAccessRow extends StatelessWidget {
     return BlocBuilder<QuickCubit, QuickState>(
       builder: (context, state) {
         if (state is QuickLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return SizedBox(
+            height: 110,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 9,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemBuilder: (context, i) {
+                return const Padding(
+                  padding: EdgeInsets.only(right: 12),
+                  child: ContainerLoadingState(),
+                );
+              },
+            ),
+          );
         }
 
         if (state is QuickError) {

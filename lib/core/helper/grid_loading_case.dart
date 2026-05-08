@@ -6,8 +6,7 @@ class GridLoadingCase extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnimatedOpacity(
+    return AnimatedOpacity(
         opacity: 0.7, duration: const Duration(milliseconds: 900),
         child: Container(
           width: 240,
@@ -79,7 +78,6 @@ class GridLoadingCase extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 
