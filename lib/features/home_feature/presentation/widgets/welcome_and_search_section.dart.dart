@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:campus_ai/features/home_feature/presentation/widgets/custom_home_app_bar.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/decoration_backgroung_stack_home_screen.dart';
-import 'package:campus_ai/features/home_feature/presentation/widgets/search_text_field.dart';
+import 'package:campus_ai/core/helper/search_text_field.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/welcome_section_home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';

@@ -2,7 +2,7 @@ import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:campus_ai/features/doctors_feature/data/cubit/doctor_cubit.dart';
 import 'package:campus_ai/features/doctors_feature/data/cubit/doctor_state.dart';
 import 'package:campus_ai/features/doctors_feature/presentation/widgets/doctor_card.dart';
-import 'package:campus_ai/features/home_feature/presentation/widgets/search_text_field.dart';
+import 'package:campus_ai/core/helper/search_text_field.dart';
 import 'package:campus_ai/features/service_feature/presentation/widgets/services_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -11,7 +11,6 @@ import 'map_state.dart';
 class MapCubit extends Cubit<MapState> {
   MapCubit() : super(MapState(locations: campusLocations));
 
-  /// ================= SELECTION =================
   void selectLocation(CampusLocation location) {
     if (state.selected?.id == location.id) return;
 
@@ -27,7 +26,6 @@ class MapCubit extends Cubit<MapState> {
     emit(state.copyWith(clearSelected: true));
   }
 
-  /// ================= FILTER =================
   void setFilter(LocationCategory? category) {
     if (state.filter == category) return;
 
@@ -37,7 +35,6 @@ class MapCubit extends Cubit<MapState> {
     ));
   }
 
-  /// ================= SEARCH (OPTIMIZED) =================
   Timer? _debounce;
 
   void search(String text) {
@@ -49,7 +46,6 @@ class MapCubit extends Cubit<MapState> {
     });
   }
 
-  /// ================= LOCATION =================
   Future<void> locateUser() async {
     try {
       final hasService = await Geolocator.isLocationServiceEnabled();
@@ -70,7 +66,6 @@ class MapCubit extends Cubit<MapState> {
         position.longitude,
       );
 
-      /// تجنب emit لو نفس المكان
       if (state.userLocation == newLocation) return;
 
       emit(state.copyWith(
@@ -82,7 +77,6 @@ class MapCubit extends Cubit<MapState> {
     }
   }
 
-  /// ================= PERMISSION HANDLING =================
   Future<bool> _handlePermission() async {
     LocationPermission permission =
     await Geolocator.checkPermission();
@@ -106,7 +100,6 @@ class MapCubit extends Cubit<MapState> {
     return true;
   }
 
-  /// ================= SETTINGS =================
   LocationSettings get _settings {
     if (Platform.isAndroid) {
       return  AndroidSettings(
@@ -127,7 +120,6 @@ class MapCubit extends Cubit<MapState> {
     );
   }
 
-  /// ================= ERROR HANDLER =================
   void _emitError(String message) {
     if (state.error == message) return;
 

@@ -12,6 +12,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../../core/helper/search_text_field.dart';
+import 'horizonatal_filter.dart';
+
 class MapScreenBody extends StatefulWidget {
   const MapScreenBody({super.key});
 
@@ -32,10 +35,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
     searchController = TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      mapController.move(
-        const LatLng(30.0777111, 31.283907),
-        18,
-      );
+      mapController.move(const LatLng(30.0777111, 31.283907), 18);
     });
   }
 
@@ -66,7 +66,6 @@ class _MapScreenBodyState extends State<MapScreenBody> {
         },
         child: Stack(
           children: [
-            /// ================= MAP =================
             FlutterMap(
               mapController: mapController,
               options: MapOptions(
@@ -77,11 +76,10 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               children: [
                 TileLayer(
                   urlTemplate:
-                  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
                   subdomains: const ['a', 'b', 'c', 'd'],
                 ),
 
-                /// USER LOCATION
                 BlocSelector<MapCubit, MapState, LatLng?>(
                   selector: (state) => state.userLocation,
                   builder: (_, userLocation) {
@@ -95,7 +93,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                           height: 40,
                           child: const Icon(
                             Icons.person_pin_circle,
-                            color: Colors.blue,
+                            color: AppColors.primary,
                             size: 40,
                           ),
                         ),
@@ -107,7 +105,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                 /// MARKERS
                 BlocBuilder<MapCubit, MapState>(
                   buildWhen: (prev, curr) =>
-                  prev.filtered != curr.filtered ||
+                      prev.filtered != curr.filtered ||
                       prev.selected != curr.selected,
                   builder: (context, state) {
                     return MarkerLayer(
@@ -121,8 +119,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                           child: GestureDetector(
                             onTap: () => cubit.selectLocation(loc),
                             child: AnimatedContainer(
-                              duration:
-                              const Duration(milliseconds: 150),
+                              duration: const Duration(milliseconds: 150),
                               decoration: BoxDecoration(
                                 color: loc.color,
                                 shape: BoxShape.circle,
@@ -149,7 +146,6 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               ],
             ),
 
-            /// ================= TOP UI =================
             Positioned(
               top: MediaQuery.of(context).padding.top + 10,
               left: 16,
@@ -163,7 +159,6 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               ),
             ),
 
-            /// ================= DETAILS =================
             BlocBuilder<MapCubit, MapState>(
               buildWhen: (prev, curr) => prev.selected != curr.selected,
               builder: (context, state) {
@@ -178,11 +173,11 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               },
             ),
 
-            /// ================= GPS BUTTON =================
             Positioned(
               right: 16,
               bottom: 30,
               child: FloatingActionButton(
+                backgroundColor: AppColors.primary,
                 onPressed: () async {
                   await cubit.locateUser();
                   final user = cubit.state.userLocation;
@@ -191,7 +186,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                     mapController.move(user, 17);
                   }
                 },
-                child: const Icon(Icons.gps_fixed),
+                child: const Icon(Icons.gps_fixed, color: Colors.white),
               ),
             ),
           ],
@@ -200,22 +195,19 @@ class _MapScreenBodyState extends State<MapScreenBody> {
     );
   }
 
-  /// ================= SEARCH =================
   Widget _searchBar() {
-    return TextField(
-      controller: searchController,
+    return SearchTextField(
+      fillColor: Colors.transparent,
+      hintText: 'Search',
       onChanged: _onSearchChanged,
-      decoration: InputDecoration(
-        hintText: 'Search...',
-        prefixIcon: const Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
+      controller: searchController,
+      iconAndTextColor: AppColors.textPrimary,
+      border: OutlineInputBorder(
+        borderSide: BorderSide(color: AppColors.border),
       ),
     );
   }
 
-  /// ================= FILTERS =================
   Widget _filters() {
     return BlocBuilder<MapCubit, MapState>(
       buildWhen: (prev, curr) => prev.filter != curr.filter,
@@ -231,12 +223,41 @@ class _MapScreenBodyState extends State<MapScreenBody> {
 
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
-                child: FilterChip(
-                  selected: selected,
-                  label: Text(category.label),
-                  onSelected: (_) {
+                child: HorizontalFilter(
+                  scale: selected ? 1.03 : 1,
+                  text: category.label,
+                  gradient: selected
+                      ? LinearGradient(
+                          colors: [
+                            AppColors.primary,
+                            AppColors.primary.withOpacity(0.75),
+                          ],
+                        )
+                      : null,
+                  color: selected
+                      ? null
+                      : Theme.of(context).colorScheme.surface,
+                  border: Border.all(
+                    color: selected
+                        ? Colors.transparent
+                        : AppColors.primary.withValues(alpha: 0.25),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    if (selected)
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.28),
+                        blurRadius: 14,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 5),
+                      ),
+                  ],
+                  onTap: () {
                     cubit.setFilter(selected ? null : category);
                   },
+                  animatedColor: selected ? Colors.white : AppColors.primary,
+                  textColor:selected ? Colors.white : AppColors.textSecondary,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
               );
             }).toList(),
@@ -246,12 +267,10 @@ class _MapScreenBodyState extends State<MapScreenBody> {
     );
   }
 
-  /// ================= DETAILS =================
   Widget _detailsCard(CampusLocation location) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      color: AppColors.bgColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -268,9 +287,9 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                 children: [
                   Text(
                     location.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold,color: AppColors.textPrimary),
                   ),
-                  Text('Floor: ${location.floor}'),
+                  Text('Floor: ${location.floor}',style: TextStyle(color: AppColors.textSecondary),),
                 ],
               ),
             ),
@@ -278,7 +297,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               onPressed: () {
                 context.read<MapCubit>().clearSelection();
               },
-              icon: const Icon(Icons.close),
+              icon: const Icon(Icons.close,color: AppColors.textSecondary,),
             ),
           ],
         ),
@@ -286,3 +305,4 @@ class _MapScreenBodyState extends State<MapScreenBody> {
     );
   }
 }
+

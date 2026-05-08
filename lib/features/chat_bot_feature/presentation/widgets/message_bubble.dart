@@ -58,7 +58,7 @@ class MessageBubble extends StatelessWidget {
                   ? Text(
                 message.content,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                   fontSize: 14,
                 ),
               )
@@ -74,7 +74,7 @@ class MessageBubble extends StatelessWidget {
 
                                     styleSheet: MarkdownStyleSheet(
                                       tableCellsPadding: const EdgeInsets.all(12),
-                    tableBorder: TableBorder.all(color: Colors.red),
+                    tableBorder: TableBorder.all(color: AppColors.textTertiary),
                     p: TextStyle(
                       fontSize: 14,
                       color: Theme.of(context)
@@ -110,9 +110,6 @@ class MessageBubble extends StatelessWidget {
   }
 }
 
-/// ===============================
-/// 🚀 PROFESSIONAL TABLE BUILDER
-/// ===============================
 class _ProTableBuilder extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
@@ -125,8 +122,6 @@ class _ProTableBuilder extends MarkdownElementBuilder {
         [];
 
     if (rows.isEmpty) return const SizedBox();
-
-    // أول صف = Header
     final headerCells = rows.first.children
         ?.whereType<md.Element>()
         .where((e) => e.tag == 'th' || e.tag == 'td')
@@ -140,10 +135,10 @@ class _ProTableBuilder extends MarkdownElementBuilder {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: AppColors.textTertiary),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -155,7 +150,6 @@ class _ProTableBuilder extends MarkdownElementBuilder {
           scrollDirection: Axis.horizontal,
           child: Column(
             children: [
-              // ================= HEADER =================
               Container(
                 color: Colors.blueGrey.shade50,
                 child: Row(
@@ -168,7 +162,6 @@ class _ProTableBuilder extends MarkdownElementBuilder {
                 ),
               ),
 
-              // ================= BODY =================
               ...bodyRows.asMap().entries.map((entry) {
                 final index = entry.key;
                 final row = entry.value;
@@ -205,15 +198,15 @@ class _ProTableBuilder extends MarkdownElementBuilder {
     required bool isHeader,
   }) {
     return Container(
-      width: 160, // 👈 fixed column width = real table feel
+      width: 160,
       padding: const EdgeInsets.symmetric(
         horizontal: 14,
         vertical: 12,
       ),
       decoration: BoxDecoration(
         border: Border(
-          right: BorderSide(color: Colors.grey.shade300, width: 0.8),
-          bottom: BorderSide(color: Colors.grey.shade300, width: 0.8),
+          right: BorderSide(color: AppColors.textTertiary, width: 0.8),
+          bottom: BorderSide(color: AppColors.textTertiary, width: 0.8),
         ),
       ),
       child: Text(
@@ -222,7 +215,7 @@ class _ProTableBuilder extends MarkdownElementBuilder {
         style: TextStyle(
           fontSize: 13.5,
           fontWeight: isHeader ? FontWeight.bold : FontWeight.w500,
-          color: isHeader ? Colors.black87 : Colors.black87,
+          color: isHeader ? AppColors.textPrimary : AppColors.textPrimary,
         ),
       ),
     );

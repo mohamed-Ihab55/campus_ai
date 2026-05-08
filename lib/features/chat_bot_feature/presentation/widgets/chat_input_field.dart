@@ -25,7 +25,7 @@ class ChatInputField extends StatelessWidget {
             textInputAction: TextInputAction.send,
             onSubmitted: (_) => onSend(),
             decoration: InputDecoration(
-              hintText: 'Type your message...',
+              hintText: 'Write your message...',
               hintStyle: TextStyle(color: AppColors.textTertiary),
               border: OutlineInputBorder(
                 borderSide: BorderSide(color: AppColors.bgColor),

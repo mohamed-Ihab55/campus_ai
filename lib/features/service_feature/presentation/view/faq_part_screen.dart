@@ -1,6 +1,6 @@
 import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:campus_ai/features/home_feature/presentation/widgets/feature_label.dart';
-import 'package:campus_ai/features/home_feature/presentation/widgets/search_text_field.dart';
+import 'package:campus_ai/core/helper/search_text_field.dart';
 import 'package:campus_ai/features/service_feature/data/model/faq_item.dart';
 import 'package:campus_ai/features/service_feature/presentation/widgets/faq_card.dart';
 import 'package:flutter/material.dart';
