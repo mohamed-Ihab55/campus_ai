@@ -51,13 +51,7 @@ class _ChatBotScreenBodyState extends State<ChatBotScreenBody> {
           backgroundColor: AppColors.bgColor,
           body: Column(
             children: [
-              ServicesHeader(
-                height: 270,
-                titleName: 'Campus',
-                subTitle: 'AI',
-                description:
-                    'The AI agent help you in everything you need to know about the collage',
-              ),
+              SizedBox(height: 50,),
               Expanded(
                 child: messages.isEmpty
                     ? Center(
