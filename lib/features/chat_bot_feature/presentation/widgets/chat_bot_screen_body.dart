@@ -3,7 +3,6 @@ import 'package:campus_ai/features/chat_bot_feature/data/cubit/chat_cubit.dart';
 import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_error_banner.dart';
 import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_input_field.dart';
 import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_messages_list.dart';
-import 'package:campus_ai/features/service_feature/presentation/widgets/services_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

@@ -1,10 +1,11 @@
 import 'package:campus_ai/features/authentication_feature/presentation/view/login_screen.dart';
 import 'package:campus_ai/features/authentication_feature/presentation/view/register_screen.dart';
+import 'package:campus_ai/features/dashboard_screen/presentation/view/dashboard_screen.dart';
+import 'package:campus_ai/features/dashboard_screen/presentation/widgets/doctors_dash_board_screen.dart';
 import 'package:flutter/material.dart';
 import '../../app.dart';
 import '../../features/academic_warning_feature/presentation/view/academic_warning_screen.dart';
 import '../../features/course_registration_feature/presentation/view/course_registration_screen.dart';
-import '../../features/dashboard_screen/presentation/view/dashboard_screen.dart';
 import '../../features/dashboard_screen/presentation/widgets/add_service.dart';
 import '../../features/departments_feature/presentation/view/departments_screen.dart';
 import '../../features/doctors_feature/presentation/view/doctors_screen.dart';
@@ -30,8 +31,8 @@ class AppRoutes {
     '/elearn': (context) => const ElearningScreen(),
     '/department': (context) => const DepartmentsScreen(),
     '/labs': (context) => const LabsScreen(),
+    '/doctors_dashboard': (context) => const DoctorsDashboardScreen(),
     '/dashboard': (context) => const DashboardScreen(),
-    // '/edit-avatar-colors': (context) => const EditAvatarColorScreen(),
     '/add_services': (context) => const AddServiceScreen(),
     '/transcript': (context) => const TranscriptScreen(),
     '/warning': (context) => const AcademicWarningScreen(),

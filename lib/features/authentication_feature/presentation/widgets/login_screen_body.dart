@@ -266,6 +266,7 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                   ),
                                 ),
                               ),
+                              TextButton(onPressed: (){Navigator.pushNamed(context, '/dashboard');}, child: Text('dashboard'))
                             ],
                           ),
                         ),
