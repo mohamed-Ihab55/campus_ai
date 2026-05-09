@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:campus_ai/features/service_feature/data/model/gpa_course_model.dart';
 import 'package:campus_ai/features/service_feature/logic/gpa_calculator.dart';
-import 'package:meta/meta.dart';
 
 part 'gpa_state.dart';
 

@@ -115,7 +115,7 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                           border: Border.all(color: AppColors.border),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.08),
+                              color: AppColors.primary.withValues(alpha: 0.08),
                               blurRadius: 30,
                               offset: const Offset(0, 12),
                             ),

@@ -68,7 +68,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               options: MapOptions(
                 initialCenter: campusCenter,
                 initialZoom: 17,
-                onTap: (_, __) => cubit.clearSelection(),
+                onTap: (_, _) => cubit.clearSelection(),
               ),
               children: [
                 TileLayer(
@@ -227,7 +227,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                       ? LinearGradient(
                           colors: [
                             AppColors.primary,
-                            AppColors.primary.withOpacity(0.75),
+                            AppColors.primary.withValues(alpha: 0.75),
                           ],
                         )
                       : null,

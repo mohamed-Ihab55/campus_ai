@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HorizontalFilter extends StatelessWidget {
@@ -40,7 +39,7 @@ class HorizontalFilter extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          splashColor: Colors.white.withOpacity(0.08),
+          splashColor: Colors.white.withValues(alpha: 0.08),
           highlightColor: Colors.transparent,
           onTap: onTap,
           child: AnimatedScale(

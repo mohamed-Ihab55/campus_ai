@@ -74,7 +74,7 @@ class _AdminDashboardState extends State<AdminDashboard>
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 25,
               spreadRadius: 2,
               offset: const Offset(0, 10),
@@ -109,7 +109,7 @@ class _AdminDashboardState extends State<AdminDashboard>
                           ? LinearGradient(
                         colors: [
                           AppColors.primary,
-                          AppColors.primary.withOpacity(0.7),
+                          AppColors.primary.withValues(alpha: 0.7),
                         ],
                       )
                           : null,

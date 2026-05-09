@@ -16,7 +16,6 @@ class _EditAvatarColorScreenState extends State<EditAvatarColorScreen> {
   String? selectedDepartment;
   bool isLoading = false;
 
-  // ✅ استخدم Color بدل int
   final Map<String, Color> departmentColors = {
     "CS": const Color(0xFF2196F3),
     "Mathematics": const Color(0xff000B58),
@@ -57,7 +56,7 @@ class _EditAvatarColorScreenState extends State<EditAvatarColorScreen> {
 
   Widget buildDepartmentDropdown() {
     return DropdownButtonFormField<String>(
-      initialValue: selectedDepartment, // ✅ بدل initialValue
+      initialValue: selectedDepartment,
       decoration: InputDecoration(
         labelText: "Choose Department",
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),

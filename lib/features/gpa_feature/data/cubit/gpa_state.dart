@@ -1,6 +1,5 @@
 part of 'gpa_cubit.dart';
 
-@immutable
 sealed class GpaCubitState {}
 
 class GpaState {

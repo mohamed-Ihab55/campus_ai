@@ -1,7 +1,4 @@
-import 'package:campus_ai/core/helper/custom_text_form_field.dart';
-import 'package:campus_ai/core/utils/custom_button.dart';
 import 'package:campus_ai/features/dashboard_screen/data/doctors_cubit/doctors_dashboard_cubit.dart';
-import 'package:campus_ai/features/dashboard_screen/data/models/doctors_dashboard_model.dart';
 import 'package:campus_ai/features/dashboard_screen/data/repos/doctor_dashboard_repos.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';

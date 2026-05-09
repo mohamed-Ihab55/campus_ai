@@ -68,7 +68,7 @@ class _DoctorListCardState extends State<DoctorListCard>
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.06),
+                    color: AppColors.primary.withValues(alpha: 0.06),
                     blurRadius: 12,
                     offset: const Offset(0, 3),
                   ),
