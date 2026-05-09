@@ -215,7 +215,7 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                 textColor: AppColors.surface,
                                 onTap: state is AuthLoading
                                     ? null
-                                    : () {
+                                    : () async {
                                   setState(() {
                                     _autoValidate = true;
                                   });
@@ -224,19 +224,31 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
 
                                   if (!isValid) return;
 
-                                  context.read<AuthCubit>().login(
-                                    email: emailController.text,
-                                    password: passwordController.text,
+                                  final email = emailController.text.trim();
+                                  final password = passwordController.text.trim();
+
+                                  await context.read<AuthCubit>().login(
+                                    email: email,
+                                    password: password,
                                   );
 
-                                  Navigator.pushNamedAndRemoveUntil(
-                                    context,
-                                    '/main_screen',
-                                        (route) => false,
-                                  );
+                                  if (!context.mounted) return;
+
+                                  if (email == 'admin@gmail.com' && password == 'admin123') {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      '/dashboard',
+                                          (route) => false,
+                                    );
+                                  } else {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      '/main_screen',
+                                          (route) => false,
+                                    );
+                                  }
                                 },
                               ),
-
                               const SizedBox(height: 10),
 
                               SocialButton(
@@ -266,7 +278,7 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                   ),
                                 ),
                               ),
-                              TextButton(onPressed: (){Navigator.pushNamed(context, '/dashboard');}, child: Text('dashboard'))
+                              // TextButton(onPressed: (){Navigator.pushNamed(context, '/dashboard');}, child: Text('dashboard'))
                             ],
                           ),
                         ),
