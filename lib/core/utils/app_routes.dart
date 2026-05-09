@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../app.dart';
 import '../../features/academic_warning_feature/presentation/view/academic_warning_screen.dart';
 import '../../features/course_registration_feature/presentation/view/course_registration_screen.dart';
-import '../../features/dashboard_screen/presentation/widgets/add_service.dart';
+import '../../features/dashboard_screen/presentation/widgets/services_dashboard_screen.dart';
 import '../../features/departments_feature/presentation/view/departments_screen.dart';
 import '../../features/doctors_feature/presentation/view/doctors_screen.dart';
 import '../../features/elearn_web_view_feature/presentation/view/elearning_screen.dart';
@@ -33,7 +33,7 @@ class AppRoutes {
     '/labs': (context) => const LabsScreen(),
     '/doctors_dashboard': (context) => const DoctorsDashboardScreen(),
     '/dashboard': (context) => const DashboardScreen(),
-    '/add_services': (context) => const AddServiceScreen(),
+    '/services_dashboard': (context) => const ServicesDashboardScreen(),
     '/transcript': (context) => const TranscriptScreen(),
     '/warning': (context) => const AcademicWarningScreen(),
     '/course_register': (context) => const CourseRegistrationScreen(),

@@ -1,4 +1,4 @@
-import 'package:campus_ai/features/dashboard_screen/data/doctors_cubit/doctors_dashboard_cubit.dart';
+import 'package:campus_ai/features/dashboard_screen/data/cubits/doctors_cubit/doctors_dashboard_cubit.dart';
 import 'package:campus_ai/features/dashboard_screen/data/repos/doctor_dashboard_repos.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +20,6 @@ class DoctorsDashboardScreen extends StatelessWidget {
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
-          backgroundColor: const Color(0xffF5F7FB),
           body: Column(
             children: [
               Container(

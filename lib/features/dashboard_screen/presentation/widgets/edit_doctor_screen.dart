@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/doctors_dashboard_model.dart';
-import '../../data/doctors_cubit/doctors_dashboard_cubit.dart';
+import '../../data/cubits/doctors_cubit/doctors_dashboard_cubit.dart';
 
 class EditDoctorScreen extends StatefulWidget {
   final DoctorsDashboardModel doctor;

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 
-import '../models/doctors_dashboard_model.dart';
-import '../repos/doctor_dashboard_repos.dart';
+import '../../models/doctors_dashboard_model.dart';
+import '../../repos/doctor_dashboard_repos.dart';
 
 part 'doctors_dashboard_state.dart';
 

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/helper/custom_text_form_field.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/custom_button.dart';
-import '../../data/doctors_cubit/doctors_dashboard_cubit.dart';
+import '../../data/cubits/doctors_cubit/doctors_dashboard_cubit.dart';
 import '../../data/models/doctors_dashboard_model.dart';
 
 class AddDoctorForm extends StatefulWidget {
@@ -47,6 +47,7 @@ class _AddDoctorFormState extends State<AddDoctorForm> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: DropdownButtonFormField<String>(
+        style: TextStyle(color: AppColors.textSecondary,fontSize: 15),
         dropdownColor: AppColors.surface,
         initialValue: selectedDepartment,
         validator: (value) {
@@ -89,6 +90,7 @@ class _AddDoctorFormState extends State<AddDoctorForm> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: DropdownButtonFormField<int>(
+        style: TextStyle(color: AppColors.textSecondary,fontSize: 15),
         dropdownColor: AppColors.surface,
         initialValue: selectedColor,
         validator: (value) {
@@ -194,29 +196,60 @@ class _AddDoctorFormState extends State<AddDoctorForm> {
         padding: const EdgeInsets.all(18),
         children: [
           CustomTextFormField(
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Doctor name is required';
+              }
+              return null;
+            },
             hintText: 'Doctor Name',
             labelText: 'Doctor Name',
             controller: nameController,
           ),
-          const SizedBox(height: 15,),
+
+          const SizedBox(height: 15),
+
           CustomTextFormField(
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Doctor title is required';
+              }
+              return null;
+            },
             hintText: 'Professor',
             labelText: 'Doctor Title',
             controller: titleController,
           ),
-          const SizedBox(height: 15,),
+
+          const SizedBox(height: 15),
+
           CustomTextFormField(
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Room is required';
+              }
+              return null;
+            },
             hintText: 'Doctor Room',
             labelText: 'Room',
             controller: roomController,
           ),
-          const SizedBox(height: 15,),
+
+          const SizedBox(height: 15),
+
           CustomTextFormField(
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Doctor initials are required';
+              }
+              return null;
+            },
             hintText: 'Shortcut doctor name',
             labelText: 'Doctor Initials',
             controller: initialsController,
           ),
-          const SizedBox(height: 15,),
+
+          const SizedBox(height: 15),
 
           departmentDropdown(),
 
@@ -227,7 +260,13 @@ class _AddDoctorFormState extends State<AddDoctorForm> {
           CustomButton(
             text: 'Add Doctor',
             backgroundColor: AppColors.primary,
-            onTap: isLoading ? null : addDoctor,
+            onTap: isLoading
+                ? null
+                : () {
+              if (_formKey.currentState!.validate()) {
+                addDoctor();
+              }
+            },
           ),
         ],
       ),

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/helper/search_text_field.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/doctors_cubit/doctors_dashboard_cubit.dart';
+import '../../data/cubits/doctors_cubit/doctors_dashboard_cubit.dart';
 import 'doctors_dashboard_card.dart';
 
 class DoctorsDashboardList extends StatelessWidget {
