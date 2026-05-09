@@ -1,0 +1,463 @@
+═══════════════════════════════════════════════════
+RAG SYSTEM TEST REPORT — دليل الطالب كلية العلوم
+Date: 2026-05-09 17:08:16
+═══════════════════════════════════════════════════
+
+SUMMARY
+───────
+Total test cases:      174
+PASS:                  134  (77.0%)
+  (includes cases where only univ-req rows ETHR/SCTH/ENCU/GHDS/SKIL were absent)
+PARTIAL:               5
+WRONG_PROGRAM:         31
+NO_CODES_IN_RESPONSE:  0
+EXTRA_COURSES:         4
+TIMEOUT:               0
+Avg response time:     17.8s
+Slow but passing (>90s): 1
+
+═══════════════════════════════════════════════════
+FAILURES — SORTED BY SEVERITY
+═══════════════════════════════════════════════════
+
+[WRONG_PROGRAM — 31 cases]
+────────────────────────────────
+  ❌ برنامج الإحصاء الرياضي وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['COMP 104', 'COMP 202', 'COMP 204', 'COMP 206', 'COMP 208', 'COMP 212', 'STAT 102', 'STAT 202', 'STAT 204', 'STAT 206', 'STAT 208']
+     Got:      ['MATH 101', 'MATH 202', 'MATH 204', 'OR 102', 'STAT 101', 'STAT 102', 'STAT 202', 'STAT 204', 'STAT 206', 'STAT 222', 'STAT 224']
+     Missing:  ['COMP 104', 'COMP 202', 'COMP 204', 'COMP 206', 'COMP 208', 'COMP 212', 'STAT 208']
+     Extra:    ['MATH 101', 'MATH 202', 'MATH 204', 'OR 102', 'STAT 101', 'STAT 222', 'STAT 224']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'بحوث العمليات', 'الرياضيات', 'الإحصاء الرياضي'}
+     Time:     15.48s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (6 ساعات) | STAT 202 | نظرية الإحصاء (2) | 3 | STAT 102 || إجباري | STAT 204 | طرق احتمالية في
+
+  ❌ برنامج الفيزياء والكيمياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 3 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['CHEM 360', 'CHEM 362', 'CHEM 370', 'CHEM 380', 'CHEM 390', 'ETHR 302', 'PHYS 201', 'PHYS 203', 'PHYS 205', 'PHYS 358', 'PHYS 360', 'PHYS 362', 'PHYS 364', 'PHYS 380', 'STAT 232']
+     Got:      ['CHEM 360', 'CHEM 362', 'CHEM 370', 'CHEM 380', 'CHEM 390', 'ETHR 302', 'PHYS 201', 'PHYS 205', 'PHYS 206', 'PHYS 212', 'PHYS 358', 'PHYS 360', 'PHYS 362', 'PHYS 364', 'PHYS 380', 'STAT 232']
+     Missing:  ['PHYS 203']
+     Extra:    ['PHYS 206', 'PHYS 212']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الفيزياء'}
+     Time:     22.97s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ETHR 302 | أخلاقيات البحث العلمي | 1 | - || إجباري تخصص أول (10 ساعات) | PHYS 360 | م
+
+  ❌ برنامج الفيزياء وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['COMP 104', 'COMP 202', 'COMP 204', 'COMP 206', 'COMP 208', 'COMP 212', 'MATH 101', 'MATH 102', 'MATH 202', 'OR 102', 'PHYS 101', 'PHYS 102', 'PHYS 204', 'PHYS 210', 'PHYS 216', 'STAT 232']
+     Got:      ['COMP 104', 'COMP 202', 'COMP 204', 'COMP 206', 'COMP 208', 'COMP 212', 'MATH 101', 'MATH 102', 'MATH 202', 'OR 102', 'PHYS 102', 'PHYS 204', 'PHYS 216', 'STAT 218', 'STAT 232']
+     Missing:  ['PHYS 101', 'PHYS 210']
+     Extra:    ['STAT 218']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الإحصاء الرياضي'}
+     Time:     18.6s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري تخصص أول (6 ساعات) | PHYS 204 | بصريات فيزيائية | 2 | PHYS 102 || إجباري تخصص أول | PHYS 216 |
+
+  ❌ برنامج الفيزياء وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 4 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['COMP 201', 'COMP 212', 'COMP 401', 'COMP 403', 'COMP 407', 'COMP 411', 'COMP 413', 'ENCU 401', 'GHDS 401', 'PHYS 315', 'PHYS 362', 'PHYS 364', 'PHYS 371', 'PHYS 449', 'PHYS 461', 'PHYS 465', 'PHYS 469', 'PHYS 471', 'SKIL 401']
+     Got:      ['COMP 201', 'COMP 205', 'COMP 303', 'COMP 304', 'COMP 401', 'COMP 403', 'COMP 407', 'COMP 411', 'COMP 413', 'COMP 415', 'ENCU 401', 'GHDS 401', 'PHYS 315', 'PHYS 362', 'PHYS 364', 'PHYS 371', 'PHYS 449', 'PHYS 461', 'PHYS 465', 'PHYS 469', 'PHYS 471', 'SKIL 401']
+     Missing:  ['COMP 212']
+     Extra:    ['COMP 205', 'COMP 303', 'COMP 304', 'COMP 415']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'علوم الحاسب'}
+     Time:     25.03s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة (يختار ساعة واحدة) | SKIL 401 | مهارات العمل | 1 | - || متطلب الجامعة | ENCU 401 | ثقاف
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['BIOP 213', 'BOTA 101', 'BOTA 102', 'BOTA 201', 'BOTA 213', 'BOTA 215', 'BOTA 217', 'CHEM 261', 'CHEM 271', 'CHEM 281', 'ENGL 102', 'ENGL 201', 'GEOL 255', 'MICR 102', 'MICR 201', 'PHYS 101']
+     Got:      ['BIOP 213', 'BOTA 101', 'BOTA 102', 'BOTA 201', 'BOTA 203', 'BOTA 205', 'BOTA 207', 'BOTA 209', 'BOTA 211', 'CHEM 101', 'CHEM 255', 'ENGL 102', 'ENGL 201', 'ENTM 102', 'ENTM 211', 'GEOL 255', 'PHYS 101', 'STAT 209']
+     Missing:  ['BOTA 213', 'BOTA 215', 'BOTA 217', 'CHEM 261', 'CHEM 271', 'CHEM 281', 'MICR 102', 'MICR 201']
+     Extra:    ['BOTA 203', 'BOTA 205', 'BOTA 207', 'BOTA 209', 'BOTA 211', 'CHEM 101', 'CHEM 255', 'ENTM 102', 'ENTM 211', 'STAT 209']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الكيمياء', 'الإحصاء الرياضي', 'علم الحشرات'}
+     Time:     20.37s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ENGL 201 | لغة إنجليزية (2) | 2 | ENGL 102 || إجباري (134 ساعة) | BOTA 201 | تشريح نب
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['BOTA 212', 'BOTA 214', 'BOTA 216', 'BOTA 218', 'BOTA 220', 'CHEM 204', 'CHEM 260', 'CHEM 262', 'CHEM 264', 'CHEM 282', 'CHEM 290', 'CHEM 292']
+     Got:      ['BIOC 204', 'BOTA 202', 'BOTA 204', 'BOTA 206', 'BOTA 208', 'BOTA 210', 'CHEM 102', 'CHEM 204', 'ENTM 102', 'ENTM 204', 'MICR 102', 'MICR 202']
+     Missing:  ['BOTA 212', 'BOTA 214', 'BOTA 216', 'BOTA 218', 'BOTA 220', 'CHEM 260', 'CHEM 262', 'CHEM 264', 'CHEM 282', 'CHEM 290', 'CHEM 292']
+     Extra:    ['BIOC 204', 'BOTA 202', 'BOTA 204', 'BOTA 206', 'BOTA 208', 'BOTA 210', 'CHEM 102', 'ENTM 102', 'ENTM 204', 'MICR 102', 'MICR 202']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الكيمياء', 'الكيمياء الحيوية', 'الميكروبيولوجي', 'علم الحشرات'}
+     Time:     16.83s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (14 ساعة) | BOTA 202 | أساسيات علم التصنيف | 2 | - || إجباري | BOTA 204 | أرشيجونيات | 3 | - |
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['BOTA 213', 'BOTA 216', 'BOTA 217', 'BOTA 321', 'BOTA 323', 'BOTA 325', 'BOTA 327', 'BOTA 329', 'BOTA 331', 'CHEM 361', 'CHEM 363', 'CHEM 371', 'CHEM 381', 'CHEM 383', 'CHEM 391', 'CHEM 393', 'SCTH 301']
+     Got:      ['BOTA 204', 'BOTA 206', 'BOTA 207', 'BOTA 209', 'BOTA 301', 'BOTA 303', 'BOTA 305', 'BOTA 307', 'BOTA 309', 'BOTA 311', 'BOTA 313', 'CHEM 102', 'CHEM 353', 'SCTH 301', 'STAT 209', 'STAT 321']
+     Missing:  ['BOTA 213', 'BOTA 216', 'BOTA 217', 'BOTA 321', 'BOTA 323', 'BOTA 325', 'BOTA 327', 'BOTA 329', 'BOTA 331', 'CHEM 361', 'CHEM 363', 'CHEM 371', 'CHEM 381', 'CHEM 383', 'CHEM 391', 'CHEM 393']
+     Extra:    ['BOTA 204', 'BOTA 206', 'BOTA 207', 'BOTA 209', 'BOTA 301', 'BOTA 303', 'BOTA 305', 'BOTA 307', 'BOTA 309', 'BOTA 311', 'BOTA 313', 'CHEM 102', 'CHEM 353', 'STAT 209', 'STAT 321']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الكيمياء', 'الإحصاء الرياضي'}
+     Time:     18.47s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | SCTH 301 | التفكير العلمي | 1 | - || إجباري (12 ساعة) | BOTA 301 | فسيولوجيا النمو وا
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['BOTA 215', 'BOTA 216', 'BOTA 217', 'BOTA 316', 'BOTA 320', 'BOTA 322', 'BOTA 324', 'BOTA 326', 'BOTA 330', 'CHEM 360', 'CHEM 362', 'CHEM 370', 'CHEM 380', 'CHEM 390', 'ETHR 302']
+     Got:      ['BOTA 202', 'BOTA 203', 'BOTA 204', 'BOTA 205', 'BOTA 206', 'BOTA 209', 'BOTA 302', 'BOTA 304', 'BOTA 306', 'BOTA 308', 'BOTA 310', 'BOTA 312', 'BOTA 314', 'BOTA 316', 'BOTA 318', 'BOTA 320', 'ETHR 302', 'MICR 101', 'MICR 388', 'STAT 209']
+     Missing:  ['BOTA 215', 'BOTA 216', 'BOTA 217', 'BOTA 322', 'BOTA 324', 'BOTA 326', 'BOTA 330', 'CHEM 360', 'CHEM 362', 'CHEM 370', 'CHEM 380', 'CHEM 390']
+     Extra:    ['BOTA 202', 'BOTA 203', 'BOTA 204', 'BOTA 205', 'BOTA 206', 'BOTA 209', 'BOTA 302', 'BOTA 304', 'BOTA 306', 'BOTA 308', 'BOTA 310', 'BOTA 312', 'BOTA 314', 'BOTA 318', 'MICR 101', 'MICR 388', 'STAT 209']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الميكروبيولوجي', 'الإحصاء الرياضي'}
+     Time:     23.02s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ETHR 302 | أخلاقيات البحث العلمي | 1 | - || إجباري (14 ساعة) | BOTA 302 | الخصائص الج
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 4 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['BOTA 321', 'BOTA 322', 'BOTA 421', 'BOTA 423', 'BOTA 427', 'BOTA 429', 'BOTA 431', 'CHEM 461', 'CHEM 463', 'CHEM 471', 'CHEM 481', 'CHEM 491', 'CHEM 493', 'ENCU 401', 'GHDS 401', 'MICR 481', 'SKIL 401']
+     Got:      ['BOTA 207', 'BOTA 304', 'BOTA 306', 'BOTA 307', 'BOTA 401', 'BOTA 403', 'BOTA 405', 'BOTA 407', 'BOTA 411', 'BOTA 413', 'BOTA 415', 'ENCU 401', 'GHDS 401', 'MICR 202', 'MICR 481', 'SKIL 401']
+     Missing:  ['BOTA 321', 'BOTA 322', 'BOTA 421', 'BOTA 423', 'BOTA 427', 'BOTA 429', 'BOTA 431', 'CHEM 461', 'CHEM 463', 'CHEM 471', 'CHEM 481', 'CHEM 491', 'CHEM 493']
+     Extra:    ['BOTA 207', 'BOTA 304', 'BOTA 306', 'BOTA 307', 'BOTA 401', 'BOTA 403', 'BOTA 405', 'BOTA 407', 'BOTA 411', 'BOTA 413', 'BOTA 415', 'MICR 202']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الميكروبيولوجي'}
+     Time:     22.29s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة (يختار ساعة واحدة) | SKIL 401 | مهارات العمل | 1 | - || متطلب الجامعة | ENCU 401 | ثقاف
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 4 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['BOTA 216', 'BOTA 321', 'BOTA 323', 'BOTA 325', 'BOTA 422', 'BOTA 424', 'BOTA 426', 'BOTA 430', 'BOTA 432', 'BOTA 434', 'CHEM 460', 'CHEM 462', 'CHEM 470', 'CHEM 480', 'CHEM 490', 'CHEM 492']
+     Got:      ['BOTA 204', 'BOTA 304', 'BOTA 305', 'BOTA 312', 'BOTA 402', 'BOTA 404', 'BOTA 406', 'BOTA 408', 'BOTA 410', 'BOTA 412', 'BOTA 414', 'BOTA 416', 'BOTA 418', 'BOTA 420']
+     Missing:  ['BOTA 216', 'BOTA 321', 'BOTA 323', 'BOTA 325', 'BOTA 422', 'BOTA 424', 'BOTA 426', 'BOTA 430', 'BOTA 432', 'BOTA 434', 'CHEM 460', 'CHEM 462', 'CHEM 470', 'CHEM 480', 'CHEM 490', 'CHEM 492']
+     Extra:    ['BOTA 204', 'BOTA 304', 'BOTA 305', 'BOTA 312', 'BOTA 402', 'BOTA 404', 'BOTA 406', 'BOTA 408', 'BOTA 410', 'BOTA 412', 'BOTA 414', 'BOTA 416', 'BOTA 418', 'BOTA 420']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات'}
+     Time:     17.14s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (12 ساعة) | BOTA 402 | أيض وطاقة إحيائية | 3 | - || إجباري | BOTA 404 | فلورة النباتات الزهرية
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['BIOC 221', 'BIOP 213', 'CHEM 102', 'CHEM 251', 'ENGL 102', 'ENGL 201', 'GEOL 255', 'PHYS 101', 'STAT 209', 'ZOOL 101', 'ZOOL 102', 'ZOOL 201', 'ZOOL 203', 'ZOOL 205']
+     Got:      ['BIOP 213', 'BOTA 101', 'BOTA 102', 'BOTA 201', 'BOTA 203', 'BOTA 205', 'BOTA 207', 'BOTA 209', 'BOTA 211', 'CHEM 101', 'CHEM 255', 'ENGL 102', 'ENGL 201', 'ENTM 102', 'ENTM 211', 'GEOL 255', 'PHYS 101', 'STAT 209']
+     Missing:  ['BIOC 221', 'CHEM 102', 'CHEM 251', 'ZOOL 101', 'ZOOL 102', 'ZOOL 201', 'ZOOL 203', 'ZOOL 205']
+     Extra:    ['BOTA 101', 'BOTA 102', 'BOTA 201', 'BOTA 203', 'BOTA 205', 'BOTA 207', 'BOTA 209', 'BOTA 211', 'CHEM 101', 'CHEM 255', 'ENTM 102', 'ENTM 211']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الكيمياء', 'علم الحشرات'}
+     Time:     20.61s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ENGL 201 | لغة إنجليزية (2) | 2 | ENGL 102 || إجباري (134 ساعة) | BOTA 201 | تشريح نب
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['MICR 102', 'MICR 288', 'ZOOL 101', 'ZOOL 102', 'ZOOL 202', 'ZOOL 204', 'ZOOL 206', 'ZOOL 208', 'ZOOL 210', 'ZOOL 214', 'ZOOL 216', 'ZOOL 220']
+     Got:      ['BIOC 204', 'BOTA 202', 'BOTA 204', 'BOTA 206', 'BOTA 208', 'BOTA 210', 'CHEM 102', 'CHEM 204', 'ENTM 102', 'ENTM 204', 'MICR 102', 'MICR 202']
+     Missing:  ['MICR 288', 'ZOOL 101', 'ZOOL 102', 'ZOOL 202', 'ZOOL 204', 'ZOOL 206', 'ZOOL 208', 'ZOOL 210', 'ZOOL 214', 'ZOOL 216', 'ZOOL 220']
+     Extra:    ['BIOC 204', 'BOTA 202', 'BOTA 204', 'BOTA 206', 'BOTA 208', 'BOTA 210', 'CHEM 102', 'CHEM 204', 'ENTM 102', 'ENTM 204', 'MICR 202']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الكيمياء', 'الكيمياء الحيوية', 'الميكروبيولوجي', 'علم الحشرات'}
+     Time:     16.96s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (14 ساعة) | BOTA 202 | أساسيات علم التصنيف | 2 | - || إجباري | BOTA 204 | أرشيجونيات | 3 | - |
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['ENTM 101', 'ENTM 331', 'SCTH 301', 'STAT 209', 'STAT 321', 'ZOOL 102', 'ZOOL 203', 'ZOOL 204', 'ZOOL 210', 'ZOOL 303', 'ZOOL 305', 'ZOOL 307', 'ZOOL 309', 'ZOOL 331']
+     Got:      ['BOTA 204', 'BOTA 206', 'BOTA 207', 'BOTA 209', 'BOTA 301', 'BOTA 303', 'BOTA 305', 'BOTA 307', 'BOTA 309', 'BOTA 311', 'BOTA 313', 'CHEM 102', 'CHEM 353', 'SCTH 301', 'STAT 209', 'STAT 321']
+     Missing:  ['ENTM 101', 'ENTM 331', 'ZOOL 102', 'ZOOL 203', 'ZOOL 204', 'ZOOL 210', 'ZOOL 303', 'ZOOL 305', 'ZOOL 307', 'ZOOL 309', 'ZOOL 331']
+     Extra:    ['BOTA 204', 'BOTA 206', 'BOTA 207', 'BOTA 209', 'BOTA 301', 'BOTA 303', 'BOTA 305', 'BOTA 307', 'BOTA 309', 'BOTA 311', 'BOTA 313', 'CHEM 102', 'CHEM 353']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الكيمياء'}
+     Time:     18.79s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | SCTH 301 | التفكير العلمي | 1 | - || إجباري (12 ساعة) | BOTA 301 | فسيولوجيا النمو وا
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['BIOC 221', 'BIOC 322', 'ETHR 302', 'MICR 102', 'MICR 388', 'ZOOL 201', 'ZOOL 202', 'ZOOL 204', 'ZOOL 205', 'ZOOL 210', 'ZOOL 302', 'ZOOL 304', 'ZOOL 306', 'ZOOL 308', 'ZOOL 310', 'ZOOL 314', 'ZOOL 320', 'ZOOL 330']
+     Got:      ['BOTA 202', 'BOTA 203', 'BOTA 204', 'BOTA 205', 'BOTA 206', 'BOTA 209', 'BOTA 302', 'BOTA 304', 'BOTA 306', 'BOTA 308', 'BOTA 310', 'BOTA 312', 'BOTA 314', 'BOTA 316', 'BOTA 318', 'BOTA 320', 'ETHR 302', 'MICR 101', 'MICR 388', 'STAT 209']
+     Missing:  ['BIOC 221', 'BIOC 322', 'MICR 102', 'ZOOL 201', 'ZOOL 202', 'ZOOL 204', 'ZOOL 205', 'ZOOL 210', 'ZOOL 302', 'ZOOL 304', 'ZOOL 306', 'ZOOL 308', 'ZOOL 310', 'ZOOL 314', 'ZOOL 320', 'ZOOL 330']
+     Extra:    ['BOTA 202', 'BOTA 203', 'BOTA 204', 'BOTA 205', 'BOTA 206', 'BOTA 209', 'BOTA 302', 'BOTA 304', 'BOTA 306', 'BOTA 308', 'BOTA 310', 'BOTA 312', 'BOTA 314', 'BOTA 316', 'BOTA 318', 'BOTA 320', 'MICR 101', 'STAT 209']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الميكروبيولوجي', 'الإحصاء الرياضي'}
+     Time:     22.95s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ETHR 302 | أخلاقيات البحث العلمي | 1 | - || إجباري (14 ساعة) | BOTA 302 | الخصائص الج
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 4 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['ENCU 401', 'GHDS 401', 'SKIL 401', 'ZOOL 201', 'ZOOL 302', 'ZOOL 304', 'ZOOL 305', 'ZOOL 306', 'ZOOL 309', 'ZOOL 401', 'ZOOL 403', 'ZOOL 405', 'ZOOL 407', 'ZOOL 411', 'ZOOL 413', 'ZOOL 415', 'ZOOL 417', 'ZOOL 427']
+     Got:      ['BOTA 207', 'BOTA 304', 'BOTA 306', 'BOTA 307', 'BOTA 401', 'BOTA 403', 'BOTA 405', 'BOTA 407', 'BOTA 411', 'BOTA 413', 'BOTA 415', 'ENCU 401', 'GHDS 401', 'MICR 202', 'MICR 481', 'SKIL 401']
+     Missing:  ['ZOOL 201', 'ZOOL 302', 'ZOOL 304', 'ZOOL 305', 'ZOOL 306', 'ZOOL 309', 'ZOOL 401', 'ZOOL 403', 'ZOOL 405', 'ZOOL 407', 'ZOOL 411', 'ZOOL 413', 'ZOOL 415', 'ZOOL 417', 'ZOOL 427']
+     Extra:    ['BOTA 207', 'BOTA 304', 'BOTA 306', 'BOTA 307', 'BOTA 401', 'BOTA 403', 'BOTA 405', 'BOTA 407', 'BOTA 411', 'BOTA 413', 'BOTA 415', 'MICR 202', 'MICR 481']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات', 'الميكروبيولوجي'}
+     Time:     21.83s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة (يختار ساعة واحدة) | SKIL 401 | مهارات العمل | 1 | - || متطلب الجامعة | ENCU 401 | ثقاف
+
+  ❌ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة / Level 4 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['ZOOL 201', 'ZOOL 305', 'ZOOL 402', 'ZOOL 412', 'ZOOL 414', 'ZOOL 416', 'ZOOL 418', 'ZOOL 420', 'ZOOL 422', 'ZOOL 432']
+     Got:      ['BOTA 204', 'BOTA 304', 'BOTA 305', 'BOTA 312', 'BOTA 402', 'BOTA 404', 'BOTA 406', 'BOTA 408', 'BOTA 410', 'BOTA 412', 'BOTA 414', 'BOTA 416', 'BOTA 418', 'BOTA 420']
+     Missing:  ['ZOOL 201', 'ZOOL 305', 'ZOOL 402', 'ZOOL 412', 'ZOOL 414', 'ZOOL 416', 'ZOOL 418', 'ZOOL 420', 'ZOOL 422', 'ZOOL 432']
+     Extra:    ['BOTA 204', 'BOTA 304', 'BOTA 305', 'BOTA 312', 'BOTA 402', 'BOTA 404', 'BOTA 406', 'BOTA 408', 'BOTA 410', 'BOTA 412', 'BOTA 414', 'BOTA 416', 'BOTA 418', 'BOTA 420']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'النبات'}
+     Time:     16.33s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (12 ساعة) | BOTA 402 | أيض وطاقة إحيائية | 3 | - || إجباري | BOTA 404 | فلورة النباتات الزهرية
+
+  ❌ برنامج علم الحيوان - الكيمياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 2 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['BIOP 213', 'CHEM 261', 'CHEM 271', 'CHEM 281', 'ENGL 201', 'GEOL 255', 'PHYS 101', 'STAT 209', 'ZOOL 101', 'ZOOL 102', 'ZOOL 205', 'ZOOL 207', 'ZOOL 209']
+     Got:      ['BIOP 213', 'CHEM 102', 'CHEM 251', 'ENGL 102', 'ENGL 201', 'GEOL 255', 'PHYS 101', 'STAT 209', 'ZOOL 101', 'ZOOL 102', 'ZOOL 205', 'ZOOL 207', 'ZOOL 209']
+     Missing:  ['CHEM 261', 'CHEM 271', 'CHEM 281']
+     Extra:    ['CHEM 102', 'CHEM 251']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الكيمياء'}
+     Time:     18.09s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ENGL 201 | لغة إنجليزية (2) | 2 | ENGL 102 || إجباري تخصص أول (6 ساعات) | ZOOL 207 | 
+
+  ❌ برنامج علم الحيوان - الكيمياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['CHEM 260', 'CHEM 262', 'CHEM 264', 'CHEM 282', 'CHEM 290', 'CHEM 292', 'CHEM 294', 'MICR 102', 'MICR 288', 'ZOOL 101', 'ZOOL 102', 'ZOOL 208', 'ZOOL 212', 'ZOOL 216', 'ZOOL 220']
+     Got:      ['MICR 102', 'MICR 288', 'ZOOL 101', 'ZOOL 102', 'ZOOL 202', 'ZOOL 204', 'ZOOL 206', 'ZOOL 208', 'ZOOL 210', 'ZOOL 212', 'ZOOL 214', 'ZOOL 216', 'ZOOL 220']
+     Missing:  ['CHEM 260', 'CHEM 262', 'CHEM 264', 'CHEM 282', 'CHEM 290', 'CHEM 292', 'CHEM 294']
+     Extra:    ['ZOOL 202', 'ZOOL 204', 'ZOOL 206', 'ZOOL 210', 'ZOOL 214']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'علم الحيوان'}
+     Time:     23.42s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (15 ساعة) | ZOOL 202 | حبليات والتطور العضوي | 4 | ZOOL 101 || إجباري | ZOOL 210 | التغذية وال
+
+  ❌ برنامج علم الحيوان - الكيمياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 3 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['BIOC 322', 'CHEM 360', 'CHEM 362', 'CHEM 370', 'CHEM 380', 'CHEM 390', 'ETHR 302', 'ZOOL 101', 'ZOOL 201', 'ZOOL 207', 'ZOOL 310', 'ZOOL 322', 'ZOOL 328']
+     Got:      ['BIOC 221', 'BIOC 322', 'CHEM 360', 'CHEM 362', 'CHEM 370', 'CHEM 380', 'CHEM 390', 'ETHR 302', 'ZOOL 101', 'ZOOL 201', 'ZOOL 302', 'ZOOL 310', 'ZOOL 322', 'ZOOL 328']
+     Missing:  ['ZOOL 207']
+     Extra:    ['BIOC 221', 'ZOOL 302']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الكيمياء الحيوية', 'علم الحيوان'}
+     Time:     19.32s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الكلية | ETHR 302 | أخلاقيات البحث العلمي | 1 | - || إجباري تخصص أول (7 ساعات) | ZOOL 322 | علم
+
+  ❌ برنامج علم الحيوان - الكيمياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 4 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['CHEM 461', 'CHEM 463', 'CHEM 471', 'CHEM 481', 'CHEM 491', 'CHEM 493', 'ENCU 401', 'GHDS 401', 'SKIL 401', 'ZOOL 207', 'ZOOL 305', 'ZOOL 322', 'ZOOL 415', 'ZOOL 417', 'ZOOL 419', 'ZOOL 421', 'ZOOL 423', 'ZOOL 427']
+     Got:      ['ENCU 401', 'GHDS 401', 'SKIL 401', 'ZOOL 201', 'ZOOL 302', 'ZOOL 304', 'ZOOL 305', 'ZOOL 306', 'ZOOL 309', 'ZOOL 401', 'ZOOL 403', 'ZOOL 405', 'ZOOL 407', 'ZOOL 411', 'ZOOL 413', 'ZOOL 415', 'ZOOL 417', 'ZOOL 427']
+     Missing:  ['CHEM 461', 'CHEM 463', 'CHEM 471', 'CHEM 481', 'CHEM 491', 'CHEM 493', 'ZOOL 207', 'ZOOL 322', 'ZOOL 419', 'ZOOL 421', 'ZOOL 423']
+     Extra:    ['ZOOL 201', 'ZOOL 302', 'ZOOL 304', 'ZOOL 306', 'ZOOL 309', 'ZOOL 401', 'ZOOL 403', 'ZOOL 405', 'ZOOL 407', 'ZOOL 411', 'ZOOL 413']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'علم الحيوان'}
+     Time:     20.81s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة (يختار ساعة واحدة) | SKIL 401 | مهارات العمل | 1 | - || متطلب الجامعة | ENCU 401 | ثقاف
+
+  ❌ برنامج الحشرات الطبية (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['ENTM 208', 'ENTM 252', 'ENTM 350', 'ENTM 352', 'ENTM 354', 'ENTM 356', 'ENTM 360', 'ENTM 362', 'ETHR 302']
+     Got:      ['COMP 201', 'ENTM 208', 'ENTM 350', 'ENTM 352', 'ENTM 354', 'ENTM 356', 'ENTM 360', 'ENTM 362', 'ETHR 302']
+     Missing:  ['ENTM 252']
+     Extra:    ['COMP 201']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'علوم الحاسب'}
+     Time:     13.38s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ETHR 302 | أخلاقيات البحث العلمي | 1 | - || إجباري (11 ساعة) | ENTM 350 | مقدمة في عل
+
+  ❌ برنامج جيولوجيا - جيوفيزياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['CHEM 102', 'CHEM 232', 'GEOL 102', 'GEOL 104', 'GEOL 202', 'GEOL 204', 'GEOL 215', 'GEOP 102', 'GEOP 204', 'GEOP 208', 'PHYS 101', 'PHYS 266']
+     Got:      ['CHEM 260', 'CHEM 262', 'CHEM 264', 'CHEM 282', 'CHEM 290', 'CHEM 292', 'CHEM 294', 'GEOL 104', 'GEOL 202', 'GEOL 204', 'MATH 101', 'MATH 102', 'MATH 202', 'MATH 204', 'OR 102', 'PHYS 256', 'STAT 232']
+     Missing:  ['CHEM 102', 'CHEM 232', 'GEOL 102', 'GEOL 215', 'GEOP 102', 'GEOP 204', 'GEOP 208', 'PHYS 101', 'PHYS 266']
+     Extra:    ['CHEM 260', 'CHEM 262', 'CHEM 264', 'CHEM 282', 'CHEM 290', 'CHEM 292', 'CHEM 294', 'MATH 101', 'MATH 102', 'MATH 202', 'MATH 204', 'OR 102', 'PHYS 256', 'STAT 232']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الكيمياء', 'الرياضيات', 'بحوث العمليات', 'الإحصاء الرياضي', 'الفيزياء'}
+     Time:     21.84s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري تخصص أول (9 ساعات) | GEOL 202 | صخور نارية | 3 | GEOL 104 || إجباري | GEOL 204 | ترسيب وصخور ر
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['COMP 214', 'ENGL 102', 'ENGL 201', 'GEOP 102', 'GEOP 201', 'GEOP 203', 'GEOP 205', 'GEOP 207', 'MATH 102', 'PHYS 101', 'PHYS 265', 'STAT 211']
+     Got:      ['COMP 214', 'ENGL 102', 'ENGL 201', 'GEOL 106', 'GEOL 205', 'GEOP 102', 'GEOP 201', 'GEOP 203', 'GEOP 205', 'PHYS 102', 'PHYS 225', 'STAT 211']
+     Missing:  ['GEOP 207', 'MATH 102', 'PHYS 101', 'PHYS 265']
+     Extra:    ['GEOL 106', 'GEOL 205', 'PHYS 102', 'PHYS 225']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الجيولوجيا', 'الفيزياء'}
+     Time:     15.01s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ENGL 201 | لغة إنجليزية (2) | 2 | ENGL 102 || إجباري (14 ساعة) | GEOP 201 | فيزياء ال
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 1 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['CHEM 101', 'GEOL 106', 'GEOP 104', 'HURI 101', 'MATH 101', 'PHYS 101']
+     Got:      ['CHEM 101', 'CHEM 103', 'GEOL 101', 'HURI 101', 'MATH 101', 'PHYS 101', 'SAFS 101']
+     Missing:  ['GEOL 106', 'GEOP 104']
+     Extra:    ['CHEM 103', 'GEOL 101']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الكيمياء', 'الجيولوجيا'}
+     Time:     15.21s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | SAFS 101 | الأمن والسلامة | 1 | - || متطلب الجامعة | HURI 101 | حقوق الإنسان | - (P/F
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 1 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['CHEM 101', 'CHEM 102', 'COMP 106', 'ENGL 102', 'GEOL 106', 'GEOL 108', 'INCO 102', 'MATH 101', 'MATH 102', 'PHYS 101', 'PHYS 102']
+     Got:      ['CHEM 102', 'CHEM 104', 'ENGL 102', 'GEOL 102', 'GEOL 104', 'GEOP 102', 'INCO 102']
+     Missing:  ['CHEM 101', 'COMP 106', 'GEOL 106', 'GEOL 108', 'MATH 101', 'MATH 102', 'PHYS 101', 'PHYS 102']
+     Extra:    ['CHEM 104', 'GEOL 102', 'GEOL 104', 'GEOP 102']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الكيمياء', 'الجيولوجيا', 'الجيوفيزياء'}
+     Time:     13.82s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ENGL 102 | لغة إنجليزية (1) | 2 | - || متطلب الجامعة | INCO 102 | مدخل في الحاسب الآل
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['ENGL 102', 'ENGL 201', 'GEOL 106', 'GEOL 205', 'GEOP 104', 'GEOP 201', 'GEOP 203', 'GEOP 205', 'MATH 102', 'MATH 201', 'PHYS 102', 'PHYS 225', 'STAT 211']
+     Got:      ['COMP 214', 'ENGL 102', 'ENGL 201', 'GEOL 106', 'GEOL 205', 'GEOP 102', 'GEOP 201', 'GEOP 203', 'GEOP 205', 'PHYS 102', 'PHYS 225', 'STAT 211']
+     Missing:  ['GEOP 104', 'MATH 102', 'MATH 201']
+     Extra:    ['COMP 214', 'GEOP 102']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'علوم الحاسب', 'الجيوفيزياء'}
+     Time:     14.86s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ENGL 201 | لغة إنجليزية (2) | 2 | ENGL 102 || إجباري (14 ساعة) | GEOP 201 | فيزياء ال
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['GEOL 106', 'GEOL 204', 'GEOL 210', 'GEOP 104', 'GEOP 202', 'GEOP 212', 'MATH 101', 'MATH 202', 'MATH 204', 'PHYS 102', 'PHYS 220', 'PHYS 274']
+     Got:      ['GEOL 102', 'GEOL 104', 'GEOL 202', 'GEOL 204', 'GEOP 102', 'GEOP 201', 'GEOP 202', 'GEOP 204', 'GEOP 206', 'GEOP 208', 'MATH 102', 'PHYS 101', 'PHYS 266']
+     Missing:  ['GEOL 106', 'GEOL 210', 'GEOP 104', 'GEOP 212', 'MATH 101', 'MATH 202', 'MATH 204', 'PHYS 102', 'PHYS 220', 'PHYS 274']
+     Extra:    ['GEOL 102', 'GEOL 104', 'GEOL 202', 'GEOP 102', 'GEOP 201', 'GEOP 204', 'GEOP 206', 'GEOP 208', 'MATH 102', 'PHYS 101', 'PHYS 266']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الرياضيات', 'الجيولوجيا', 'الجيوفيزياء', 'الفيزياء'}
+     Time:     17.21s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (14 ساعة) | GEOP 202 | فيزياء الأرض (3) - الديناميكا الجيوفيزيائية | 3 | GEOP 201 || إجباري | 
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['GEOL 101', 'GEOL 301', 'GEOL 305', 'GEOP 104', 'GEOP 203', 'GEOP 205', 'GEOP 303', 'GEOP 305', 'GEOP 307', 'GEOP 309', 'GEOP 311', 'SCTH 301']
+     Got:      ['GEOL 101', 'GEOL 301', 'GEOP 102', 'GEOP 205', 'GEOP 208', 'GEOP 301', 'GEOP 311', 'GEOP 313', 'GEOP 315', 'GEOP 317', 'GEOP 319', 'GEOP 321', 'SCTH 301']
+     Missing:  ['GEOL 305', 'GEOP 104', 'GEOP 203', 'GEOP 303', 'GEOP 305', 'GEOP 307', 'GEOP 309']
+     Extra:    ['GEOP 102', 'GEOP 208', 'GEOP 301', 'GEOP 313', 'GEOP 315', 'GEOP 317', 'GEOP 319', 'GEOP 321']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الجيوفيزياء'}
+     Time:     16.87s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | SCTH 301 | التفكير العلمي | 1 | - || إجباري (11 ساعة) | GEOP 311 | طرق جيوفيزيائية مت
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['ETHR 302', 'GEOL 204', 'GEOL 314', 'GEOL 318', 'GEOP 202', 'GEOP 203', 'GEOP 302', 'GEOP 304', 'GEOP 306', 'GEOP 308', 'GEOP 310', 'GEOP 312']
+     Got:      ['ETHR 302', 'GEOL 202', 'GEOL 204', 'GEOL 304', 'GEOL 308', 'GEOP 312', 'GEOP 314', 'GEOP 316', 'GEOP 318', 'GEOP 319', 'GEOP 320', 'GEOP 322']
+     Missing:  ['GEOL 314', 'GEOL 318', 'GEOP 202', 'GEOP 203', 'GEOP 302', 'GEOP 304', 'GEOP 306', 'GEOP 308', 'GEOP 310']
+     Extra:    ['GEOL 202', 'GEOL 304', 'GEOL 308', 'GEOP 314', 'GEOP 316', 'GEOP 318', 'GEOP 319', 'GEOP 320', 'GEOP 322']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الجيولوجيا', 'الجيوفيزياء'}
+     Time:     16.28s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ETHR 302 | أخلاقيات البحث العلمي | 1 | - || إجباري (11 ساعة) | GEOP 312 | جيوفيزياء م
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 4 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['ENCU 401', 'GEOL 204', 'GEOL 409', 'GEOL 431', 'GEOP 305', 'GEOP 311', 'GEOP 401', 'GEOP 403', 'GEOP 405', 'GEOP 407', 'GEOP 409', 'GEOP 411', 'GEOP 413', 'GHDS 401', 'SKIL 401']
+     Got:      ['ENCU 401', 'GEOP 102', 'GEOP 301', 'GEOP 315', 'GEOP 411', 'GEOP 413', 'GEOP 415', 'GEOP 417', 'GEOP 419', 'GEOP 421', 'GEOP 423', 'GEOP 431', 'GHDS 401', 'SKIL 401']
+     Missing:  ['GEOL 204', 'GEOL 409', 'GEOL 431', 'GEOP 305', 'GEOP 311', 'GEOP 401', 'GEOP 403', 'GEOP 405', 'GEOP 407', 'GEOP 409']
+     Extra:    ['GEOP 102', 'GEOP 301', 'GEOP 315', 'GEOP 415', 'GEOP 417', 'GEOP 419', 'GEOP 421', 'GEOP 423', 'GEOP 431']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الجيوفيزياء'}
+     Time:     17.14s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة (يختار ساعة واحدة) | SKIL 401 | مهارات العمل | 1 | - || متطلب الجامعة | ENCU 401 | ثقاف
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 4 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['COMP 422', 'GEOP 305', 'GEOP 402', 'GEOP 404', 'GEOP 406', 'GEOP 408', 'GEOP 410', 'GEOP 412', 'GEOP 414', 'GEOP 416']
+     Got:      ['GEOP 205', 'GEOP 316', 'GEOP 410', 'GEOP 412', 'GEOP 414', 'GEOP 416', 'GEOP 418', 'GEOP 419', 'GEOP 422', 'GEOP 424', 'GEOP 426']
+     Missing:  ['COMP 422', 'GEOP 305', 'GEOP 402', 'GEOP 404', 'GEOP 406', 'GEOP 408']
+     Extra:    ['GEOP 205', 'GEOP 316', 'GEOP 418', 'GEOP 419', 'GEOP 422', 'GEOP 424', 'GEOP 426']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الجيوفيزياء'}
+     Time:     14.91s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (13 ساعة) | GEOP 412 | تفسير الجاذبية والمغناطيسية | 3 | GEOP 205 || إجباري | GEOP 414 | تصميم
+
+[PARTIAL — 5 cases]
+────────────────────────────────
+  ❌ برنامج الرياضيات البحتة وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 3 / Semester الأول
+     Status:   PARTIAL (92%)
+     Expected: ['COMP 303', 'COMP 305', 'COMP 307', 'COMP 309', 'COMP 311', 'COMP 313', 'MATH 301', 'MATH 303', 'MATH 305', 'MATH 307', 'MATH 319', 'MATH 331', 'SCTH 301']
+     Got:      ['COMP 303', 'COMP 305', 'COMP 307', 'COMP 309', 'COMP 311', 'MATH 301', 'MATH 303', 'MATH 305', 'MATH 307', 'MATH 319', 'MATH 331', 'SCTH 301']
+     Missing:  ['COMP 313']
+     Extra:    []
+     Diagnosis:1 course(s) missing — likely split table or edge cut
+     Time:     20.19s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | SCTH 301 | التفكير العلمي | 1 | - || إجباري تخصص أول (6 ساعات) | MATH 301 | الجبر الم
+
+  ❌ برنامج الإحصاء الرياضي (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   PARTIAL (91%)
+     Expected: ['MATH 101', 'MATH 202', 'MATH 204', 'OR 102', 'STAT 101', 'STAT 102', 'STAT 202', 'STAT 204', 'STAT 206', 'STAT 222', 'STAT 224']
+     Got:      ['MATH 101', 'MATH 202', 'MATH 204', 'OR 102', 'STAT 102', 'STAT 202', 'STAT 204', 'STAT 206', 'STAT 222', 'STAT 224']
+     Missing:  ['STAT 101']
+     Extra:    []
+     Diagnosis:1 course(s) missing — likely split table or edge cut
+     Time:     13.61s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (15 ساعة) | STAT 202 | نظرية الإحصاء (2) | 3 | STAT 102 || إجباري | STAT 204 | طرق احتمالية في
+
+  ❌ برنامج الإحصاء الرياضي وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 4 / Semester الثاني
+     Status:   PARTIAL (88%)
+     Expected: ['COMP 201', 'COMP 207', 'COMP 212', 'COMP 402', 'COMP 404', 'COMP 414', 'COMP 416', 'COMP 418', 'STAT 205', 'STAT 302', 'STAT 303', 'STAT 408', 'STAT 412', 'STAT 416', 'STAT 418', 'STAT 424']
+     Got:      ['COMP 201', 'COMP 212', 'COMP 402', 'COMP 404', 'COMP 414', 'COMP 418', 'STAT 205', 'STAT 302', 'STAT 303', 'STAT 408', 'STAT 412', 'STAT 416', 'STAT 418', 'STAT 424']
+     Missing:  ['COMP 207', 'COMP 416']
+     Extra:    []
+     Diagnosis:2 course(s) missing — likely split table or edge cut
+     Time:     17.33s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري تخصص أول (7 ساعات) | STAT 408 | سلاسل زمنية | 3 | STAT 302 || إجباري تخصص أول | STAT 418 | عمل
+
+  ❌ برنامج الفيزياء الحيوية (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الثاني
+     Status:   PARTIAL (62%)
+     Expected: ['BIOC 201', 'BIOC 324', 'BIOP 201', 'BIOP 222', 'BIOP 302', 'BIOP 312', 'BIOP 322', 'BIOP 332', 'ETHR 302', 'PHYS 102', 'PHYS 211', 'PHYS 360', 'PHYS 362', 'ZOOL 222']
+     Got:      ['BIOP 201', 'BIOP 302', 'BIOP 312', 'BIOP 322', 'BIOP 332', 'PHYS 211', 'PHYS 362', 'ZOOL 222']
+     Missing:  ['BIOC 201', 'BIOC 324', 'BIOP 222', 'PHYS 102', 'PHYS 360']
+     Extra:    []
+     Diagnosis:5 course(s) missing — likely split table or edge cut
+     Time:     12.63s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (13 ساعة) | BIOP 302 | أساسيات الفيزياء النووية وبيولوجيا الإشعاع | 3 | BIOP 201 || إجباري | B
+
+  ❌ برنامج الكيمياء التطبيقية (تخصص منفرد) - 134 ساعة معتمدة / Level 4 / Semester الثاني
+     Status:   PARTIAL (96%)
+     Expected: ['APCH 311', 'APCH 341', 'APCH 344', 'APCH 412', 'APCH 414', 'APCH 416', 'APCH 418', 'APCH 424', 'APCH 426', 'APCH 428', 'APCH 432', 'APCH 440', 'APCH 442', 'APCH 444', 'APCH 446', 'APCH 448', 'APCH 450', 'CHEM 211', 'CHEM 321', 'CHEM 322', 'CHEM 331', 'CHEM 410', 'CHEM 416', 'CHEM 422', 'COMP 418']
+     Got:      ['APCH 311', 'APCH 341', 'APCH 344', 'APCH 412', 'APCH 414', 'APCH 416', 'APCH 418', 'APCH 424', 'APCH 426', 'APCH 428', 'APCH 432', 'APCH 440', 'APCH 442', 'APCH 444', 'APCH 446', 'APCH 450', 'CHEM 211', 'CHEM 321', 'CHEM 322', 'CHEM 331', 'CHEM 410', 'CHEM 416', 'CHEM 422', 'COMP 418']
+     Missing:  ['APCH 448']
+     Extra:    []
+     Diagnosis:1 course(s) missing — likely split table or edge cut
+     Time:     27.16s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (14 ساعة) | APCH 450 | مشروع بحث 2 | 1 | - || إجباري | APCH 412 | كيمياء عضوية تطبيقية (صناعة 
+
+[NO_CODES_IN_RESPONSE — 0 cases]
+────────────────────────────────
+  (none)
+
+[EXTRA_COURSES — 4 cases]
+────────────────────────────────
+  ❌ برنامج الإحصاء الرياضي وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 3 / Semester الأول
+     Status:   EXTRA_COURSES
+     Expected: ['COMP 303', 'COMP 305', 'COMP 307', 'COMP 309', 'COMP 311', 'SCTH 301', 'STAT 202', 'STAT 204', 'STAT 205', 'STAT 301', 'STAT 303', 'STAT 305', 'STAT 311', 'STAT 315']
+     Got:      ['COMP 303', 'COMP 305', 'COMP 307', 'COMP 309', 'COMP 311', 'COMP 313', 'SCTH 301', 'STAT 202', 'STAT 204', 'STAT 205', 'STAT 301', 'STAT 303', 'STAT 305', 'STAT 311', 'STAT 315']
+     Missing:  []
+     Extra:    ['COMP 313']
+     Diagnosis:Extra codes from: {'علوم الحاسب'}
+     Time:     20.26s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | SCTH 301 | التفكير العلمي | 1 | - || إجباري تخصص أول (6 ساعات) | STAT 301 | استدلال إ
+
+  ❌ برنامج الفيزياء وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 4 / Semester الثاني
+     Status:   EXTRA_COURSES
+     Expected: ['COMP 201', 'COMP 212', 'COMP 402', 'COMP 404', 'COMP 414', 'COMP 418', 'PHYS 315', 'PHYS 362', 'PHYS 438', 'PHYS 468', 'PHYS 470', 'PHYS 472', 'PHYS 476']
+     Got:      ['COMP 201', 'COMP 207', 'COMP 212', 'COMP 402', 'COMP 404', 'COMP 414', 'COMP 416', 'COMP 418', 'PHYS 315', 'PHYS 362', 'PHYS 438', 'PHYS 468', 'PHYS 470', 'PHYS 472', 'PHYS 476']
+     Missing:  []
+     Extra:    ['COMP 207', 'COMP 416']
+     Diagnosis:Extra codes from: {'علوم الحاسب'}
+     Time:     21.31s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري تخصص أول (7 ساعات) | PHYS 476 | فيزياء حسابية متقدم | 3 | PHYS 315 || إجباري تخصص أول | PHYS 4
+
+  ❌ برنامج علم الحيوان - الكيمياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 4 / Semester الثاني
+     Status:   EXTRA_COURSES
+     Expected: ['CHEM 460', 'CHEM 462', 'CHEM 470', 'CHEM 480', 'CHEM 490', 'CHEM 492', 'ZOOL 102', 'ZOOL 208', 'ZOOL 209', 'ZOOL 212', 'ZOOL 322', 'ZOOL 406', 'ZOOL 410', 'ZOOL 414', 'ZOOL 416', 'ZOOL 418', 'ZOOL 422', 'ZOOL 424', 'ZOOL 428', 'ZOOL 430']
+     Got:      ['CHEM 460', 'CHEM 462', 'CHEM 470', 'CHEM 480', 'CHEM 490', 'CHEM 492', 'ZOOL 102', 'ZOOL 208', 'ZOOL 209', 'ZOOL 212', 'ZOOL 322', 'ZOOL 406', 'ZOOL 410', 'ZOOL 414', 'ZOOL 416', 'ZOOL 418', 'ZOOL 420', 'ZOOL 422', 'ZOOL 424', 'ZOOL 428', 'ZOOL 430']
+     Missing:  []
+     Extra:    ['ZOOL 420']
+     Diagnosis:Extra codes from: {'علم الحيوان'}
+     Time:     24.34s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري تخصص أول (8 ساعات) | ZOOL 406 | علم الأنسجة | 2 | ZOOL 208 || إجباري تخصص أول | ZOOL 410 | أسا
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   EXTRA_COURSES
+     Expected: ['GEOL 104', 'GEOL 202', 'GEOL 204', 'GEOP 102', 'GEOP 201', 'GEOP 202', 'GEOP 204', 'GEOP 206', 'GEOP 208', 'MATH 102', 'PHYS 101', 'PHYS 266']
+     Got:      ['GEOL 102', 'GEOL 104', 'GEOL 202', 'GEOL 204', 'GEOP 102', 'GEOP 201', 'GEOP 202', 'GEOP 204', 'GEOP 206', 'GEOP 208', 'MATH 102', 'PHYS 101', 'PHYS 266']
+     Missing:  []
+     Extra:    ['GEOL 102']
+     Diagnosis:Extra codes from: {'الجيولوجيا'}
+     Time:     17.26s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (14 ساعة) | GEOP 202 | فيزياء الأرض (3) - الديناميكا الجيوفيزيائية | 3 | GEOP 201 || إجباري | 
+
+═══════════════════════════════════════════════════
+PASSING PROGRAMS (for reference)
+═══════════════════════════════════════════════════
+  ✅ برنامج الإحصاء الرياضي (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الإحصاء الرياضي وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الجيولوجيا (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الحشرات الطبية (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الرياضيات (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الرياضيات البحتة والإحصاء الرياضي (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الرياضيات البحتة وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الفيزياء (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الفيزياء الحيوية (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الفيزياء والكيمياء (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الفيزياء وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الكيمياء (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الكيمياء التطبيقية (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الكيمياء الحيوية (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الميكروبيولوجي (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج جيولوجيا - جيوفيزياء (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج علم الحشرات (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج علم الحيوان - الكيمياء (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج علوم الحاسب (تخصص منفرد) - 134 ساعة معتمدة
+
+═══════════════════════════════════════════════════
+KNOWN CORRECT BEHAVIOR (not counted as failures)
+═══════════════════════════════════════════════════
+- الكيمياء التطبيقية L1/L2 → returns الكيمياء data + sharing note ✅
+- الجيوفيزياء L1 → returns الجيولوجيا shared data + sharing note ✅
+- ETHR/SCTH/ENCU/GHDS/SKIL missing → counted as PASS (univ-req edge rows) ✅

@@ -1,0 +1,21 @@
+# البيئة الافتراضية
+.venv/
+venv/
+
+# الإعدادات الخاصة
+.env
+
+# ملفات Python المؤقتة
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# الـ Vector Database (كبيرة ومحلية)
+vectorstore/
+
+# الـ PDFs (ممكن تكون حساسة)
+data/pdfs/
+
+# ملفات النتائج
+evaluation_results.csv

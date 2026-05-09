@@ -1,0 +1,183 @@
+═══════════════════════════════════════════════════
+RAG SYSTEM TEST REPORT — دليل الطالب كلية العلوم
+Date: 2026-05-09 18:23:37
+═══════════════════════════════════════════════════
+
+SUMMARY
+───────
+Total test cases:      166
+PASS:                  154  (92.8%)
+  (includes cases where only univ-req rows ETHR/SCTH/ENCU/GHDS/SKIL were absent)
+PARTIAL:               3
+WRONG_PROGRAM:         3
+NO_CODES_IN_RESPONSE:  5
+EXTRA_COURSES:         1
+TIMEOUT:               0
+Avg response time:     17.7s
+Slow but passing (>90s): 0
+
+═══════════════════════════════════════════════════
+FAILURES — SORTED BY SEVERITY
+═══════════════════════════════════════════════════
+
+[WRONG_PROGRAM — 3 cases]
+────────────────────────────────
+  ❌ برنامج الحشرات الطبية (تخصص منفرد) - 134 ساعة معتمدة / Level 3 / Semester الثاني
+     Status:   WRONG_PROGRAM
+     Expected: ['ENTM 208', 'ENTM 252', 'ENTM 350', 'ENTM 352', 'ENTM 354', 'ENTM 356', 'ENTM 360', 'ENTM 362', 'ETHR 302']
+     Got:      ['COMP 201', 'ENTM 208', 'ENTM 350', 'ENTM 352', 'ENTM 354', 'ENTM 356', 'ENTM 360', 'ENTM 362', 'ETHR 302']
+     Missing:  ['ENTM 252']
+     Extra:    ['COMP 201']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'علوم الحاسب'}
+     Time:     13.43s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ETHR 302 | أخلاقيات البحث العلمي | 1 | - || إجباري (11 ساعة) | ENTM 350 | مقدمة في عل
+
+  ❌ برنامج جيولوجيا - جيوفيزياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 2 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['COMP 214', 'ENGL 102', 'ENGL 201', 'GEOL 201', 'GEOL 213', 'GEOP 102', 'GEOP 203', 'GEOP 205', 'STAT 211']
+     Got:      ['CHEM 261', 'COMP 214', 'ENGL 102', 'ENGL 201', 'GEOL 203', 'GEOP 102', 'GEOP 104', 'GEOP 201', 'GEOP 205', 'STAT 211']
+     Missing:  ['GEOL 201', 'GEOL 213', 'GEOP 203']
+     Extra:    ['CHEM 261', 'GEOL 203', 'GEOP 104', 'GEOP 201']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الجيوفيزياء', 'الكيمياء', 'الجيولوجيا'}
+     Time:     15.17s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ENGL 201 | لغة إنجليزية (2) | 2 | ENGL 102 || إجباري تخصص أول | GEOP 201 | فيزياء الأ
+
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الأول
+     Status:   WRONG_PROGRAM
+     Expected: ['COMP 214', 'ENGL 102', 'ENGL 201', 'GEOP 102', 'GEOP 201', 'GEOP 203', 'GEOP 205', 'GEOP 207', 'MATH 102', 'PHYS 101', 'PHYS 265', 'STAT 211']
+     Got:      ['COMP 214', 'ENGL 102', 'ENGL 201', 'GEOL 106', 'GEOL 205', 'GEOP 102', 'GEOP 201', 'GEOP 203', 'GEOP 205', 'PHYS 102', 'PHYS 225', 'STAT 211']
+     Missing:  ['GEOP 207', 'MATH 102', 'PHYS 101', 'PHYS 265']
+     Extra:    ['GEOL 106', 'GEOL 205', 'PHYS 102', 'PHYS 225']
+     Diagnosis:Wrong program retrieved. Extra codes from: {'الفيزياء', 'الجيولوجيا'}
+     Time:     15.0s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | ENGL 201 | لغة إنجليزية (2) | 2 | ENGL 102 || إجباري (14 ساعة) | GEOP 201 | فيزياء ال
+
+[PARTIAL — 3 cases]
+────────────────────────────────
+  ❌ برنامج الرياضيات البحتة وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 3 / Semester الأول
+     Status:   PARTIAL (92%)
+     Expected: ['COMP 303', 'COMP 305', 'COMP 307', 'COMP 309', 'COMP 311', 'COMP 313', 'MATH 301', 'MATH 303', 'MATH 305', 'MATH 307', 'MATH 319', 'MATH 331', 'SCTH 301']
+     Got:      ['COMP 303', 'COMP 305', 'COMP 307', 'COMP 309', 'COMP 311', 'MATH 301', 'MATH 303', 'MATH 305', 'MATH 307', 'MATH 319', 'MATH 331', 'SCTH 301']
+     Missing:  ['COMP 313']
+     Extra:    []
+     Diagnosis:1 course(s) missing — likely split table or edge cut
+     Time:     18.21s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| متطلب الجامعة | SCTH 301 | التفكير العلمي | 1 | - || إجباري تخصص أول (6 ساعات) | MATH 301 | الجبر الم
+
+  ❌ برنامج الإحصاء الرياضي (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   PARTIAL (91%)
+     Expected: ['MATH 101', 'MATH 202', 'MATH 204', 'OR 102', 'STAT 101', 'STAT 102', 'STAT 202', 'STAT 204', 'STAT 206', 'STAT 222', 'STAT 224']
+     Got:      ['MATH 101', 'MATH 202', 'MATH 204', 'OR 102', 'STAT 102', 'STAT 202', 'STAT 204', 'STAT 206', 'STAT 222', 'STAT 224']
+     Missing:  ['STAT 101']
+     Extra:    []
+     Diagnosis:1 course(s) missing — likely split table or edge cut
+     Time:     12.89s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (15 ساعة) | STAT 202 | نظرية الإحصاء (2) | 3 | STAT 102 || إجباري | STAT 204 | طرق احتمالية في
+
+  ❌ برنامج الكيمياء التطبيقية (تخصص منفرد) - 134 ساعة معتمدة / Level 4 / Semester الثاني
+     Status:   PARTIAL (96%)
+     Expected: ['APCH 311', 'APCH 341', 'APCH 344', 'APCH 412', 'APCH 414', 'APCH 416', 'APCH 418', 'APCH 424', 'APCH 426', 'APCH 428', 'APCH 432', 'APCH 440', 'APCH 442', 'APCH 444', 'APCH 446', 'APCH 448', 'APCH 450', 'CHEM 211', 'CHEM 321', 'CHEM 322', 'CHEM 331', 'CHEM 410', 'CHEM 416', 'CHEM 422', 'COMP 418']
+     Got:      ['APCH 311', 'APCH 341', 'APCH 344', 'APCH 412', 'APCH 414', 'APCH 416', 'APCH 418', 'APCH 424', 'APCH 426', 'APCH 428', 'APCH 432', 'APCH 440', 'APCH 442', 'APCH 444', 'APCH 446', 'APCH 450', 'CHEM 211', 'CHEM 321', 'CHEM 322', 'CHEM 331', 'CHEM 410', 'CHEM 416', 'CHEM 422', 'COMP 418']
+     Missing:  ['APCH 448']
+     Extra:    []
+     Diagnosis:1 course(s) missing — likely split table or edge cut
+     Time:     27.12s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (14 ساعة) | APCH 450 | مشروع بحث 2 | 1 | - || إجباري | APCH 412 | كيمياء عضوية تطبيقية (صناعة 
+
+[NO_CODES_IN_RESPONSE — 5 cases]
+────────────────────────────────
+  ❌ برنامج الرياضيات البحتة والإحصاء الرياضي (تخصص مزدوج) - 140 ساعة معتمدة / Level 1 / Semester الأول
+     Status:   NO_CODES_IN_RESPONSE
+     Expected: ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'SAFS 101', 'STAT 101']
+     Got:      []
+     Missing:  ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'SAFS 101', 'STAT 101']
+     Extra:    []
+     Diagnosis:LLM gave prose without any course codes
+     Time:     15.72s
+     Snippet:  | م | المتطلبات | المقررات | عدد الساعات المعتمدة ||---|---|---|---|| 8 | برنامج تخصص مزدوج - من المستوى الثاني إلى المستوى الرابع | التخصص الرئيسي الأول (51 ساعة معتمدة): مقررات تخصص إجبارية | 40 || 
+
+  ❌ برنامج الرياضيات البحتة وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 1 / Semester الأول
+     Status:   NO_CODES_IN_RESPONSE
+     Expected: ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'SAFS 101', 'STAT 101']
+     Got:      []
+     Missing:  ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'SAFS 101', 'STAT 101']
+     Extra:    []
+     Diagnosis:LLM gave prose without any course codes
+     Time:     15.5s
+     Snippet:  | م | المتطلبات | المقررات | عدد الساعات المعتمدة ||---|---|---|---|| 8 | برنامج تخصص مزدوج - من المستوى الثاني إلى المستوى الرابع | التخصص الرئيسي الأول (51 ساعة معتمدة): مقررات تخصص إجبارية | 40 || 
+
+  ❌ برنامج الإحصاء الرياضي وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 1 / Semester الأول
+     Status:   NO_CODES_IN_RESPONSE
+     Expected: ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'SAFS 101', 'STAT 101']
+     Got:      []
+     Missing:  ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'SAFS 101', 'STAT 101']
+     Extra:    []
+     Diagnosis:LLM gave prose without any course codes
+     Time:     16.61s
+     Snippet:  | م | المتطلبات | المقررات | عدد الساعات المعتمدة ||---|---|---|---|| 8 | برنامج تخصص مزدوج - من المستوى الثاني إلى المستوى الرابع | التخصص الرئيسي الأول (51 ساعة معتمدة): مقررات تخصص إجبارية | 40 || 
+
+  ❌ برنامج الفيزياء والكيمياء (تخصص مزدوج) - 140 ساعة معتمدة / Level 1 / Semester الأول
+     Status:   NO_CODES_IN_RESPONSE
+     Expected: ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'PHYS 103', 'SAFS 101']
+     Got:      []
+     Missing:  ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'PHYS 103', 'SAFS 101']
+     Extra:    []
+     Diagnosis:LLM gave prose without any course codes
+     Time:     17.38s
+     Snippet:  | م | المتطلبات | المقررات | عدد الساعات المعتمدة ||---|---|---|---|| 8 | برنامج تخصص مزدوج - من المستوى الثاني إلى المستوى الرابع | التخصص الرئيسي الأول (51 ساعة معتمدة): مقررات تخصص إجبارية | 40 || 
+
+  ❌ برنامج الفيزياء وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة / Level 1 / Semester الأول
+     Status:   NO_CODES_IN_RESPONSE
+     Expected: ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'PHYS 103', 'SAFS 101']
+     Got:      []
+     Missing:  ['CHEM 101', 'CHEM 103', 'HURI 101', 'MATH 101', 'PHYS 101', 'PHYS 103', 'SAFS 101']
+     Extra:    []
+     Diagnosis:LLM gave prose without any course codes
+     Time:     19.65s
+     Snippet:  | م | المتطلبات | المقررات | عدد الساعات المعتمدة ||---|---|---|---|| 8 | برنامج تخصص مزدوج - من المستوى الثاني إلى المستوى الرابع | التخصص الرئيسي الأول (51 ساعة معتمدة): مقررات تخصص إجبارية | 40 || 
+
+[EXTRA_COURSES — 1 cases]
+────────────────────────────────
+  ❌ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة / Level 2 / Semester الثاني
+     Status:   EXTRA_COURSES
+     Expected: ['GEOL 104', 'GEOL 202', 'GEOL 204', 'GEOP 102', 'GEOP 201', 'GEOP 202', 'GEOP 204', 'GEOP 206', 'GEOP 208', 'MATH 102', 'PHYS 101', 'PHYS 266']
+     Got:      ['GEOL 102', 'GEOL 104', 'GEOL 202', 'GEOL 204', 'GEOP 102', 'GEOP 201', 'GEOP 202', 'GEOP 204', 'GEOP 206', 'GEOP 208', 'MATH 102', 'PHYS 101', 'PHYS 266']
+     Missing:  []
+     Extra:    ['GEOL 102']
+     Diagnosis:Extra codes from: {'الجيولوجيا'}
+     Time:     17.27s
+     Snippet:  | حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة ||---|---|---|---|---|| إجباري (14 ساعة) | GEOP 202 | فيزياء الأرض (3) - الديناميكا الجيوفيزيائية | 3 | GEOP 201 || إجباري | 
+
+═══════════════════════════════════════════════════
+PASSING PROGRAMS (for reference)
+═══════════════════════════════════════════════════
+  ✅ برنامج الإحصاء الرياضي (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الإحصاء الرياضي وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الجيوفيزياء (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الجيولوجيا (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الحشرات الطبية (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الرياضيات (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الرياضيات البحتة والإحصاء الرياضي (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الرياضيات البحتة وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الفيزياء (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الفيزياء الحيوية (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الفيزياء والكيمياء (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الفيزياء وعلوم الحاسب (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج الكيمياء (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الكيمياء التطبيقية (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الكيمياء الحيوية (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج الميكروبيولوجي (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج النبات (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج جيولوجيا - جيوفيزياء (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج علم الحشرات (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج علم الحيوان (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج علم الحيوان - الكيمياء (تخصص مزدوج) - 140 ساعة معتمدة
+  ✅ برنامج علوم الحاسب (تخصص منفرد) - 134 ساعة معتمدة
+  ✅ برنامج نبات - كيمياء (تخصص مزدوج) - 140 ساعة معتمدة
+
+═══════════════════════════════════════════════════
+KNOWN CORRECT BEHAVIOR (not counted as failures)
+═══════════════════════════════════════════════════
+- الكيمياء التطبيقية L1/L2 → returns الكيمياء data + sharing note ✅
+- الجيوفيزياء L1 → returns الجيولوجيا shared data + sharing note ✅
+- ETHR/SCTH/ENCU/GHDS/SKIL missing → counted as PASS (univ-req edge rows) ✅
