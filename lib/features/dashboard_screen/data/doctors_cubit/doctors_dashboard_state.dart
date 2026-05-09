@@ -8,8 +8,12 @@ class DoctorsLoading extends DoctorsDashboardState {}
 
 class DoctorsLoaded extends DoctorsDashboardState {
   final List<DoctorsDashboardModel> doctors;
+  final List<DoctorsDashboardModel> allDoctors;
 
-  DoctorsLoaded(this.doctors);
+  DoctorsLoaded({
+    required this.doctors,
+    required this.allDoctors,
+  });
 }
 
 class DoctorsError extends DoctorsDashboardState {
