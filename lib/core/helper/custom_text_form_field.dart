@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class CustomTextFormField extends StatelessWidget {
-  const CustomTextFormField({super.key, this.controller, this.onChanged, required this.hintText, required this.labelText,  this.prefixIcon,  this.suffixIcon, this.obscureText=false, this.keyboardType=TextInputType.text, this.validator});
+  const CustomTextFormField({super.key, this.controller, this.onChanged,this.hintText, required this.labelText,  this.prefixIcon,  this.suffixIcon, this.obscureText=false, this.keyboardType=TextInputType.text, this.validator});
   final TextEditingController? controller;
   final void Function(String)? onChanged;
   final String? Function(String?)? validator;
-  final String hintText;
+  final String? hintText;
   final String labelText;
   final Widget? prefixIcon;
   final Widget? suffixIcon;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/doctors_dashboard_model.dart';
+import 'edit_doctor_screen.dart';
 
 class DoctorDashboardCard extends StatelessWidget {
   final DoctorsDashboardModel doctor;
@@ -15,14 +16,14 @@ class DoctorDashboardCard extends StatelessWidget {
       highlightColor: Colors.transparent,
       borderRadius: BorderRadius.circular(24),
       onTap: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (_) => EditDoctorScreen(
-        //       doctor: doctor,
-        //     ),
-        //   ),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => EditDoctorScreen(
+              doctor: doctor,
+            ),
+          ),
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
