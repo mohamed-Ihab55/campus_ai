@@ -15,38 +15,29 @@ class ChatCubit extends Cubit<ChatState> {
 
   final String _userId = FirebaseAuth.instance.currentUser!.uid;
 
-  ChatCubit({
-    ChatRepository? repository,
-    ChatRemoteService? remoteService,
-  })  : _repository = repository ?? ChatRepository(),
-        _remoteService = remoteService ?? ChatRemoteService(),
-        super(const ChatInitial());
+  ChatCubit({ChatRepository? repository, ChatRemoteService? remoteService})
+    : _repository = repository ?? ChatRepository(),
+      _remoteService = remoteService ?? ChatRemoteService(),
+      super(const ChatInitial());
 
   StreamSubscription<List<ChatMessage>>? _messagesSubscription;
 
   Future<void> loadMessages() async {
     try {
-      emit(ChatLoading(state.messages));
-
       await _messagesSubscription?.cancel();
 
       _messagesSubscription = _repository
           .getMessages(userId: _userId)
           .listen(
             (messages) {
-          emit(ChatSuccess(messages));
-        },
-        onError: (error) {
-          emit(ChatError(state.messages, error.toString()));
-        },
-      );
+              emit(ChatSuccess(messages)); // Firestore is source of truth
+            },
+            onError: (error) {
+              emit(ChatError(state.messages, error.toString()));
+            },
+          );
     } catch (e) {
-      emit(
-        ChatError(
-          state.messages,
-          'Failed to load messages: ${e.toString()}',
-        ),
-      );
+      emit(ChatError(state.messages, e.toString()));
     }
   }
 
@@ -55,141 +46,85 @@ class ChatCubit extends Cubit<ChatState> {
 
     final trimmedMessage = message.trim();
 
-    final currentMessages = List<ChatMessage>.from(state.messages);
-
     final userMessage = ChatMessage(
       content: trimmedMessage,
       role: MessageRole.user,
       userId: _userId,
     );
 
-    final streamingMessage = ChatMessage(
-      content: '',
-      role: MessageRole.assistant,
+    await _repository.saveMessage(
+      content: userMessage.content,
+      role: MessageRole.user,
       userId: _userId,
+      isError: false,
     );
 
-    emit(
-      ChatLoading([
-        ...currentMessages,
-        userMessage,
-        streamingMessage,
-      ]),
+    final responseBuffer = StringBuffer();
+    String? apiMessageId;
+
+    await _remoteService.sendMessageStreaming(
+      message: trimmedMessage,
+      userId: _userId,
+
+      onMessageId: (id) {
+        apiMessageId = id;
+      },
+
+      onToken: (token) {
+        responseBuffer.write(token);
+
+        final updated = [
+          ...state.messages,
+          ChatMessage(
+            id: apiMessageId,
+            content: responseBuffer.toString(),
+            role: MessageRole.assistant,
+            userId: _userId,
+          ),
+        ];
+
+        emit(ChatStreaming(updated));
+      },
+
+      onDone: () async {
+        final fullReply = responseBuffer.toString().trim();
+
+        final assistantMessage = ChatMessage(
+          id: apiMessageId,
+          content: fullReply,
+          role: MessageRole.assistant,
+          userId: _userId,
+        );
+
+        await _repository.saveMessage(
+          id: apiMessageId,
+          content: fullReply,
+          role: MessageRole.assistant,
+          userId: _userId,
+          isError: false,
+        );
+
+        // 🔥 DO NOT rebuild manually — Firestore will push update
+      },
+
+      onError: (error) async {
+        final errorMessage = ChatMessage(
+          content: error.toString(),
+          role: MessageRole.assistant,
+          userId: _userId,
+          isError: true,
+        );
+
+        await _repository.saveMessage(
+          content: errorMessage.content,
+          role: MessageRole.assistant,
+          userId: _userId,
+          isError: true,
+        );
+
+        emit(ChatError([...state.messages, errorMessage], error));
+      },
     );
-
-    try {
-      await _repository.saveMessage(
-        content: userMessage.content,
-        role: MessageRole.user,
-        userId: _userId,
-        isError: false,
-      );
-
-      final StringBuffer responseBuffer = StringBuffer();
-
-      String? apiMessageId;
-
-      await _remoteService.sendMessageStreaming(
-        message: trimmedMessage,
-        userId: _userId,
-
-        onMessageId: (messageId) {
-          apiMessageId = messageId;
-        },
-
-        onToken: (token) {
-          responseBuffer.write(token);
-
-          final updatedMessages =
-          List<ChatMessage>.from([
-            ...currentMessages,
-            userMessage,
-          ])
-            ..add(
-              ChatMessage(
-                id: apiMessageId,
-                content: responseBuffer.toString(),
-                role: MessageRole.assistant,
-                userId: _userId,
-              ),
-            );
-
-          emit(ChatStreaming(updatedMessages));
-        },
-
-        onDone: () async {
-          final fullReply = responseBuffer.toString().trim();
-
-          final assistantMessage = ChatMessage(
-            id: apiMessageId,
-            content: fullReply,
-            role: MessageRole.assistant,
-            userId: _userId,
-          );
-
-          await _repository.saveMessage(
-            id: apiMessageId,
-            content: fullReply,
-            role: MessageRole.assistant,
-            userId: _userId,
-            isError: false,
-          );
-
-          emit(
-            ChatSuccess([
-              ...currentMessages,
-              userMessage,
-              assistantMessage,
-            ]),
-          );
-        },
-
-        onError: (error) async {
-          final errorMessage = ChatMessage(
-            role: MessageRole.assistant,
-            userId: _userId,
-            isError: true,
-            content: error.toString(),
-          );
-
-          await _repository.saveMessage(
-            content: errorMessage.content,
-            role: MessageRole.assistant,
-            userId: _userId,
-            isError: true,
-          );
-
-          emit(
-            ChatError(
-              [
-                ...currentMessages,
-                userMessage,
-                errorMessage,
-              ],
-              error,
-            ),
-          );
-        },
-      );
-    } catch (e) {
-      final errorMessage = ChatMessage(
-        role: MessageRole.assistant,
-        userId: _userId,
-        isError: true,
-        content: e.toString(),
-      );
-
-      emit(
-        ChatError(
-          [
-            ...currentMessages,
-            userMessage,
-            errorMessage,
-          ],
-          e.toString(),
-        ),
-      );
-    }
   }
 
   @override
