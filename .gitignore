@@ -27,9 +27,6 @@ venv/
 .flutter-plugins-dependencies
 src/flutter/.flutter-plugins-dependencies
 
-# Claude Code internal
-.claude/
-
 # IDE
 .idea/
 .vscode/
