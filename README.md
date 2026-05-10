@@ -96,55 +96,56 @@ The RAG backend answers academic questions by retrieving relevant sections from 
 ```
 campus_ai/
 ├── src/                              # All source code
-│   ├── lib/                          # Flutter Dart source
-│   │   ├── main.dart                 # App entry point
-│   │   ├── app.dart                  # Main navigation (PageView + BottomNav)
-│   │   ├── firebase_options.dart     # Firebase configuration
-│   │   ├── core/
-│   │   │   ├── helper/               # Reusable UI components
-│   │   │   ├── theme/                # App colors, theme, dark mode
-│   │   │   └── utils/               # Routes, constants, nav bar
-│   │   └── features/
-│   │       ├── authentication_feature/
-│   │       ├── chat_bot_feature/     # RAG chatbot integration
-│   │       │   ├── data/
-│   │       │   │   ├── cubit/        # ChatCubit + ChatState
-│   │       │   │   ├── model/        # ChatMessage model
-│   │       │   │   └── services/     # HTTP calls to RAG API
-│   │       │   └── presentation/     # Chat UI screens & widgets
-│   │       ├── home_feature/
-│   │       ├── departments_feature/
-│   │       ├── doctors_feature/
-│   │       ├── gpa_feature/
-│   │       ├── map_feature/
-│   │       ├── service_feature/
-│   │       ├── academic_warning_feature/
-│   │       ├── course_registration_feature/
-│   │       ├── elearn_web_view_feature/
-│   │       ├── news_feature/
-│   │       ├── transcript_feature/
-│   │       ├── dashboard_screen/
-│   │       └── ums_webview_feature/
-│   ├── rag_system/                   # Python RAG backend
-│   │   ├── main.py                   # FastAPI server
-│   │   ├── retriever.py              # Hybrid RRF retrieval engine
-│   │   ├── reranker.py               # Qwen3 cross-encoder reranking
-│   │   ├── memory.py                 # Conversation memory (TTL-based)
-│   │   ├── ingest_markdown.py        # Table-aware markdown ingestion
-│   │   ├── requirements.txt          # Python dependencies
-│   │   ├── setup.sh                  # Automated setup script
-│   │   ├── data/
-│   │   │   └── markdown/
-│   │   │       └── guide.md          # Faculty of Science student guide
-│   │   └── vectorstore/              # Auto-generated on first run
-│   │       ├── chroma.sqlite3
-│   │       └── bm25_cache.pkl
-│   ├── android/                      # Android native configuration
-│   ├── ios/                          # iOS native configuration
-│   ├── web/                          # Web platform files
-│   ├── assets/                       # Images and static files
-│   ├── test/                         # Flutter widget tests
-│   └── pubspec.yaml                  # Flutter dependencies
+│   ├── flutter/                      # Flutter mobile application
+│   │   ├── lib/                      # Dart source code
+│   │   │   ├── main.dart             # App entry point
+│   │   │   ├── app.dart              # Main navigation (PageView + BottomNav)
+│   │   │   ├── firebase_options.dart # Firebase configuration
+│   │   │   ├── core/
+│   │   │   │   ├── helper/           # Reusable UI components
+│   │   │   │   ├── theme/            # App colors, theme, dark mode
+│   │   │   │   └── utils/            # Routes, constants, nav bar
+│   │   │   └── features/
+│   │   │       ├── authentication_feature/
+│   │   │       ├── chat_bot_feature/ # RAG chatbot integration
+│   │   │       │   ├── data/
+│   │   │       │   │   ├── cubit/    # ChatCubit + ChatState
+│   │   │       │   │   ├── model/    # ChatMessage model
+│   │   │       │   │   └── services/ # HTTP calls to RAG API
+│   │   │       │   └── presentation/ # Chat UI screens & widgets
+│   │   │       ├── home_feature/
+│   │   │       ├── departments_feature/
+│   │   │       ├── doctors_feature/
+│   │   │       ├── gpa_feature/
+│   │   │       ├── map_feature/
+│   │   │       ├── service_feature/
+│   │   │       ├── academic_warning_feature/
+│   │   │       ├── course_registration_feature/
+│   │   │       ├── elearn_web_view_feature/
+│   │   │       ├── news_feature/
+│   │   │       ├── transcript_feature/
+│   │   │       ├── dashboard_screen/
+│   │   │       └── ums_webview_feature/
+│   │   ├── android/                  # Android native configuration
+│   │   ├── ios/                      # iOS native configuration
+│   │   ├── web/                      # Web platform files
+│   │   ├── assets/                   # Images and static files
+│   │   ├── test/                     # Flutter widget tests
+│   │   └── pubspec.yaml              # Flutter dependencies
+│   └── rag/                          # Python RAG backend
+│       ├── main.py                   # FastAPI server
+│       ├── retriever.py              # Hybrid RRF retrieval engine
+│       ├── reranker.py               # Qwen3 cross-encoder reranking
+│       ├── memory.py                 # Conversation memory (TTL-based)
+│       ├── ingest_markdown.py        # Table-aware markdown ingestion
+│       ├── requirements.txt          # Python dependencies
+│       ├── setup.sh                  # Automated setup script
+│       ├── data/
+│       │   └── markdown/
+│       │       └── guide.md          # Faculty of Science student guide
+│       └── vectorstore/              # Auto-generated on first run
+│           ├── chroma.sqlite3
+│           └── bm25_cache.pkl
 ├── exe/                              # Pre-built executables (see below)
 └── README.md
 ```
@@ -167,7 +168,7 @@ campus_ai/
 | RAM | 8 GB minimum | 16 GB recommended |
 | Disk | 5 GB free | Models + vectorstore |
 
-**Python packages** (pinned in `src/rag_system/requirements.txt`):
+**Python packages** (pinned in `src/rag/requirements.txt`):
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -195,7 +196,7 @@ campus_ai/
 | Android SDK | API 21+ | Android 5.0 minimum |
 | Firebase project | — | Auth + Firestore enabled |
 
-**Key Flutter packages** (full list in `src/pubspec.yaml`):
+**Key Flutter packages** (full list in `src/flutter/pubspec.yaml`):
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -214,7 +215,7 @@ campus_ai/
 
 ## Environment Setup & Configuration
 
-### RAG Backend — `src/rag_system/.env`
+### RAG Backend — `src/rag/.env`
 
 ```env
 # LLM — local Ollama server
@@ -236,7 +237,7 @@ RERANKER_MODEL=Qwen/Qwen3-Reranker-0.6B
 RERANKER_CONCURRENCY=4
 ```
 
-### Flutter App — `src/.env`
+### Flutter App — `src/flutter/.env`
 
 ```env
 # RAG backend URL — use your machine's LAN IP, not localhost
@@ -254,9 +255,9 @@ GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 1. Create a project at [console.firebase.google.com](https://console.firebase.google.com)
 2. Enable **Authentication** → Email/Password provider
 3. Enable **Cloud Firestore** → Start in test mode
-4. **Android:** Download `google-services.json` → place in `src/android/app/`
-5. **iOS:** Download `GoogleService-Info.plist` → place in `src/ios/Runner/`
-6. Update `src/lib/firebase_options.dart` with your project credentials (or run `flutterfire configure` from inside `src/`)
+4. **Android:** Download `google-services.json` → place in `src/flutter/android/app/`
+5. **iOS:** Download `GoogleService-Info.plist` → place in `src/flutter/ios/Runner/`
+6. Update `src/flutter/lib/firebase_options.dart` with your project credentials (or run `flutterfire configure` from inside `src/flutter/`)
 
 ---
 
@@ -268,7 +269,7 @@ GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 
 ```bash
 git clone https://github.com/mohamed-Ihab55/campus_ai.git
-cd campus_ai/src/rag_system
+cd campus_ai/src/rag
 ```
 
 **Step 2 — Automated setup (recommended)**
@@ -317,13 +318,13 @@ ollama pull gemma3     # Download Gemma3 model (~4 GB, run once)
 **Step 2d — Configure environment**
 
 ```bash
-# Create .env in src/rag_system/ with the values shown above
+# Create .env in src/rag/ with the values shown above
 ```
 
 **Step 3 — Start the RAG server**
 
 ```bash
-# From inside src/rag_system/
+# From inside src/rag/
 python main.py
 ```
 
@@ -363,7 +364,7 @@ curl -X POST http://localhost:8000/chat \
 **Step 1 — Navigate to the Flutter source directory**
 
 ```bash
-cd campus_ai/src
+cd campus_ai/src/flutter
 ```
 
 **Step 2 — Install Flutter dependencies**
@@ -374,7 +375,7 @@ flutter pub get
 
 **Step 3 — Configure environment**
 
-Create `src/.env` with the values shown in [Flutter App `.env`](#flutter-app--srcenv) above.
+Create `src/flutter/.env` with the values shown in [Flutter App `.env`](#flutter-app--srcflutterenv) above.
 
 **Step 4 — Set up Firebase**
 
@@ -396,7 +397,7 @@ flutter run
 
 ```bash
 flutter build apk --release
-# Output: src/build/app/outputs/flutter-apk/app-release.apk
+# Output: src/flutter/build/app/outputs/flutter-apk/app-release.apk
 # Copy the APK to the exe/ folder for distribution
 ```
 
@@ -535,10 +536,10 @@ curl -X DELETE http://localhost:8000/session/your-session-uuid
 | Issue | Solution |
 |-------|---------|
 | Chatbot shows "Connection refused" | Make sure the RAG server is running on port 8000 |
-| App cannot reach RAG server | Use machine's LAN IP (not `localhost`) in `src/.env` |
+| App cannot reach RAG server | Use machine's LAN IP (not `localhost`) in `src/flutter/.env` |
 | Slow first chat response | Normal — first query warms up the embedding model (~10s) |
 | Ollama not connected in `/health` | Run `ollama serve` before starting the RAG server |
-| Vectorstore seems empty / wrong | Delete `src/rag_system/vectorstore/` folder and restart server |
-| Firebase auth errors | Check `google-services.json` is in `src/android/app/` |
+| Vectorstore seems empty / wrong | Delete `src/rag/vectorstore/` folder and restart server |
+| Firebase auth errors | Check `google-services.json` is in `src/flutter/android/app/` |
 | `flutter pub get` fails | Run `flutter upgrade` then retry |
-| `flutter run` not finding project | Make sure you are inside the `src/` directory |
+| `flutter run` not finding project | Make sure you are inside the `src/flutter/` directory |
