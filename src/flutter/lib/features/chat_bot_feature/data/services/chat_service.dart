@@ -21,7 +21,6 @@ class ChatRemoteService {
 
   Future<String> sendMessage({
     required String message,
-    required String sessionId,
     required String userId,
   }) async {
     final buffer = StringBuffer();
@@ -32,7 +31,6 @@ class ChatRemoteService {
 
     await sendMessageStreaming(
       message: message,
-      sessionId: sessionId,
       userId: userId,
       onToken: (token) => buffer.write(token),
       onDone: () => completer.complete(),
@@ -59,7 +57,6 @@ class ChatRemoteService {
 
   Future<void> sendMessageStreaming({
     required String message,
-    required String sessionId,
     required String userId,
     required void Function(String token) onToken,
     required void Function() onDone,
@@ -71,7 +68,6 @@ class ChatRemoteService {
         '/chat',
         data: {
           'question': message,
-          'session_id': sessionId,
           'user_id': userId,
         },
         options: Options(
@@ -95,13 +91,6 @@ class ChatRemoteService {
 
         if (cleaned.isEmpty) continue;
 
-        /// لو الـ API بيرجع JSON
-        /// مثال:
-        /// {
-        ///   "message_id":"123",
-        ///   "token":"hello"
-        /// }
-
         try {
           final data = jsonDecode(cleaned);
 
@@ -119,7 +108,6 @@ class ChatRemoteService {
             }
           }
         } catch (_) {
-          /// fallback لو الرد text مباشر
           onToken(cleaned);
         }
       }
