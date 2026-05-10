@@ -9,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/helper/custom_text_form_field.dart';
 import '../../../../core/utils/social_button.dart';
 import '../../data/cubit/auth_cubit.dart';
+import 'forget_password_screen.dart';
 
 class LoginScreenBody extends StatefulWidget {
   const LoginScreenBody({super.key});
@@ -52,9 +53,7 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
     _slide = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     _controller.forward();
     _startTyping();
@@ -164,9 +163,14 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                 ),
                                 controller: emailController,
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Enter your email';
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Email is required';
                                   }
+
+                                  if (!value.contains('@')) {
+                                    return 'Enter a valid email';
+                                  }
+
                                   return null;
                                 },
                               ),
@@ -206,7 +210,29 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                   return null;
                                 },
                               ),
-
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ForgotPasswordScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Forget password?',
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                               const SizedBox(height: 25),
 
                               CustomButton(
@@ -216,38 +242,42 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                 onTap: state is AuthLoading
                                     ? null
                                     : () async {
-                                  setState(() {
-                                    _autoValidate = true;
-                                  });
+                                        setState(() {
+                                          _autoValidate = true;
+                                        });
 
-                                  final isValid = formKey.currentState!.validate();
+                                        final isValid = formKey.currentState!
+                                            .validate();
 
-                                  if (!isValid) return;
+                                        if (!isValid) return;
 
-                                  final email = emailController.text.trim();
-                                  final password = passwordController.text.trim();
+                                        final email = emailController.text
+                                            .trim();
+                                        final password = passwordController.text
+                                            .trim();
 
-                                  await context.read<AuthCubit>().login(
-                                    email: email,
-                                    password: password,
-                                  );
+                                        await context.read<AuthCubit>().login(
+                                          email: email,
+                                          password: password,
+                                        );
 
-                                  if (!context.mounted) return;
+                                        if (!context.mounted) return;
 
-                                  if (email == 'admin@gmail.com' && password == 'admin123') {
-                                    Navigator.pushNamedAndRemoveUntil(
-                                      context,
-                                      '/dashboard',
-                                          (route) => false,
-                                    );
-                                  } else {
-                                    Navigator.pushNamedAndRemoveUntil(
-                                      context,
-                                      '/main_screen',
-                                          (route) => false,
-                                    );
-                                  }
-                                },
+                                        if (email == 'admin@gmail.com' &&
+                                            password == 'admin123') {
+                                          Navigator.pushNamedAndRemoveUntil(
+                                            context,
+                                            '/dashboard',
+                                            (route) => false,
+                                          );
+                                        } else {
+                                          Navigator.pushNamedAndRemoveUntil(
+                                            context,
+                                            '/main_screen',
+                                            (route) => false,
+                                          );
+                                        }
+                                      },
                               ),
                               const SizedBox(height: 10),
 
@@ -255,10 +285,10 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                 onPressed: state is AuthLoading
                                     ? null
                                     : () {
-                                  context
-                                      .read<AuthCubit>()
-                                      .signInWithGoogle();
-                                },
+                                        context
+                                            .read<AuthCubit>()
+                                            .signInWithGoogle();
+                                      },
                                 text: 'Continue with Google',
                                 icon: FontAwesomeIcons.google,
                               ),

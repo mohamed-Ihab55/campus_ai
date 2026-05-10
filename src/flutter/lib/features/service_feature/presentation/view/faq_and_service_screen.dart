@@ -1,11 +1,13 @@
 import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:campus_ai/features/service_feature/data/cubit/services_cubit.dart';
 import 'package:campus_ai/features/service_feature/data/model/faq_item.dart';
-import 'package:campus_ai/features/service_feature/presentation/view/faq_part_screen.dart';
-import 'package:campus_ai/features/service_feature/presentation/view/services_part_screen.dart';
-import 'package:campus_ai/features/service_feature/presentation/widgets/services_app_bar.dart';
+import 'package:campus_ai/features/service_feature/presentation/widgets/faq_part_screen.dart';
+import 'package:campus_ai/features/service_feature/presentation/widgets/services_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/helper/grid_loading_case.dart';
+import '../widgets/services_grid.dart';
 
 class FaqScreen extends StatefulWidget {
   const FaqScreen({super.key});
@@ -15,7 +17,6 @@ class FaqScreen extends StatefulWidget {
 
 class _FaqScreenState extends State<FaqScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabCtrl;
   final List<FaqItem> _faqs = [
     FaqItem(
       question: 'How do I register for courses?',
@@ -44,66 +45,88 @@ class _FaqScreenState extends State<FaqScreen>
           'Tuition fees are paid at the beginning of each academic term through approved banks or at the treasury office in Building A — ground floor. Keep your payment receipt.',
     ),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabCtrl = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabCtrl.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bgColor,
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          ServicesAppBar(
-            tabController: _tabCtrl,
-            forceElevated: innerBoxIsScrolled,
-            tab1: 'Services',
-            tab2: 'FAQ',
-            titleName: 'Services',
-            subTitle: 'Affairs',
-            description: 'Every service you need in one place',
-          ),
-        ],
-        body: TabBarView(
-          controller: _tabCtrl,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: AppColors.bgColor,
+        body: Column(
           children: [
-            BlocProvider(
-              create: (_) => ServicesCubit()..getServices(),
-              child: BlocBuilder<ServicesCubit, ServicesState>(
-                builder: (context, state) {
-                  if (state is ServicesLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (state is ServicesError) {
-                    return Center(child: Text(state.message));
-                  }
-
-                  if (state is ServicesSuccess) {
-                    return ServicesTab(services: state.services);
-                  }
-
-                  return const SizedBox();
-                },
+            ServicesHeader(
+              height: 270,
+              titleName: 'Services',
+              subTitle: 'Affairs',
+              description: 'All services in one place',
+            ),
+            Container(
+              margin: const EdgeInsets.only(left: 16,right: 16,top: 16),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: TabBar(
+                dividerColor: AppColors.primary,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: Theme.of(context).primaryColor,
+                ),
+                labelColor: AppColors.surface,
+                unselectedLabelColor: AppColors.textTertiary,
+                tabs: const [
+                  Tab(text: 'Services'),
+                  Tab(text: 'FAQ'),
+                ],
               ),
             ),
+            Expanded(
+              child: TabBarView(
+                  children: [
+                    BlocProvider(
+                      create: (_) => ServicesCubit()..getServices(),
+                      child: BlocBuilder<ServicesCubit, ServicesState>(
+                        builder: (context, state) {
+                          if (state is ServicesLoading) {
+                            return GridView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: 6,
+                              gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                                childAspectRatio: 0.78,
+                              ),
+                              itemBuilder: (_, index) {
+                                return const GridLoadingCase();
+                              },
+                            );
+                          }
 
-            FaqPartScreen(
-              faqs: _faqs,
-              onToggle: (i) {
-                setState(() => _faqs[i].isOpen = !_faqs[i].isOpen);
-              },
+                          if (state is ServicesError) {
+                            return Center(child: Text(state.message));
+                          }
+
+                          if (state is ServicesSuccess) {
+                            return ServicesGrid(services: state.services);
+                          }
+
+                          return const SizedBox();
+                        },
+                      ),
+                    ),
+
+                    FaqPartScreen(
+                      faqs: _faqs,
+                      onToggle: (i) {
+                        setState(() => _faqs[i].isOpen = !_faqs[i].isOpen);
+                      },
+                    ),
+                  ],
+                ),
             ),
-          ],
+          ]
         ),
       ),
     );

@@ -26,7 +26,7 @@ class ServicesHeader extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          const DecorationBackgroungStackHomeScreen(),
+          const DecorationBackgroundStackHomeScreen(),
           SafeArea(
             bottom: false,
             child: Padding(

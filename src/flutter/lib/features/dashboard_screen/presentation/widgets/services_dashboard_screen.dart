@@ -1,5 +1,5 @@
 import 'package:campus_ai/features/dashboard_screen/presentation/widgets/add_services_dashboard.dart';
-import 'package:campus_ai/features/service_feature/presentation/view/services_part_screen.dart';
+import 'package:campus_ai/features/service_feature/presentation/widgets/services_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -58,7 +58,7 @@ class ServicesDashboardScreen extends StatelessWidget {
                           }
 
                           if (state is ServicesSuccess) {
-                            return ServicesTab(services: state.services);
+                            return ServicesGrid(services: state.services);
                           }
 
                           return const SizedBox();

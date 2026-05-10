@@ -16,6 +16,15 @@ class AuthLoading extends AuthState {
   const AuthLoading();
 }
 
+class AuthSuccess extends AuthState {
+  final String message;
+
+  const AuthSuccess(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class AuthAuthenticated extends AuthState {
   final User user;
 

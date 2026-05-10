@@ -86,6 +86,23 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
 
+  Future<void> resetPassword(String email) async {
+    try {
+      emit(AuthLoading());
+
+      await _auth.sendPasswordResetEmail(
+        email: email.trim(),
+      );
+
+      emit(const AuthSuccess('Password reset email sent'));
+    } on FirebaseAuthException catch (e) {
+      emit(AuthError(_mapFirebaseError(e.code)));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+
   Future<void> logout() async {
     await _auth.signOut();
     emit(const AuthUnauthenticated());

@@ -1,6 +1,5 @@
 import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:campus_ai/features/departments_feature/data/cubit/department_cubit.dart';
-import 'package:campus_ai/features/service_feature/presentation/widgets/services_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -35,13 +34,7 @@ class DepartmentsScreenBody extends StatelessWidget {
             }
             return Column(
               children: [
-                ServicesHeader(
-                  height: 250,
-                  titleName: 'College',
-                  subTitle: 'Departments',
-                  description:
-                      'Explore the various departments and their specialties.',
-                ),
+
                 Expanded(
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),

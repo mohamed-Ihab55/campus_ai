@@ -39,7 +39,6 @@ class _AdminDashboardState extends State<AdminDashboard>
     return Scaffold(
       backgroundColor: AppColors.bgColor,
 
-      /// BODY ANIMATION
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
         switchInCurve: Curves.easeOutBack,
@@ -62,7 +61,6 @@ class _AdminDashboardState extends State<AdminDashboard>
         ),
       ),
 
-      /// CUSTOM PROFESSIONAL NAVIGATION BAR
       bottomNavigationBar: Container(
         margin: const EdgeInsets.all(14),
         padding: const EdgeInsets.symmetric(

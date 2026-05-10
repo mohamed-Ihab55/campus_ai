@@ -10,9 +10,10 @@ class DoctorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.surface,
+      color: AppColors.bgColor,
       margin: const EdgeInsets.only(left: 14, right: 14, bottom: 12),
       child: Material(
+        color: AppColors.bgColor,
         borderRadius: BorderRadius.circular(18),
         elevation: 2,
         child: Padding(
@@ -43,7 +44,6 @@ class DoctorCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// Name
                     Text(
                       doctor.name,
                       maxLines: 1,
@@ -68,7 +68,6 @@ class DoctorCard extends StatelessWidget {
 
                     const SizedBox(height: 8),
 
-                    /// Room Badge
                     Row(
                       children: [
                         Container(

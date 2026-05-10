@@ -1,8 +1,8 @@
 import 'package:campus_ai/core/utils/dots_grid.dart';
 import 'package:flutter/material.dart';
 
-class DecorationBackgroungStackHomeScreen extends StatelessWidget {
-  const DecorationBackgroungStackHomeScreen({super.key});
+class DecorationBackgroundStackHomeScreen extends StatelessWidget {
+  const DecorationBackgroundStackHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

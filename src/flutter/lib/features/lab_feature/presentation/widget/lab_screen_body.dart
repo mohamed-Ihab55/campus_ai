@@ -67,7 +67,7 @@ class LabScreenBody extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         const Text(
-          "No Departments Found",
+          "No Labs Found",
           style: TextStyle(
             fontSize: 18,
             color: AppColors.textSecondary,

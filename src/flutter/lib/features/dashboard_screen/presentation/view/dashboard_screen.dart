@@ -2,23 +2,75 @@ import 'package:campus_ai/features/dashboard_screen/presentation/view/main_dashb
 import 'package:campus_ai/features/service_feature/presentation/widgets/services_header.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          ServicesHeader(
-            titleName: 'Admin',
-            subTitle: 'Dashboard',
-            description: 'Control in everything in one place',
-            height: 235,
-          ),
+          Column(
+            children: [
+              ServicesHeader(
+                titleName: 'Admin',
+                subTitle: 'Dashboard',
+                description: 'Control in everything in one place',
+                height: 235,
+              ),
 
-          Expanded(
-            child: AdminDashboard(),
+              Expanded(child: AdminDashboard()),
+            ],
+          ),
+          Positioned(
+            top: 55,
+            right: 20,
+            child: GestureDetector(
+              onTap: () async {
+                final selected = await showMenu(
+                  context: context,
+                  position: const RelativeRect.fromLTRB(
+                    100,
+                    80,
+                    20,
+                    0,
+                  ),
+                  items: const [
+                    PopupMenuItem(
+                      value: 'logout',
+                      child: Row(
+                        children: [
+                          Icon(Icons.logout, color: Colors.red),
+                          SizedBox(width: 10),
+                          Text('Logout'),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+
+                if (selected == 'logout') {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/',
+                        (route) => false,
+                  );
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.surface.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
         ],
       ),

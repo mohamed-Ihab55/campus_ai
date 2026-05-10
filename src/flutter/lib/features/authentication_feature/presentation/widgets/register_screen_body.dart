@@ -192,9 +192,14 @@ class _RegisterScreenBodyState extends State<RegisterScreenBody>
                                 ),
                                 controller: emailController,
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Enter your email';
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Email is required';
                                   }
+
+                                  if (!value.contains('@')) {
+                                    return 'Enter a valid email';
+                                  }
+
                                   return null;
                                 },
                               ),
@@ -228,9 +233,39 @@ class _RegisterScreenBodyState extends State<RegisterScreenBody>
                                 ),
                                 controller: passwordController,
                                 validator: (value) {
-                                  if (value == null || value.length < 6) {
-                                    return 'Password must be 6+ chars';
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Password is required';
                                   }
+
+                                  if (value.length < 8) {
+                                    return 'Password must be at least 8 characters';
+                                  }
+
+                                  final hasUppercase = RegExp(r'[A-Z]').hasMatch(value);
+
+                                  final hasLowercase = RegExp(r'[a-z]').hasMatch(value);
+
+                                  final hasNumber = RegExp(r'[0-9]').hasMatch(value);
+
+                                  final hasSpecialChar =
+                                  RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value);
+
+                                  if (!hasUppercase) {
+                                    return 'Add at least one uppercase letter';
+                                  }
+
+                                  if (!hasLowercase) {
+                                    return 'Add at least one lowercase letter';
+                                  }
+
+                                  if (!hasNumber) {
+                                    return 'Add at least one number';
+                                  }
+
+                                  if (!hasSpecialChar) {
+                                    return 'Add at least one special character';
+                                  }
+
                                   return null;
                                 },
                               ),

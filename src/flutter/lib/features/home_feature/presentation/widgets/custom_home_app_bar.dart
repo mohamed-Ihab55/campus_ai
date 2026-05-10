@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-
+import '../../../../core/theme/app_colors.dart';
+import '../../../authentication_feature/data/cubit/auth_cubit.dart';
 
 String getSeason() {
   final month = DateTime.now().month;
@@ -56,6 +58,53 @@ class CustomHomeAppBar extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          ),
+          child: BlocBuilder<AuthCubit,AuthState>(
+            builder: (context,state ) {
+              return GestureDetector(
+                onTap: () async {
+                  final selected = await showMenu(
+                    context: context,
+                    position: const RelativeRect.fromLTRB(100, 80, 20, 0),
+                    items: const [
+                      PopupMenuItem(
+                        textStyle: TextStyle(color: AppColors.textSecondary,fontSize: 14),
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout, color: Colors.red,size: 15,),
+                            SizedBox(width: 10),
+                            Text('Logout',style: TextStyle(color: AppColors.textSecondary,fontSize: 14),),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+
+                  if (selected == 'logout') {
+                    await context.read<AuthCubit>().logout();
+
+
+                    if (!context.mounted) return;
+
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/',
+                      (route) => false,
+                    );
+                  }
+                },
+                child: Icon(Icons.keyboard_arrow_down, color: AppColors.surface),
+              );
+            }
           ),
         ),
       ],

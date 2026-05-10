@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:campus_ai/features/home_feature/presentation/widgets/feature_label.dart';
 import 'package:campus_ai/features/service_feature/data/model/service_item.dart';
 import 'package:campus_ai/features/service_feature/presentation/widgets/service_card.dart';
 
@@ -33,7 +32,7 @@ class ServicesGrid extends StatelessWidget {
             const SizedBox(height: 18),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
-              child: FeatureLabel(label: 'ACADEMIC SERVICES'),
+              // child: FeatureLabel(label: 'ACADEMIC SERVICES'),
             ),
 
             const SizedBox(height: 12),

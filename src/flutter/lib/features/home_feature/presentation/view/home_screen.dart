@@ -55,7 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(
-            child: WelcomeAndSearchSection(blinkAnim: _blinkAnimation),
+            child: HomeAppBar(blinkAnim: _blinkAnimation),
           ),
           SliverToBoxAdapter(
             child: AccessSection(fadeAnimation: _fadeAnimation),

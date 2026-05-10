@@ -3,6 +3,8 @@ import 'package:campus_ai/features/departments_feature/presentation/widgets/depa
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../service_feature/presentation/widgets/services_header.dart';
+
 class DepartmentsScreen extends StatelessWidget {
   const DepartmentsScreen({super.key});
 
@@ -10,7 +12,23 @@ class DepartmentsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => DepartmentCubit()..getDepartments(),
-      child: DepartmentsScreenBody(),
+      child: Scaffold(
+        body: Column(
+          children: [
+            ServicesHeader(
+              height: 250,
+              titleName: 'College',
+              subTitle: 'Departments',
+              description:
+              'Explore the various departments and their specialties.',
+            ),
+
+            Expanded(
+              child: DepartmentsScreenBody(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
