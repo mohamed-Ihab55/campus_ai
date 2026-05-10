@@ -7,9 +7,11 @@ part 'stats_state.dart';
 class StatsCubit extends Cubit<StatsState> {
   StatsCubit() : super(const StatsState());
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   Future<int> countDocuments(String collectionName) async {
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final snapshot = await _firestore
           .collection(collectionName)
           .count()
           .get();
@@ -21,7 +23,7 @@ class StatsCubit extends Cubit<StatsState> {
   }
 
   Future<void> loadStats() async {
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isLoading: true, error: null));
 
     try {
       final doctors = await countDocuments('doctors');
@@ -32,11 +34,21 @@ class StatsCubit extends Cubit<StatsState> {
       emit(
         state.copyWith(
           isLoading: false,
-          stats: [doctors, departments, services, labs],
+          stats: {
+            'doctors': doctors,
+            'departments': departments,
+            'services': services,
+            'labs': labs,
+          },
         ),
       );
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: e.toString()));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: e.toString(),
+        ),
+      );
     }
   }
 }
