@@ -1,21 +1,34 @@
 # Build artifacts
-src/build/
-src/.dart_tool/
-src/.pub-cache/
-src/.pub/
-src/coverage/
+build/
+.dart_tool/
+src/flutter/build/
+src/flutter/.dart_tool/
+src/flutter/.pub-cache/
+src/flutter/.pub/
+src/flutter/coverage/
 
 # Platform build outputs
-src/android/app/debug/
-src/android/app/profile/
-src/android/app/release/
+src/flutter/android/app/debug/
+src/flutter/android/app/profile/
+src/flutter/android/app/release/
 
 # Python
-src/rag_system/__pycache__/
-src/rag_system/.venv/
-src/rag_system/vectorstore/
+src/rag/__pycache__/
+src/rag/.venv/
+src/rag/vectorstore/
 *.pyc
 *.pyo
+
+# Virtual environment (root level)
+.venv/
+venv/
+
+# Flutter generated
+.flutter-plugins-dependencies
+src/flutter/.flutter-plugins-dependencies
+
+# Claude Code internal
+.claude/
 
 # IDE
 .idea/

@@ -37,4 +37,4 @@ pydantic==2.7.1
 # Torch — CUDA 12.1 build for RTX 3050 GPU acceleration
 # Install with: pip install torch==2.3.1+cu121 --extra-index-url https://download.pytorch.org/whl/cu121
 # If no GPU available, fall back to CPU: pip install torch==2.3.1+cpu
-torch==2.3.1+cu121
+torch==2.3.1+cpu
