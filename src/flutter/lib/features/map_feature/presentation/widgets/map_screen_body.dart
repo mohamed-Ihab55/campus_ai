@@ -1,5 +1,6 @@
 ﻿import 'dart:async';
 
+import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:campus_ai/features/map_feature/data/cubit/map_cubit.dart';
 import 'package:campus_ai/features/map_feature/data/cubit/map_state.dart';
 import 'package:campus_ai/features/map_feature/data/model/campus_data.dart';
@@ -8,9 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helper: point-in-polygon (ray casting)
-// ─────────────────────────────────────────────────────────────────────────────
 
 bool _pointInPolygon(LatLng point, List<LatLng> polygon) {
   bool inside = false;
@@ -31,10 +29,6 @@ bool _pointInPolygon(LatLng point, List<LatLng> polygon) {
   }
   return inside;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Widget
-// ─────────────────────────────────────────────────────────────────────────────
 
 class MapScreenBody extends StatefulWidget {
   const MapScreenBody({super.key});
@@ -73,25 +67,20 @@ class _MapScreenBodyState extends State<MapScreenBody> {
     });
   }
 
-  // ── hit-test: أي polygon تم الضغط عليه؟ ─────────────────────────────────
 
   void _onMapTap(TapPosition _, LatLng tapped) {
     final cubit = context.read<MapCubit>();
     final locations = cubit.state.filtered;
-
-    // ابحث بالـ polygons أولاً
     for (final loc in locations) {
       if (loc.polygon != null && _pointInPolygon(tapped, loc.polygon!)) {
         cubit.selectLocation(loc);
         return;
       }
     }
-
-    // لو مفيش polygon اتلمس، امسح الاختيار
     cubit.clearSelection();
   }
 
-  // ── يبني Polygon widgets من الـ locations ─────────────────────────────────
+
 
   List<Polygon> _buildPolygons(
     List<CampusLocation> locations,
@@ -118,7 +107,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
     }).toList();
   }
 
-  // ── يبني Markers للنقاط (بدون polygon) ───────────────────────────────────
+
 
   List<Marker> _buildPointMarkers(
     List<CampusLocation> locations,
@@ -224,7 +213,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
         },
         child: Stack(
           children: [
-            // ── الخريطة ────────────────────────────────────────────────────
+
             BlocBuilder<MapCubit, MapState>(
               builder: (context, state) {
                 return FlutterMap(
@@ -245,7 +234,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                     },
                   ),
                   children: [
-                    // طبقة الخريطة الأساسية
+
                     TileLayer(
                       urlTemplate:
                           'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -253,7 +242,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                       userAgentPackageName: 'com.example.campus_ai',
                     ),
 
-                    // طبقة الـ Polygons (المباني والساحات)
+
                     if (_currentZoom >= 17.5)
                       PolygonLayer(
                         polygons: _buildPolygons(
@@ -262,7 +251,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                         ),
                       ),
 
-                    // طبقة موقع المستخدم
+
                     if (state.userLocation != null)
                       MarkerLayer(
                         markers: [
@@ -298,7 +287,6 @@ class _MapScreenBodyState extends State<MapScreenBody> {
                         ],
                       ),
 
-                    // طبقة الـ Markers للنقاط
                     MarkerLayer(
                       markers: _currentZoom < 17.5
                           ? _buildAllAsMarkers(state.filtered, state.selected)
@@ -309,7 +297,6 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               },
             ),
 
-            // ── شريط البحث والفلاتر ────────────────────────────────────────
             Positioned(
               top: MediaQuery.of(context).padding.top + 10,
               left: 12,
@@ -343,12 +330,12 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               },
             ),
 
-            // ── زر GPS ─────────────────────────────────────────────────────
+
             Positioned(
               right: 16,
               bottom: 36,
               child: FloatingActionButton(
-                backgroundColor: const Color(0xFF185FA5),
+                backgroundColor:  AppColors.primary,
                 elevation: 4,
                 onPressed: () async {
                   await cubit.locateUser();
@@ -359,7 +346,7 @@ class _MapScreenBodyState extends State<MapScreenBody> {
               ),
             ),
 
-            // ── رسالة الخطأ ────────────────────────────────────────────────
+
             BlocBuilder<MapCubit, MapState>(
               buildWhen: (prev, curr) => prev.error != curr.error,
               builder: (_, state) {
@@ -399,9 +386,6 @@ class _MapScreenBodyState extends State<MapScreenBody> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Search Bar
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _SearchBar extends StatelessWidget {
   final TextEditingController controller;
@@ -428,7 +412,7 @@ class _SearchBar extends StatelessWidget {
         onChanged: onChanged,
         textDirection: TextDirection.rtl,
         decoration: const InputDecoration(
-          hintText: 'ابحث عن مبنى أو مكان...',
+          hintText: 'Search places, departments, labs....',
           hintTextDirection: TextDirection.rtl,
           prefixIcon: Icon(Icons.search, color: Color(0xFF185FA5)),
           border: InputBorder.none,
@@ -439,9 +423,8 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Filters Row
-// ─────────────────────────────────────────────────────────────────────────────
+
+
 
 class _FiltersRow extends StatelessWidget {
   @override
@@ -509,9 +492,8 @@ class _FiltersRow extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Details Card
-// ─────────────────────────────────────────────────────────────────────────────
+
+
 
 class _DetailsCard extends StatelessWidget {
   final CampusLocation location;
@@ -538,7 +520,6 @@ class _DetailsCard extends StatelessWidget {
         child: Row(
           textDirection: TextDirection.rtl,
           children: [
-            // أيقونة المكان
             Container(
               width: 52,
               height: 52,
@@ -557,7 +538,6 @@ class _DetailsCard extends StatelessWidget {
 
             const SizedBox(width: 12),
 
-            // الاسم والتفاصيل
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -596,7 +576,7 @@ class _DetailsCard extends StatelessWidget {
               ),
             ),
 
-            // زر الإغلاق
+
             IconButton(
               onPressed: onClose,
               icon: const Icon(Icons.close, color: Colors.black38),

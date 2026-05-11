@@ -13,7 +13,6 @@ class ChatRepository {
   User? get _currentUser =>
       FirebaseAuth.instance.currentUser;
 
-  /// Get messages for a specific session (or all if no sessionId)
   Stream<List<ChatMessage>> getMessages({
     String? userId,
     String? sessionId,
