@@ -1,0 +1,1 @@
+from app.ingestion.ingest_markdown import ingest_all_markdown

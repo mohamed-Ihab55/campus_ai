@@ -26,7 +26,11 @@ import chromadb
 from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer
 
-from ingest_markdown import _extract_level_number, _extract_semester, _detect_query_program
+from app.ingestion.ingest_markdown import _extract_level_number, _extract_semester, _detect_query_program
+from app.core.config import settings
+from app.core.logging_setup import get_logger
+
+logger = get_logger(__name__)
 
 # ── Program boost matching ────────────────────────────────────────────────────
 # Explicit shared-program allowlist: when user asks about program A,
@@ -74,7 +78,8 @@ def _boost_matches(query_prog: str, chunk_prog: str, chunk_level: str = "") -> b
 
 
 # ── Config ────────────────────────────────────────────────────────────────────
-BM25_CACHE_PATH = Path("vectorstore/bm25_cache.pkl")
+BM25_CACHE_PATH = Path(settings.chroma_path) / "bm25_cache.pkl"
+
 
 # ── Arabic normalization ──────────────────────────────────────────────────────
 # Only strip actual diacritical marks — NOT base Arabic letters.
@@ -224,12 +229,11 @@ def _select_device() -> str:
 class Retriever:
     def __init__(self):
         device = _select_device()
-        print(f"[INIT] Embedding device: {device}")
-        self.embed_model = SentenceTransformer(
-            "paraphrase-multilingual-mpnet-base-v2", device=device
-        )
-        self.client     = chromadb.PersistentClient(path="vectorstore")
-        self.collection = self.client.get_or_create_collection(name="rag_docs")
+        logger.info("[INIT] Embedding device: {device}")
+        self.embed_model = SentenceTransformer(settings.embed_model, ...)
+        self.client     = chromadb.PersistentClient(path=settings.chroma_path)
+        self.collection = self.client.get_or_create_collection(name=settings.chroma_collection)
+        
         self._prepare_bm25()
 
     # ── BM25 persistence ──────────────────────────────────────────────────────
@@ -251,7 +255,7 @@ class Retriever:
                     print(f"[CACHE] BM25 loaded ({len(self.documents)} docs)")
                     return
             except Exception as e:
-                print(f"[WARN] BM25 cache invalid: {e}")
+                logger.warning("[WARN] BM25 cache invalid: {e}")
 
         print("[BUILD] Building BM25 index...")
         all_docs       = self.collection.get()

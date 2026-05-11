@@ -11,7 +11,10 @@ from dataclasses import dataclass
 from typing import Literal
 import os
 
+from app.core.config import settings
+from app.core.logging_setup import get_logger
 
+logger = get_logger(__name__)
 @dataclass
 class Turn:
     role: Literal["user", "assistant"]

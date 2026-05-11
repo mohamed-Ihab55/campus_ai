@@ -21,18 +21,22 @@ import re
 import hashlib
 import shutil
 from pathlib import Path
+from app.core.config import settings
+from app.core.logging_setup import get_logger
+
+logger = get_logger(__name__)
 
 import chromadb
 from sentence_transformers import SentenceTransformer
 from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 
 # ── Config ────────────────────────────────────────────────────────────────────
-CHROMA_PATH   = "vectorstore"
-COLLECTION    = "rag_docs"
-EMBED_MODEL   = "paraphrase-multilingual-mpnet-base-v2"
-CHUNK_SIZE    = 1600      # raised from 1400: prevents ETHR/ENGL edge rows from being cut at chunk boundary
-CHUNK_OVERLAP = 200
-DATA_DIR      = "data/markdown"
+CHROMA_PATH   = settings.chroma_path
+COLLECTION    = settings.chroma_collection
+EMBED_MODEL   = settings.embed_model        # ← نفس القيمة المستخدمة في retriever!
+CHUNK_SIZE    = settings.chunk_size
+CHUNK_OVERLAP = settings.chunk_overlap
+DATA_DIR      = settings.data_dir
 
 # ── Article-number detection ──────────────────────────────────────────────────
 # Boundary-protected match for "مادة رقم 34" / "مادة (34)" / "مادة 34".

@@ -16,7 +16,7 @@ if sys.stderr.encoding != "utf-8":
 
 
 BASE_URL = "http://localhost:8000"
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 GUIDE_MD = ROOT / "data" / "markdown" / "guide.md"
 
 LEVEL_AR = {"1": "الأول", "2": "الثاني", "3": "الثالث", "4": "الرابع"}
