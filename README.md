@@ -18,7 +18,6 @@
 - [Features](#features)
 - [API Reference](#api-reference)
 - [Common Issues & Troubleshooting](#common-issues--troubleshooting)
-- [Additional Resources](#additional-resources)
 
 ---
 
@@ -51,71 +50,70 @@ The RAG backend answers academic questions by retrieving relevant sections from 
 The repository consists of **multiple programming languages** optimized for their use cases:
 
 ```
-┌──────────────────────────────────────────┐
-│  Campus AI Language Distribution         │
-├──────────────────────────────────────────┤
-│  Dart (Flutter)        61.1%  ██████░░  │
-│  Python (RAG/Backend)  29.3%  ███░░░░░  │
-│  C++ (Native)           4.0%  ░░░░░░░░  │
-│  CMake (Build)          3.1%  ░░░░░░░░  │
-│  Shell (Scripts)        0.6%  ░░░░░░░░  │
-│  Java                   0.5%  ░░░░░░░░  │
-│  Other                  1.4%  ░░░░░░░░  │
-└──────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│  Campus AI Language Distribution        │
+├─────────────────────────────────────────┤
+│  Dart (Flutter)        57.1%  ██████░  │
+│  Python (RAG/Backend)  27.4%  ███░░░░  │
+│  HTML (Web/UI)          6.6%  ▊░░░░░░  │
+│  C++ (Native)           3.8%  ░░░░░░░  │
+│  CMake (Build)          2.9%  ░░░░░░░  │
+│  Shell (Scripts)        0.6%  ░░░░░░░  │
+│  Other                  1.6%  ░░░░░░░  │
+└─────────────────────────────────────────┘
 ```
 
 **Why this stack?**
-- **Dart/Flutter (61.1%)**: Cross-platform mobile (iOS/Android) with fast UI performance
-- **Python (29.3%)**: NLP, ML pipelines, RAG backend, document processing
-- **C++ (4.0%)**: Native platform integrations and performance-critical sections
-- **CMake (3.1%)**: Native build system for C++ components
+- **Dart/Flutter (57.1%)**: Cross-platform mobile (iOS/Android) with fast UI performance
+- **Python (27.4%)**: NLP, ML pipelines, RAG backend, document processing
+- **HTML (6.6%)**: Web interface for browser-based testing
+- **C++ (3.8%)**: Native platform integrations and performance-critical sections
+- **CMake (2.9%)**: Native build system for C++ components
 - **Shell (0.6%)**: Automation scripts for setup and deployment
-- **Java (0.5%)**: Android native components
-- **Other (1.4%)**: Build scripts and configuration files
 
 ---
 
 ## System Architecture
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│              Flutter Mobile App (Dart)                    │
-│  ┌──────────┐  ┌──────────┐  ┌────────┐  ┌─────────┐   │
-│  │   Home   │  │ Services │  │  Map   │  │ ChatBot │   │
-│  └──────────┘  └──────────┘  └────────┘  └────┬────┘   │
-│                                              │            │
-│  Firebase Auth ←── Users        Firestore ──┘            │
-└────────────────────────────────────┬─────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                  Flutter Mobile App (Dart)               │
+│  ┌──────────┐  ┌──────────┐  ┌────────┐  ┌─────────┐  │
+│  │   Home   │  │ Services │  │  Map   │  │ ChatBot │  │
+│  └──────────┘  └──────────┘  └────────┘  └────┬────┘  │
+│                                                │         │
+│  Firebase Auth ←── Users          Firestore ──┘         │
+└────────────────────────────────────┬────────────────────┘
                                      │ HTTP POST /chat
                                      │ (streaming SSE)
-┌────────────────────────────────────▼──────────────────────┐
-│               RAG Backend (FastAPI)                        │
-│                      (Python)                              │
-│                                                           │
-│  User Query                                               │
-│      │                                                    │
-│      ▼                                                    │
-│  Language Detection (Arabic / English)                    │
-│      │                                                    │
-│      ├──► Vector Search (SentenceTransformer)             │
-│      └──► BM25 Search (Arabic tokenizer)                  │
-│                   │                                       │
-│              RRF Fusion                                   │
-│                   │                                       │
-│           Reranker (Qwen3 / HuggingFace) [optional]       │
-│                   │                                       │
-│           Build Prompt + Context                          │
-│                   │                                       │
-│           Ollama + Gemma3 (local LLM)                     │
-│                   │                                       │
-│           Stream tokens → Flutter                         │
-└────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────▼────────────────────┐
+│                    RAG Backend (FastAPI)                  │
+│                          (Python)                         │
+│                                                          │
+│  User Query                                              │
+│      │                                                   │
+│      ▼                                                   │
+│  Language Detection (Arabic / English)                   │
+│      │                                                   │
+│      ├──► Vector Search (SentenceTransformer)            │
+│      └──► BM25 Search (Arabic tokenizer)                 │
+│                   │                                      │
+│              RRF Fusion                                  │
+│                   │                                      │
+│           Reranker (Qwen3 / HuggingFace) [optional]      │
+│                   │                                      │
+│           Build Prompt + Context                         │
+│                   │                                      │
+│           Ollama + Gemma3 (local LLM)                    │
+│                   │                                      │
+│           Stream tokens → Flutter                        │
+└──────────────────────────────────────────────────────────┘
 ```
 
 **Chat Message Full Flow:**
 
 ```
-1.  Student types a question in ChatBotScreen (Flutter)
+1.  Student types a question in the ChatBotScreen (Flutter)
 2.  ChatCubit calls ChatRemoteService.sendMessageStreaming()
 3.  HTTP POST to RAG /chat with { question, session_id }
 4.  RAG detects language (Arabic / English)
@@ -137,7 +135,7 @@ The repository consists of **multiple programming languages** optimized for thei
 ```
 campus_ai/
 ├── src/
-│   ├── flutter/                      # Flutter mobile application (61.1%)
+│   ├── flutter/                      # Flutter mobile application (57.1%)
 │   │   ├── lib/                      # Dart source code
 │   │   │   ├── main.dart             # App entry point
 │   │   │   ├── app.dart              # Main navigation (PageView + BottomNav)
@@ -167,24 +165,30 @@ campus_ai/
 │   │   │       ├── transcript_feature/           # Academic transcript
 │   │   │       ├── dashboard_screen/             # Admin dashboard
 │   │   │       └── ums_webview_feature/          # UMS access
-│   │   ├── android/                  # Android native configuration (C++, CMake, Java)
+│   │   ├── android/                  # Android native configuration (C++, CMake)
 │   │   ├── ios/                      # iOS native configuration
-│   │   ├── web/                      # Web platform files
+│   │   ├── web/                      # Web platform files (HTML)
 │   │   ├── assets/                   # Images and static files
 │   │   ├── test/                     # Flutter widget tests
 │   │   └── pubspec.yaml              # Flutter dependencies
 │   │
-│   └── rag/                          # Python RAG backend (29.3%)
+│   └── rag/                          # Python RAG backend (27.4%)
 │       ├── main.py                   # FastAPI server
-│       ├── retriever.py              # Hybrid RRF retrieval engine
-│       ├── reranker.py               # Qwen3 cross-encoder reranking
-│       ├── memory.py                 # Conversation memory (TTL-based)
-│       ├── ingest_markdown.py        # Table-aware markdown ingestion
 │       ├── requirements.txt          # Python dependencies
 │       ├── setup.sh                  # Automated setup script
-│       ├── data/
+│       ├── app/                      # Core application logic
+│       │   ├── api/                  # API routing (chat and health)
+│       │   ├── core/                 # Configuration and logging
+│       │   ├── ingestion/            # Table-aware markdown ingestion
+│       │   ├── llm/                  # LLM clients (Ollama)
+│       │   ├── memory/               # Conversation memory (TTL-based)
+│       │   ├── pipeline/             # Chat pipeline, context, prompt builders
+│       │   └── retrieval/            # Hybrid RRF retrieval engine & reranking
+│       ├── data/                     # Source documents
 │       │   └── markdown/
 │       │       └── guide.md          # Faculty of Science student guide
+│       ├── prompts/                  # System prompts in AR and EN
+│       ├── tests/                    # Evaluation and integration tests
 │       └── vectorstore/              # Auto-generated on first run
 │           ├── chroma.sqlite3
 │           └── bm25_cache.pkl
@@ -410,21 +414,13 @@ GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 
 ## Installation Steps
 
-### 1. Clone the Repository
+### 1. RAG Backend (Python)
+
+#### Step 1 — Clone the Repository
 
 ```bash
 git clone https://github.com/mohamed-Ihab55/campus_ai.git
-cd campus_ai
-```
-
----
-
-### 2. RAG Backend (Python)
-
-#### Step 1 — Navigate to RAG Directory
-
-```bash
-cd src/rag
+cd campus_ai/src/rag
 ```
 
 #### Step 2 — Automated Setup (Recommended)
@@ -503,9 +499,9 @@ EOF
 
 ---
 
-### 3. Flutter Mobile App
+### 2. Flutter Mobile App
 
-#### Step 1 — Navigate to Flutter Directory
+#### Step 1 — Navigate to Flutter Source Directory
 
 ```bash
 cd campus_ai/src/flutter
@@ -864,7 +860,6 @@ curl -X DELETE http://localhost:8000/session/your-session-uuid
 - **Ollama:** https://ollama.com/library/gemma3
 - **ChromaDB:** https://www.trychroma.com/
 - **Firebase Console:** https://console.firebase.google.com
-- **RAG Backend Documentation:** `src/rag/README.md`
 - **GitHub Repository:** https://github.com/mohamed-Ihab55/campus_ai
 
 ---
@@ -879,4 +874,4 @@ This project is proprietary and intended for educational purposes at Ain Shams U
 
 For issues, questions, or contributions, please refer to the GitHub repository or contact the development team.
 
-**Last Updated:** May 11, 2026
+**Last Updated:** May 2026
