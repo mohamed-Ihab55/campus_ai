@@ -96,7 +96,24 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                 ),
               );
             }
+
+            if (state is AuthAuthenticated) {
+              if (state.user.email == 'admin@gmail.com') {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/dashboard',
+                  (route) => false,
+                );
+              } else {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/main_screen',
+                  (route) => false,
+                );
+              }
+            }
           },
+
           builder: (context, state) {
             return Center(
               child: SingleChildScrollView(
@@ -210,7 +227,9 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                   return null;
                                 },
                               ),
+
                               const SizedBox(height: 16),
+
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -233,6 +252,7 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                   ),
                                 ],
                               ),
+
                               const SizedBox(height: 25),
 
                               CustomButton(
@@ -251,34 +271,14 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
 
                                         if (!isValid) return;
 
-                                        final email = emailController.text
-                                            .trim();
-                                        final password = passwordController.text
-                                            .trim();
-
                                         await context.read<AuthCubit>().login(
-                                          email: email,
-                                          password: password,
+                                          email: emailController.text.trim(),
+                                          password: passwordController.text
+                                              .trim(),
                                         );
-
-                                        if (!context.mounted) return;
-
-                                        if (email == 'admin@gmail.com' &&
-                                            password == 'admin123') {
-                                          Navigator.pushNamedAndRemoveUntil(
-                                            context,
-                                            '/dashboard',
-                                            (route) => false,
-                                          );
-                                        } else {
-                                          Navigator.pushNamedAndRemoveUntil(
-                                            context,
-                                            '/main_screen',
-                                            (route) => false,
-                                          );
-                                        }
                                       },
                               ),
+
                               const SizedBox(height: 10),
 
                               SocialButton(
@@ -308,7 +308,6 @@ class _LoginScreenBodyState extends State<LoginScreenBody>
                                   ),
                                 ),
                               ),
-                              // TextButton(onPressed: (){Navigator.pushNamed(context, '/dashboard');}, child: Text('dashboard'))
                             ],
                           ),
                         ),
