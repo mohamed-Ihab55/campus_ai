@@ -40,7 +40,50 @@ PREFIX_TO_DEPT = {
 
 
 def extract_codes(text: str) -> list[str]:
-    return sorted(set(re.findall(r"\b[A-Z]{2,5}\s+\d{3}\b", text or "")))
+    """Extract course codes from the COURSE-CODE column only (column 2 in markdown tables).
+
+    The old regex matched codes anywhere in the response, including inside the
+    prerequisites column, which caused false WRONG_PROGRAM / EXTRA_COURSES
+    classifications (e.g. COMP 201 appearing as a prerequisite was counted as
+    an extra course).
+
+    Strategy:
+    1. Normalize streamed responses where newlines were stripped (|| → newlines).
+    2. For markdown table rows: extract only from column 2 (رقم المقرر).
+    3. For non-table text: fall back to the old regex (handles prose responses).
+    """
+    if not text:
+        return []
+
+    # Normalize: streamed responses often merge table rows with ||
+    # Split "|| متطلب" back into "|\n| متطلب" so each row is on its own line.
+    # Also handle "||---" separator rows.
+    normalized = re.sub(r'\|\|', '|\n|', text)
+
+    codes_from_tables: set[str] = set()
+    non_table_lines: list[str] = []
+
+    for line in normalized.split("\n"):
+        stripped = line.strip()
+        # Skip separator rows and empty lines
+        if not stripped or re.match(r'^\|[\s\-:|]+\|?$', stripped):
+            continue
+        # Detect markdown table row
+        if stripped.startswith("|") and stripped.count("|") >= 3:
+            cells = [c.strip() for c in stripped.split("|")]
+            # cells[0] is empty (before first |), cells[1] is col1, cells[2] is col2 (course code)
+            if len(cells) >= 3:
+                col2 = cells[2]
+                found = re.findall(r"\b[A-Z]{2,5}\s+\d{3}\b", col2)
+                codes_from_tables.update(found)
+        else:
+            non_table_lines.append(stripped)
+
+    # Fallback: if no table rows found, extract from full text (prose response)
+    if not codes_from_tables:
+        return sorted(set(re.findall(r"\b[A-Z]{2,5}\s+\d{3}\b", text)))
+
+    return sorted(codes_from_tables)
 
 
 def load_cases_from_guide() -> list[dict]:

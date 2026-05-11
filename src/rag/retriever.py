@@ -31,13 +31,15 @@ from ingest_markdown import _extract_level_number, _extract_semester, _detect_qu
 # ── Program boost matching ────────────────────────────────────────────────────
 # Explicit shared-program allowlist: when user asks about program A,
 # it's correct to also boost program B's chunks (L1-L2 shared data).
-_SHARED_PROGRAM_BOOST: set[tuple[str, str]] = {
-    ("الكيمياء التطبيقية", "الكيمياء"),   # L1-L2 shared with plain الكيمياء
-    ("الجيوفيزياء", "الجيولوجيا"),         # L1 shared with الجيولوجيا programs
-}
+# Each entry: (query_program, chunk_program, allowed_levels)
+# allowed_levels = None means all levels; a set restricts to those levels.
+_SHARED_PROGRAM_BOOST: list[tuple[str, str, set[str] | None]] = [
+    ("الكيمياء التطبيقية", "الكيمياء", {"1", "2"}),   # L1-L2 only
+    ("الجيوفيزياء", "الجيولوجيا", {"1"}),              # L1 only
+]
 
 
-def _boost_matches(query_prog: str, chunk_prog: str) -> bool:
+def _boost_matches(query_prog: str, chunk_prog: str, chunk_level: str = "") -> bool:
     """Return True when chunk_prog deserves a boost for query_prog.
 
     Rules (applied in order):
@@ -45,7 +47,7 @@ def _boost_matches(query_prog: str, chunk_prog: str) -> bool:
     2. ال-prefix variant (النبات == نبات).
        EXCEPTION: compound names with '+' are excluded from this rule so that
        'النبات' does NOT match 'نبات+كيمياء' (dual-track variant).
-    3. Explicit shared-program allowlist only.
+    3. Explicit shared-program allowlist — scoped by level.
     """
     if not query_prog or not chunk_prog:
         return False
@@ -62,9 +64,11 @@ def _boost_matches(query_prog: str, chunk_prog: str) -> bool:
         if strip_al(query_prog) == strip_al(chunk_prog):
             return True
 
-    # Rule 3: explicit shared-program allowlist
-    if (query_prog, chunk_prog) in _SHARED_PROGRAM_BOOST:
-        return True
+    # Rule 3: explicit shared-program allowlist — scoped by level
+    for qp, cp, allowed_levels in _SHARED_PROGRAM_BOOST:
+        if query_prog == qp and chunk_prog == cp:
+            if allowed_levels is None or not chunk_level or chunk_level in allowed_levels:
+                return True
 
     return False
 
@@ -296,8 +300,8 @@ class Retriever:
 
         fetch_k = min(top_k * 4, len(self.documents))
 
-        # Detect program name for post-RRF boosting
-        query_program = _detect_query_program(query) if structural else ""
+        # Detect program name for post-RRF boosting — always try, not just structural
+        query_program = _detect_query_program(query)
         if query_program:
             print(f"[SEARCH] Program detected: '{query_program}'")
 
@@ -394,20 +398,24 @@ class Retriever:
         # ── 4. Program-name boosting (structural queries only) ────────────────
         if query_program:
             is_compound = "+" in query_program
-            # Compound (dual-track) programs need stronger boost because they
-            # compete with TWO single-track programs that share keywords.
-            boost_val = 0.06 if is_compound else 0.03
+            boost_val = 0.06 if is_compound else 0.04
             boosted = 0
+            # For compound programs, extract individual component names for penalty scoping
+            compound_parts = set(query_program.split("+")) if is_compound else set()
             for doc, info in rrf_scores.items():
-                chunk_prog = info.get("metadata", {}).get("program_name", "")
-                if _boost_matches(query_program, chunk_prog):
+                chunk_meta = info.get("metadata", {})
+                chunk_prog = chunk_meta.get("program_name", "")
+                chunk_level = chunk_meta.get("level_number", "")
+                if _boost_matches(query_program, chunk_prog, chunk_level):
                     info["score"] += boost_val
                     boosted += 1
-                elif is_compound and chunk_prog and not _boost_matches(query_program, chunk_prog):
-                    # Penalize chunks from wrong programs when we know exactly
-                    # which dual-track program the user wants — prevents single-
-                    # track الفيزياء chunks from outranking الفيزياء+علوم الحاسب.
-                    info["score"] -= 0.02
+                elif is_compound and chunk_prog:
+                    # Only penalize chunks whose program shares at least one component
+                    # with the compound query (e.g. penalize علم الحيوان single-track
+                    # when query is علم الحيوان+الكيمياء, but NOT unrelated programs).
+                    chunk_parts = set(chunk_prog.split("+"))
+                    if chunk_parts & compound_parts:
+                        info["score"] -= 0.03
             if boosted:
                 print(f"[SEARCH] Program boost: {boosted} chunks for '{query_program}' (boost={boost_val})")
 
@@ -415,6 +423,25 @@ class Retriever:
         sorted_docs = sorted(
             rrf_scores.items(), key=lambda x: x[1]["score"], reverse=True
         )
+
+        # ── 5b. Program-aware result ordering ─────────────────────────────────
+        # When a specific program is detected, prioritize matching chunks.
+        # This prevents 8 competing L1/S1 chunks from different programs
+        # from drowning the correct one in the context window.
+        if query_program and structural:
+            matching = []
+            non_matching = []
+            for doc, info in sorted_docs:
+                chunk_meta = info.get("metadata", {})
+                chunk_prog = chunk_meta.get("program_name", "")
+                chunk_level = chunk_meta.get("level_number", "")
+                if _boost_matches(query_program, chunk_prog, chunk_level):
+                    matching.append((doc, info))
+                else:
+                    non_matching.append((doc, info))
+            # Take all matching first, then fill remaining slots with non-matching
+            reordered = matching + non_matching
+            sorted_docs = reordered
 
         results = [
             {
@@ -425,6 +452,57 @@ class Retriever:
             }
             for doc, info in sorted_docs[:top_k]
         ]
+
+        # ── 6. Sibling-chunk retrieval for split tables ───────────────────
+        # If a selected chunk is part of a split table (has table_group_id),
+        # find and inject its sibling(s) immediately after it so the LLM
+        # sees the full table.
+        selected_groups: set[str] = set()
+        for r in results:
+            gid = r.get("metadata", {}).get("table_group_id", "")
+            if gid:
+                selected_groups.add(gid)
+
+        if selected_groups and structural:
+            siblings_added = 0
+            sibling_cap = top_k + 6   # allow up to 6 extra sibling chunks for split tables
+            for gid in selected_groups:
+                # Find all chunks with this group_id that are NOT already in results
+                existing_texts = {r["text"] for r in results}
+                for doc, info in sorted_docs:
+                    if len(results) >= sibling_cap:
+                        break
+                    meta = info.get("metadata", {})
+                    if meta.get("table_group_id") == gid and doc not in existing_texts:
+                        results.append({
+                            "text":      doc,
+                            "source":    info["source"],
+                            "rrf_score": round(info["score"], 4),
+                            "metadata":  meta,
+                        })
+                        siblings_added += 1
+                        existing_texts.add(doc)
+
+            # Also search in self.documents (not just rrf_scores) for siblings
+            # that might not have made it into the RRF pool at all
+            if selected_groups:
+                existing_texts = {r["text"] for r in results}
+                for idx, doc_text in enumerate(self.documents):
+                    if len(results) >= sibling_cap:
+                        break
+                    meta = self.metadatas[idx] if idx < len(self.metadatas) else {}
+                    if meta.get("table_group_id", "") in selected_groups and doc_text not in existing_texts:
+                        results.append({
+                            "text":      doc_text,
+                            "source":    meta.get("source", ""),
+                            "rrf_score": 0.0,
+                            "metadata":  meta,
+                        })
+                        siblings_added += 1
+                        existing_texts.add(doc_text)
+
+            if siblings_added:
+                print(f"[SEARCH] Added {siblings_added} sibling chunk(s) for split tables")
 
         print(
             f"[SEARCH] {round(time.time()-t1, 2)}s | "
