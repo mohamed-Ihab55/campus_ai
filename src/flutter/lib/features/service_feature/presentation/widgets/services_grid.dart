@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:campus_ai/features/service_feature/data/model/service_item.dart';
 import 'package:campus_ai/features/service_feature/presentation/widgets/service_card.dart';
 
-
 class ServicesGrid extends StatelessWidget {
   final List<ServiceItem> services;
 
@@ -15,15 +14,23 @@ class ServicesGrid extends StatelessWidget {
         final width = constraints.maxWidth;
 
         double maxCrossAxisExtent;
+        double childAspectRatio;
 
-        if (width < 600) {
+        if (width < 360) {
+          maxCrossAxisExtent = width;
+          childAspectRatio = 2.2;
+        } else if (width < 600) {
           maxCrossAxisExtent = width / 2;
+          childAspectRatio = 1.1;
         } else if (width < 900) {
           maxCrossAxisExtent = width / 3;
+          childAspectRatio = 1.15;
         } else if (width < 1200) {
           maxCrossAxisExtent = width / 4;
+          childAspectRatio = 1.2;
         } else {
           maxCrossAxisExtent = width / 5;
+          childAspectRatio = 1.2;
         }
 
         return Column(
@@ -47,7 +54,7 @@ class ServicesGrid extends StatelessWidget {
                   maxCrossAxisExtent: maxCrossAxisExtent,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  childAspectRatio: 1.15,
+                  childAspectRatio: childAspectRatio,
                 ),
 
                 itemBuilder: (context, index) {
@@ -65,5 +72,3 @@ class ServicesGrid extends StatelessWidget {
     );
   }
 }
-
-

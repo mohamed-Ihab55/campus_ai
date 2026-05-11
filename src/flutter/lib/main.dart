@@ -21,7 +21,7 @@ class AICampusGuideApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ChatCubit>(
-      create: (context) =>  ChatCubit()..loadMessages(),
+      create: (context) =>  ChatCubit()..loadCurrentSession(),
       child: MaterialApp(
         initialRoute: '/splash',
         routes: AppRoutes.routes,

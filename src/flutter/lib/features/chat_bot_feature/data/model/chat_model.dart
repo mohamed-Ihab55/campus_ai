@@ -10,7 +10,7 @@ class ChatMessage {
   final String? id;
 
   final String? docId;
-
+final String? sessionId;
   final String? userId;
 
   final String content;
@@ -24,6 +24,7 @@ class ChatMessage {
   ChatMessage({
     this.id,
     this.docId,
+    this.sessionId,
     this.userId,
     required this.content,
     required this.role,
@@ -32,6 +33,7 @@ class ChatMessage {
   }) : timestamp = timestamp ?? DateTime.now();
 
   ChatMessage copyWith({
+    String? sessionId,
     String? id,
     String? docId,
     String? userId,
@@ -41,6 +43,7 @@ class ChatMessage {
     bool? isError,
   }) {
     return ChatMessage(
+       sessionId: sessionId ?? this.sessionId,
       id: id ?? this.id,
       docId: docId ?? this.docId,
       userId: userId ?? this.userId,
@@ -54,6 +57,7 @@ class ChatMessage {
   Map<String, dynamic> toJson() {
     return {
       'messageId': id,
+      'sessionId': sessionId,
       'docId': docId,
       'uid': userId,
       'content': content,
@@ -82,6 +86,7 @@ class ChatMessage {
     }
 
     return ChatMessage(
+      sessionId: json['sessionId']?.toString(),
       id: json['messageId']?.toString(),
 
       docId: json['docId']?.toString(),

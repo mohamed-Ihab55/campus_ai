@@ -15,6 +15,10 @@ class ChatCubit extends Cubit<ChatState> {
 
   final String _userId = FirebaseAuth.instance.currentUser!.uid;
 
+  String _currentSessionId = DateTime.now().millisecondsSinceEpoch.toString();
+
+  String get currentSessionId => _currentSessionId;
+
   ChatCubit({
     ChatRepository? repository,
     ChatRemoteService? remoteService,
@@ -24,14 +28,37 @@ class ChatCubit extends Cubit<ChatState> {
 
   StreamSubscription<List<ChatMessage>>? _messagesSubscription;
 
-  Future<void> loadMessages() async {
+  /// Start a brand-new chat session
+  void startNewSession() {
+    _messagesSubscription?.cancel();
+    _currentSessionId = DateTime.now().millisecondsSinceEpoch.toString();
+    emit(const ChatInitial());
+  }
+
+  /// Load a specific session (from history)
+  Future<void> loadSession(String sessionId) async {
+    _currentSessionId = sessionId;
+    await _messagesSubscription?.cancel();
+
+    emit(ChatLoading(state.messages));
+
+    _messagesSubscription = _repository
+        .getMessages(userId: _userId, sessionId: sessionId)
+        .listen(
+          (messages) => emit(ChatSuccess(messages)),
+          onError: (error) => emit(ChatError(state.messages, error.toString())),
+        );
+  }
+
+  /// Load only the current session's messages
+  Future<void> loadCurrentSession() async {
     try {
       emit(ChatLoading(state.messages));
 
       await _messagesSubscription?.cancel();
 
       _messagesSubscription = _repository
-          .getMessages(userId: _userId)
+          .getMessages(userId: _userId, sessionId: _currentSessionId)
           .listen(
             (messages) {
           emit(ChatSuccess(messages));
@@ -60,12 +87,14 @@ class ChatCubit extends Cubit<ChatState> {
     final userMessage = ChatMessage(
       content: trimmedMessage,
       role: MessageRole.user,
+      sessionId: _currentSessionId,
       userId: _userId,
     );
 
     final streamingMessage = ChatMessage(
       content: '',
       role: MessageRole.assistant,
+      sessionId: _currentSessionId,
       userId: _userId,
     );
 
@@ -82,6 +111,7 @@ class ChatCubit extends Cubit<ChatState> {
         content: userMessage.content,
         role: MessageRole.user,
         userId: _userId,
+        sessionId: _currentSessionId,
         isError: false,
       );
 
@@ -110,6 +140,7 @@ class ChatCubit extends Cubit<ChatState> {
                 id: apiMessageId,
                 content: responseBuffer.toString(),
                 role: MessageRole.assistant,
+                sessionId: _currentSessionId,
                 userId: _userId,
               ),
             );
@@ -124,6 +155,7 @@ class ChatCubit extends Cubit<ChatState> {
             id: apiMessageId,
             content: fullReply,
             role: MessageRole.assistant,
+            sessionId: _currentSessionId,
             userId: _userId,
           );
 
@@ -132,6 +164,7 @@ class ChatCubit extends Cubit<ChatState> {
             content: fullReply,
             role: MessageRole.assistant,
             userId: _userId,
+            sessionId: _currentSessionId,
             isError: false,
           );
 
@@ -148,6 +181,7 @@ class ChatCubit extends Cubit<ChatState> {
           final errorMessage = ChatMessage(
             role: MessageRole.assistant,
             userId: _userId,
+            sessionId: _currentSessionId,
             isError: true,
             content: error.toString(),
           );
@@ -156,6 +190,7 @@ class ChatCubit extends Cubit<ChatState> {
             content: errorMessage.content,
             role: MessageRole.assistant,
             userId: _userId,
+            sessionId: _currentSessionId,
             isError: true,
           );
 
@@ -175,6 +210,7 @@ class ChatCubit extends Cubit<ChatState> {
       final errorMessage = ChatMessage(
         role: MessageRole.assistant,
         userId: _userId,
+        sessionId: _currentSessionId,
         isError: true,
         content: e.toString(),
       );

@@ -55,6 +55,12 @@ class _ChatBotScreenBodyState extends State<ChatBotScreenBody>
     _scrollBottom();
   }
 
+  void _startNewChat() {
+    context.read<ChatCubit>().startNewSession();
+    _initialScrollDone = false;
+    _tabController.animateTo(0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ChatCubit, ChatState>(
@@ -77,34 +83,72 @@ class _ChatBotScreenBodyState extends State<ChatBotScreenBody>
             children: [
               const SizedBox(height: 50),
 
-              // Tab Bar
+              // Tab Bar + New Chat Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(10),
+                child: Row(
+                  children: [
+                    // Tab Bar
+                    Expanded(
+                      child: Container(
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TabBar(
+                          controller: _tabController,
+                          indicator: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          dividerColor: Colors.transparent,
+                          labelColor: Colors.white,
+                          unselectedLabelColor: AppColors.textSecondary,
+                          labelStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          tabs: const [
+                            Tab(text: 'Chat'),
+                            Tab(text: 'History'),
+                          ],
+                        ),
+                      ),
                     ),
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    dividerColor: Colors.transparent,
-                    labelColor: Colors.white,
-                    unselectedLabelColor: AppColors.textSecondary,
-                    labelStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+
+                    const SizedBox(width: 10),
+
+                    // New Chat Button
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _startNewChat,
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.edit_square,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
                     ),
-                    tabs: const [
-                      Tab(text: 'Chat'),
-                      Tab(text: 'History'),
-                    ],
-                  ),
+                  ],
                 ),
               ),
 
@@ -170,7 +214,12 @@ class _ChatBotScreenBodyState extends State<ChatBotScreenBody>
                     ),
 
                     // ── Tab 2: History ──
-                    const ChatHistoryTab(),
+                    ChatHistoryTab(
+                      onSessionSelected: () {
+                        _tabController.animateTo(0);
+                        _initialScrollDone = false;
+                      },
+                    ),
                   ],
                 ),
               ),

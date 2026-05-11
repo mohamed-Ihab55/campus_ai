@@ -55,6 +55,8 @@ class ChatRemoteService {
     return reply;
   }
 
+
+
   Future<void> sendMessageStreaming({
     required String message,
     required String userId,
@@ -136,4 +138,6 @@ class ChatRemoteService {
       onError('Unexpected error: $e');
     }
   }
+
+
 }

@@ -1,4 +1,3 @@
-import 'package:bloc/bloc.dart';
 import 'package:campus_ai/features/dashboard_screen/data/models/department_dashboard_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
