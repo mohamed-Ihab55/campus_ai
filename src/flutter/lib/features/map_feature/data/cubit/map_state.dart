@@ -1,4 +1,4 @@
-import 'package:campus_ai/features/map_feature/data/model/compus_data.dart';
+import 'package:campus_ai/features/map_feature/data/model/campus_data.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapState {
@@ -19,14 +19,9 @@ class MapState {
   });
 
   List<CampusLocation> get filtered {
-    return locations.where((location) {
-      final matchSearch = location.name.toLowerCase().contains(
-        search.toLowerCase(),
-      );
-
-      final matchFilter =
-      filter == null ? true : location.category == filter;
-
+    return locations.where((loc) {
+      final matchSearch = loc.name.toLowerCase().contains(search.toLowerCase());
+      final matchFilter = filter == null || loc.category == filter;
       return matchSearch && matchFilter;
     }).toList();
   }
@@ -39,7 +34,6 @@ class MapState {
     bool clearFilter = false,
     String? search,
     LatLng? userLocation,
-    bool clearUserLocation = false,
     String? error,
     bool clearError = false,
   }) {
@@ -48,8 +42,7 @@ class MapState {
       selected: clearSelected ? null : selected ?? this.selected,
       filter: clearFilter ? null : filter ?? this.filter,
       search: search ?? this.search,
-      userLocation:
-      clearUserLocation ? null : userLocation ?? this.userLocation,
+      userLocation: userLocation ?? this.userLocation,
       error: clearError ? null : error ?? this.error,
     );
   }

@@ -8,16 +8,14 @@ class ChatRemoteService {
   final Dio _dio;
 
   ChatRemoteService()
-      : _dio = Dio(
-    BaseOptions(
-      baseUrl: dotenv.env['CHAT_BOT_API_KEY'] ?? '',
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 60),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    ),
-  );
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: dotenv.env['CHAT_BOT_API_KEY'] ?? '',
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 300),
+          headers: {'Content-Type': 'application/json'},
+        ),
+      );
 
   Future<String> sendMessage({
     required String message,
@@ -69,14 +67,8 @@ class ChatRemoteService {
     try {
       final response = await _dio.post(
         '/chat',
-        data: {
-          'question': message,
-          'session_id': sessionId,
-          'user_id': userId,
-        },
-        options: Options(
-          responseType: ResponseType.stream,
-        ),
+        data: {'question': message, 'session_id': sessionId, 'user_id': userId},
+        options: Options(responseType: ResponseType.stream),
       );
 
       final responseBody = response.data;
@@ -107,15 +99,11 @@ class ChatRemoteService {
 
           if (data is Map<String, dynamic>) {
             if (data['message_id'] != null) {
-              onMessageId?.call(
-                data['message_id'].toString(),
-              );
+              onMessageId?.call(data['message_id'].toString());
             }
 
             if (data['token'] != null) {
-              onToken(
-                data['token'].toString(),
-              );
+              onToken(data['token'].toString());
             }
           }
         } catch (_) {
@@ -140,9 +128,7 @@ class ChatRemoteService {
           break;
 
         default:
-          onError(
-            'Request failed: ${e.message}',
-          );
+          onError('Request failed: ${e.message}');
       }
     } catch (e) {
       onError('Unexpected error: $e');
