@@ -17,7 +17,6 @@ class ChatLoading extends ChatState {
   const ChatLoading(super.messages);
 }
 
-// حالة جديدة — الـ assistant بيكتب دلوقتي
 class ChatStreaming extends ChatState {
   const ChatStreaming(super.messages);
 }

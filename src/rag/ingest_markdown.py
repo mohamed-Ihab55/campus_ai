@@ -80,6 +80,7 @@ _SEMESTER_RE = re.compile(
 _AR_SEMESTER = {
     "الأول": "الأول", "الاول": "الأول",
     "الثاني": "الثاني",
+    "الثاني عشر": "الثاني",
     "الصيفي": "الصيفي",
 }
 
@@ -133,23 +134,24 @@ _PROG_NAME_RE = re.compile(
 )
 
 PROGRAM_SYNONYMS: dict[str, list[str]] = {
-    # ── Dual-track programs (MUST come first in longest-key-first iteration) ──
+    # ── Dual-track (longer keys matched first by _detect_query_program) ──
     "الإحصاء الرياضي وعلوم الحاسب": ["الإحصاء الرياضي+علوم الحاسب"],
     "الرياضيات البحتة وعلوم الحاسب": ["الرياضيات البحتة+علوم الحاسب"],
     "الرياضيات البحتة والإحصاء الرياضي": ["الرياضيات البحتة+الإحصاء الرياضي"],
     "الفيزياء وعلوم الحاسب":      ["الفيزياء+علوم الحاسب", "فيزياء+علوم الحاسب"],
     "الفيزياء والكيمياء":          ["الفيزياء+الكيمياء", "فيزياء+كيمياء"],
     "علم الحيوان - الكيمياء":      ["علم الحيوان+الكيمياء"],
+    "علم الحيوان والكيمياء":       ["علم الحيوان+الكيمياء"],
     "الحيوان - الكيمياء":          ["علم الحيوان+الكيمياء"],
+    "الحيوان والكيمياء":           ["علم الحيوان+الكيمياء"],
+    "حيوان - كيمياء":              ["علم الحيوان+الكيمياء"],
+    "حيوان وكيمياء":               ["علم الحيوان+الكيمياء"],
     "نبات - كيمياء":               ["نبات+كيمياء"],
     "النبات - الكيمياء":           ["نبات+كيمياء"],
     "جيولوجيا - جيوفيزياء":       ["جيولوجيا+جيوفيزياء"],
     "الجيولوجيا - الجيوفيزياء":   ["جيولوجيا+جيوفيزياء"],
-    "علم الحشرات - الكيمياء":     ["علم الحشرات+الكيمياء"],
-    "الكيمياء الحيوية - الكيمياء": ["الكيمياء الحيوية+الكيمياء"],
-    "الميكروبيولوجي - الكيمياء":  ["الميكروبيولوجي+الكيمياء"],
     "الجيولوجيا - الكيمياء":      ["الجيولوجيا+الكيمياء"],
-    # ── Single-track programs ──
+    # ── Single-track ──
     "الرياضيات":                    ["الرياضيات"],
     "الرياضيات البحتة":            ["الرياضيات البحتة"],
     "الإحصاء":                      ["الإحصاء الرياضي"],
@@ -189,6 +191,7 @@ def _extract_program_name(breadcrumb: str) -> str:
 
     Single-track: '15- برنامج النبات (تخصص منفرد)' → 'النبات'
     Dual-track:   '14 (مزدوج)- برنامج نبات - كيمياء' → 'نبات+كيمياء'
+    Dual-track:   '9- برنامج الفيزياء والكيمياء (مزدوج)' → 'الفيزياء+الكيمياء'
     Special:      'برنامج جيوفيزياء البترول - اللائحة' → 'جيوفيزياء البترول'
     """
     m = _PROG_NAME_RE.search(breadcrumb)
@@ -204,6 +207,22 @@ def _extract_program_name(breadcrumb: str) -> str:
     if " - " in name and "البترول" not in name:
         parts = [p.strip() for p in name.split(" - ")]
         return "+".join(parts)
+
+    # Dual-track with "و": "الفيزياء والكيمياء" → "الفيزياء+الكيمياء"
+    # "الرياضيات البحتة والإحصاء الرياضي" → "الرياضيات البحتة+الإحصاء الرياضي"
+    # "الإحصاء الرياضي وعلوم الحاسب" → "الإحصاء الرياضي+علوم الحاسب"
+    # Only apply to known dual-track patterns (مزدوج in breadcrumb or known combos).
+    _DUAL_WO_PATTERNS = [
+        (r"الرياضيات البحتة والإحصاء الرياضي",   "الرياضيات البحتة+الإحصاء الرياضي"),
+        (r"الرياضيات البحتة وعلوم الحاسب",       "الرياضيات البحتة+علوم الحاسب"),
+        (r"الإحصاء الرياضي وعلوم الحاسب",        "الإحصاء الرياضي+علوم الحاسب"),
+        (r"الفيزياء والكيمياء",                    "الفيزياء+الكيمياء"),
+        (r"الفيزياء وعلوم الحاسب",                "الفيزياء+علوم الحاسب"),
+    ]
+    for pattern, replacement in _DUAL_WO_PATTERNS:
+        if pattern in name:
+            return replacement
+
     return name
 
 
@@ -476,7 +495,13 @@ def chunk_markdown(md_text: str, source_name: str) -> list[dict]:
                         },
                     })
                 else:
-                    for piece in _split_table_rowwise(block, prefix.rstrip(), CHUNK_SIZE):
+                    # Split table — assign a group ID so retriever can pull siblings.
+                    # Use a content hash (not len(chunks)) so the ID is stable
+                    # across re-ingestions and chunk-order changes.
+                    group_seed = f"{prog_name}|L{full_level}|S{full_term}|{block['full'][:120]}"
+                    group_id = hashlib.md5(group_seed.encode("utf-8")).hexdigest()[:16]
+                    split_pieces = list(_split_table_rowwise(block, prefix.rstrip(), CHUNK_SIZE))
+                    for piece_idx, piece in enumerate(split_pieces):
                         piece_level = full_level or _extract_level_number(piece)
                         piece_term  = full_term  or _extract_semester(piece)
                         chunks.append({
@@ -488,6 +513,9 @@ def chunk_markdown(md_text: str, source_name: str) -> list[dict]:
                                                   or section_article,
                                 "level_number":   piece_level,
                                 "semester":       piece_term,
+                                "table_group_id": group_id,
+                                "table_piece_idx": piece_idx,
+                                "table_piece_total": len(split_pieces),
                             },
                         })
             else:
@@ -534,6 +562,21 @@ def chunk_markdown(md_text: str, source_name: str) -> list[dict]:
 
     # Drop trivially short chunks (likely artifacts)
     chunks = [c for c in chunks if len(c["text"].strip()) >= 40]
+
+    # Drop non-course tables that pollute retrieval:
+    # 1. ملخص توزيع الساعات — credit-hour summaries (no course codes)
+    # 2. Program structure overview from اللائحة الداخلية section
+    #    (describes credit categories, not actual courses)
+    _NOISE = [
+        re.compile(r"ملخص\s+توزيع\s+الساعات"),
+        re.compile(r"متطلبات التخصص للبرامج المزدوجة"),
+        re.compile(r"\|\s*م\s*\|\s*المتطلبات\s*\|\s*المقررات\s*\|"),
+    ]
+    before = len(chunks)
+    chunks = [c for c in chunks if not any(p.search(c["text"]) for p in _NOISE)]
+    if (d := before - len(chunks)):
+        print(f"[INGEST] Dropped {d} noise chunks (summary/structure tables)")
+
     return chunks
 
 

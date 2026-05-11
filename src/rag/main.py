@@ -56,9 +56,10 @@ _OLLAMA_TIMEOUT = httpx.Timeout(None)
 # from closing the SSE connection during long CPU inference.
 _KEEPALIVE_INTERVAL = 20
 
-# Cap context fed to LLM: 8 × 1400-char chunks + headers ≈ 11 500 chars.
-# 7000 keeps us safely under gemma3's 8 192-token window after system prompt.
-MAX_CONTEXT_CHARS = 7000
+# Cap context fed to LLM: With gemma3's 8192-token window, Arabic text
+# averages ~3 chars/token.  10000 chars ≈ 3300 tokens, leaving ~4800 tokens
+# for the system prompt (~2500 tokens) + history + generation.
+MAX_CONTEXT_CHARS = 10000
 
 _retriever_lock = threading.Lock()
 
@@ -103,9 +104,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Arabic RAG Chatbot", version="2.1.0", lifespan=lifespan)
 
+_CORS_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_CORS_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["X-Session-ID", "X-Sources", "X-Response-Time"],
@@ -134,9 +137,9 @@ class IngestResponse(BaseModel):
 def detect_language(text: str) -> str:
     try:
         lang = detect_lang(text)
-        return lang if lang in ("ar", "en") else "en"
+        return lang if lang in ("ar", "en") else "ar"
     except LangDetectException:
-        return "en"
+        return "ar"
 
 
 def build_system_prompt(language: str) -> str:
@@ -161,11 +164,10 @@ def build_system_prompt(language: str) -> str:
             " لا تقم بتأليف أعمدة جديدة، استخدم نفس الأعمدة الموجودة في السياق المرفق تماماً.\n"
             " ممنوع استخدام الأنابيب المزدوجة (||) أو الرموز الغريبة. استخدم أنبوب واحد (|) للفصل بين الأعمدة.\n"
             " يجب وضع سطر فارغ قبل بداية الجدول وبعد نهايته.\n"
-            " مثال على الصيغة الصحيحة:\n"
+            " مثال على صيغة الترويسة الصحيحة (لا تنسخ هذه الأعمدة حرفياً، استخدم الأعمدة الموجودة في السياق):\n"
             "\n"
             "| حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة |\n"
             "|---|---|---|---|---|\n"
-            "| إجباري | COMP 402 | المعلومات الحيوية | 3 | COMP 201, 205 |\n"
             "\n"
             "═══════════════════════════════════════════════════════════════\n"
             "📌 قواعد تغطية المستويات والفصول الدراسية:\n"
@@ -180,6 +182,8 @@ def build_system_prompt(language: str) -> str:
             "═══════════════════════════════════════════════════════════════\n"
             "📊 قواعد عرض الجداول الدراسية:\n"
             "═══════════════════════════════════════════════════════════════\n"
+            "• استخدم جدول Markdown فقط عندما يحتوي السياق المرفق على بيانات جدولية (مقررات، جداول إدارية). "
+            "للأسئلة التنظيمية أو الإجرائية (أعداد، تواريخ، نسب، قواعد)، أجب بنص عادي ولا تستخدم جدولاً أبداً.\n"
             "• يجب عرض الجداول الدراسية دائماً باستخدام تنسيق Markdown Tables "
             "المنسق، وتأكد من ترتيب الأعمدة التالي عند ذكر مقررات: "
             "(حالة المقرر، رقم المقرر، اسم المقرر، الساعات المعتمدة، المتطلبات السابقة).\n"
@@ -198,7 +202,8 @@ def build_system_prompt(language: str) -> str:
             "انقل القيمة حرفياً من السياق دون إعادة صياغة.\n"
             "3. للقوائم والمقررات والشروط: اذكرها كاملةً ومُرقَّمة ولا تختصر.\n"
             "4. للأسئلة المتابِعة (لماذا/كيف/ماذا تقصد): اجمع التاريخ والسياق.\n"
-            "5. في نهاية كل إجابة، اذكر المصدر بدقّة وبالصيغة التالية:\n"
+            "5. في نهاية كل إجابة، اذكر المصدر بدقّة وبالصيغة التالية "
+            "(إذا كانت الإجابة هي جملة 'لم أجد هذه المعلومة...' فلا تُضف سطر مصدر):\n"
             "   - إن وُجد رقم مادة في وسم المقتطف 'مادة رقم X': "
             "(المصدر: مادة رقم X — <المسار التراتبي>).\n"
             "   - وإلا: (المصدر: <المسار التراتبي كما يظهر في الترويسة>).\n"
@@ -216,6 +221,9 @@ def build_system_prompt(language: str) -> str:
             "شرطاً محدداً، قل 'لم أجد هذه المعلومة في دليل الطالب'.\n"
             "11. ابدأ الإجابة مباشرةً بالمحتوى المطلوب (دون مقدمات مثل 'بالطبع' "
             "أو 'حسناً')، وأنهِها بسطر المصدر.\n"
+            "12. إذا كان السؤال لا علاقة له تماماً بكلية العلوم أو جامعة عين شمس أو دليل الطالب "
+            "(مثال: مطاعم، أسلحة، رياضة، أخبار عامة)، أجب فقط بالجملة التالية حرفياً دون أي إضافة: "
+            "'لم أجد هذه المعلومة في دليل الطالب المتاح حالياً. يُرجى مراجعة مكتب شؤون الطلاب.'\n"
             "12. البرامج المشتركة: بعض البرامج تشترك في مقررات المستويين الأول "
             "والثاني مع برنامج آخر (مثال: الكيمياء التطبيقية تشترك مع الكيمياء). "
             "إذا ظهر في السياق أن البيانات تخص برنامجاً مختلفاً، اعرضها مع "
@@ -244,11 +252,10 @@ def build_system_prompt(language: str) -> str:
         " Do not invent columns. Use the exact columns provided in the context.\n"
         " Do NOT use double pipes (||) or strange symbols. Use a single pipe (|) to separate columns.\n"
         " Always place a blank line before and after the table.\n"
-        " Example of correct format:\n"
+        " Example of correct header format (do NOT copy these column names literally — use the columns present in the context):\n"
         "\n"
         "| حالة المقرر | رقم المقرر | اسم المقرر | الساعات المعتمدة | متطلبات سابقة |\n"
-        "|---|---|---|---|---|\n"
-        "| إجباري | COMP 402 | المعلومات الحيوية | 3 | COMP 201, 205 |\n"
+        "|---|---|---|---|\n"
         "\n"
         "═══════════════════════════════════════════════════════════════\n"
         "Level / Term coverage rules:\n"
@@ -263,6 +270,8 @@ def build_system_prompt(language: str) -> str:
         "═══════════════════════════════════════════════════════════════\n"
         "Table rendering rules:\n"
         "═══════════════════════════════════════════════════════════════\n"
+        "• Use a Markdown table ONLY when the retrieved context itself contains tabular data (course tables, admin tables). "
+        "For regulatory or procedural questions (counts, dates, percentages, rules), answer in plain prose — never force a table.\n"
         "• Always render academic course tables using formatted Markdown "
         "tables. When listing courses, use this column order: "
         "(Status, Course No., Course Name, Credit Hours, Prerequisites).\n"
@@ -280,7 +289,8 @@ def build_system_prompt(language: str) -> str:
         "2. For numbers / fees / dates / course codes (e.g. GEOP 416): copy "
         "the exact figure verbatim.\n"
         "3. For lists / courses / requirements: list ALL items, numbered, no summarizing.\n"
-        "4. End every answer with a citation in this exact form:\n"
+        "4. End every answer with a citation in this exact form "
+        "(if the answer is the 'not found' refusal, omit the source line entirely):\n"
         "   - If the excerpt header carries a 'مادة رقم X' tag: "
         "(Source: Article No. X — <breadcrumb>).\n"
         "   - Else: (Source: <breadcrumb as shown in the header>).\n"
@@ -297,7 +307,11 @@ def build_system_prompt(language: str) -> str:
         "does not mention a specific number, percentage, or condition, say "
         "'I could not find this information'.\n"
         "9. Answer in English. Begin directly with the requested content (no "
-        "'Sure' / 'Of course' preambles), and end with the source line."
+        "'Sure' / 'Of course' preambles), and end with the source line.\n"
+        "10. If the question is entirely unrelated to Ain Shams University Faculty of Science "
+        "(e.g. restaurants, weapons, sports, general knowledge), respond ONLY with the exact phrase: "
+        "'I could not find this in the available student guide. Please contact the Student Affairs office.' "
+        "Do not provide general knowledge answers."
     )
 
 
@@ -342,6 +356,7 @@ async def stream_ollama_and_save(messages: list[dict], session_id: str, question
                             "temperature": 0.1,
                             "top_p":       0.7,
                             "num_ctx":     8192,
+                            "num_predict": 2048,
                         },
                     },
                 ) as response:
@@ -469,6 +484,14 @@ async def rewrite_query_with_ollama(question: str, history: list[dict]) -> str:
 
 def _refresh_retriever():
     with _retriever_lock:
+        # Invalidate stale BM25 cache BEFORE resetting the singleton so the
+        # next get_retriever() call always rebuilds from fresh collection data.
+        try:
+            old = get_retriever.__wrapped__ if hasattr(get_retriever, "__wrapped__") else None
+            from retriever import BM25_CACHE_PATH
+            BM25_CACHE_PATH.unlink(missing_ok=True)
+        except Exception:
+            pass
         reset_retriever()
         get_retriever()
 
@@ -526,14 +549,21 @@ async def chat(req: ChatRequest):
         return f"[مقتطف {i+1}{tag_str}]\n{c['text']}"
 
     if chunks:
-        context_text = "\n\n---\n\n".join(
-            _format_chunk(i, c) for i, c in enumerate(chunks)
-        )
+        # Build context by adding chunks in rank order, stopping before
+        # exceeding MAX_CONTEXT_CHARS.  This avoids cutting a chunk mid-table.
+        formatted_chunks = [_format_chunk(i, c) for i, c in enumerate(chunks)]
+        separator = "\n\n---\n\n"
+        included = []
+        total_len = 0
+        for fc in formatted_chunks:
+            added_len = len(fc) + (len(separator) if included else 0)
+            if total_len + added_len > MAX_CONTEXT_CHARS and included:
+                break
+            included.append(fc)
+            total_len += added_len
+        context_text = separator.join(included)
     else:
         context_text = ""
-
-    if len(context_text) > MAX_CONTEXT_CHARS:
-        context_text = context_text[:MAX_CONTEXT_CHARS] + "\n\n[...]"
 
     sources = list({c["source"] for c in chunks})
 
@@ -579,7 +609,9 @@ async def ingest_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
-    save_path = PDF_UPLOAD_DIR / file.filename
+    # Sanitize: strip any path components (prevent path traversal attacks)
+    safe_filename = Path(file.filename).name
+    save_path = PDF_UPLOAD_DIR / safe_filename
     content   = await file.read()
     with open(save_path, "wb") as f:
         f.write(content)

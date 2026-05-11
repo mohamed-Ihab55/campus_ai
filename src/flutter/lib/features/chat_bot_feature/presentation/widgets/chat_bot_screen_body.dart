@@ -3,6 +3,7 @@ import 'package:campus_ai/features/chat_bot_feature/data/cubit/chat_cubit.dart';
 import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_error_banner.dart';
 import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_input_field.dart';
 import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_messages_list.dart';
+import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_history_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,9 +14,26 @@ class ChatBotScreenBody extends StatefulWidget {
   State<ChatBotScreenBody> createState() => _ChatBotScreenBodyState();
 }
 
-class _ChatBotScreenBodyState extends State<ChatBotScreenBody> {
+class _ChatBotScreenBodyState extends State<ChatBotScreenBody>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  late TabController _tabController;
+  bool _initialScrollDone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _scrollBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -42,6 +60,13 @@ class _ChatBotScreenBodyState extends State<ChatBotScreenBody> {
     return BlocConsumer<ChatCubit, ChatState>(
       listener: (context, state) {
         if (state is ChatError) _scrollBottom();
+
+        if (!_initialScrollDone &&
+            state is ChatSuccess &&
+            state.messages.isNotEmpty) {
+          _initialScrollDone = true;
+          _scrollBottom();
+        }
       },
       builder: (context, state) {
         final messages = state.messages;
@@ -50,54 +75,105 @@ class _ChatBotScreenBodyState extends State<ChatBotScreenBody> {
           backgroundColor: AppColors.bgColor,
           body: Column(
             children: [
-              SizedBox(height: 50,),
-              Expanded(
-                child: messages.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset('assets/images/d3bs.png',width: 160,),
-                            // const SizedBox(height: 16),
-                             RichText(
-                              text: TextSpan(
-                                text: "Start a conversation with ",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: AppColors.textSecondary,
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: "D3bs",
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    : ChatMessagesList(
-                        messages: messages,
-                        controller: _scrollController,
-                      ),
-              ),
-              if (state is ChatError)
-                ChatErrorBanner(message: state.errorMessage),
+              const SizedBox(height: 50),
+
+              // Tab Bar
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ChatInputField(
-                  controller: _controller,
-                  isLoading: state is ChatLoading,
-                  onSend: () => _send(state),
+                child: Container(
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    labelColor: Colors.white,
+                    unselectedLabelColor: AppColors.textSecondary,
+                    labelStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    tabs: const [
+                      Tab(text: 'Chat'),
+                      Tab(text: 'History'),
+                    ],
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
+
+              // Tab Views
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // ── Tab 1: Chat ──
+                    Column(
+                      children: [
+                        Expanded(
+                          child: messages.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/d3bs.png',
+                                        width: 160,
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          text: "Start a conversation with ",
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                          children: [
+                                            TextSpan(
+                                              text: "D3bs",
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ChatMessagesList(
+                                  messages: messages,
+                                  controller: _scrollController,
+                                ),
+                        ),
+                        if (state is ChatError)
+                          ChatErrorBanner(message: state.errorMessage),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: ChatInputField(
+                            controller: _controller,
+                            isLoading: state is ChatLoading,
+                            onSend: () => _send(state),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+
+                    // ── Tab 2: History ──
+                    const ChatHistoryTab(),
+                  ],
+                ),
+              ),
             ],
           ),
         );

@@ -12,7 +12,12 @@
           "package_name": "com.example.ai_campus_guide"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "477949209095-9l1j44k01oc51r77gn436ssckq89pd55.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCvRINYYWf9TqUjRlZ1SDUoYcWU61gnJLg"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "477949209095-9l1j44k01oc51r77gn436ssckq89pd55.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "477949209095-ffbo4djl96b0paqel8gon4t2jtr5mf70.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.campusAi"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +48,28 @@
           "package_name": "com.example.campus_ai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "477949209095-3q1nas3ch4td0nvtlqltvrdn9hd0d0g3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.campus_ai",
+            "certificate_hash": "1f80566505a1e45ce7e89f2ee2a24a70c03b02d3"
+          }
+        },
+        {
+          "client_id": "477949209095-8qcrefnalap5pmqlcd20t9cc9n9tvj2t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.campus_ai",
+            "certificate_hash": "c975f14474239159a43da3e7ba37b48f36c88620"
+          }
+        },
+        {
+          "client_id": "477949209095-9l1j44k01oc51r77gn436ssckq89pd55.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCvRINYYWf9TqUjRlZ1SDUoYcWU61gnJLg"
@@ -39,7 +77,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "477949209095-9l1j44k01oc51r77gn436ssckq89pd55.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "477949209095-ffbo4djl96b0paqel8gon4t2jtr5mf70.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.campusAi"
+              }
+            }
+          ]
         }
       }
     }

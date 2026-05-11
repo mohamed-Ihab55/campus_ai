@@ -19,7 +19,6 @@ class ChatRemoteService {
 
   Future<String> sendMessage({
     required String message,
-    required String sessionId,
     required String userId,
   }) async {
     final buffer = StringBuffer();
@@ -30,7 +29,6 @@ class ChatRemoteService {
 
     await sendMessageStreaming(
       message: message,
-      sessionId: sessionId,
       userId: userId,
       onToken: (token) => buffer.write(token),
       onDone: () => completer.complete(),
@@ -57,7 +55,6 @@ class ChatRemoteService {
 
   Future<void> sendMessageStreaming({
     required String message,
-    required String sessionId,
     required String userId,
     required void Function(String token) onToken,
     required void Function() onDone,
@@ -67,8 +64,18 @@ class ChatRemoteService {
     try {
       final response = await _dio.post(
         '/chat',
+<<<<<<< HEAD
         data: {'question': message, 'session_id': sessionId, 'user_id': userId},
         options: Options(responseType: ResponseType.stream),
+=======
+        data: {
+          'question': message,
+          'user_id': userId,
+        },
+        options: Options(
+          responseType: ResponseType.stream,
+        ),
+>>>>>>> 9a1b058f3732d89394b1aee3030e66b3a47349c8
       );
 
       final responseBody = response.data;
@@ -87,13 +94,6 @@ class ChatRemoteService {
 
         if (cleaned.isEmpty) continue;
 
-        /// لو الـ API بيرجع JSON
-        /// مثال:
-        /// {
-        ///   "message_id":"123",
-        ///   "token":"hello"
-        /// }
-
         try {
           final data = jsonDecode(cleaned);
 
@@ -107,7 +107,6 @@ class ChatRemoteService {
             }
           }
         } catch (_) {
-          /// fallback لو الرد text مباشر
           onToken(cleaned);
         }
       }

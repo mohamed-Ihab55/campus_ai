@@ -62,37 +62,55 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
-  
-  
-  Future<void> login({required String email, required String password,}) async{
-    try{
+
+  Future<void> login({required String email, required String password}) async {
+    try {
       emit(AuthLoading());
-      
-      final credential= await _auth.signInWithEmailAndPassword(email: email.trim(),
-          password: password.trim());
-      final user=credential.user;
-      
-      if(user==null){
-        emit(AuthError('Login failed'));
+
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+
+      final user = credential.user;
+
+      if (user == null) {
+        emit(const AuthError('Login failed'));
         return;
       }
 
       emit(AuthAuthenticated(user));
     } on FirebaseAuthException catch (e) {
-      emit(AuthError(_mapFirebaseError(e.code)));
+      switch (e.code) {
+        case 'invalid-email':
+          emit(const AuthError('Invalid email'));
+          break;
+
+        case 'invalid-credential':
+          emit(const AuthError('Email or password is incorrect'));
+          break;
+
+        case 'user-not-found':
+          emit(const AuthError('User not found'));
+          break;
+
+        case 'wrong-password':
+          emit(const AuthError('Wrong password'));
+          break;
+
+        default:
+          emit(AuthError(e.message ?? 'Authentication error'));
+      }
     } catch (e) {
       emit(AuthError(e.toString()));
     }
   }
 
-
   Future<void> resetPassword(String email) async {
     try {
       emit(AuthLoading());
 
-      await _auth.sendPasswordResetEmail(
-        email: email.trim(),
-      );
+      await _auth.sendPasswordResetEmail(email: email.trim());
 
       emit(const AuthSuccess('Password reset email sent'));
     } on FirebaseAuthException catch (e) {
@@ -101,7 +119,6 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
-
 
   Future<void> logout() async {
     await _auth.signOut();
@@ -114,17 +131,15 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
-      final userCredential =
-      await FirebaseAuth.instance.signInWithProvider(googleProvider);
+      final userCredential = await FirebaseAuth.instance.signInWithProvider(
+        googleProvider,
+      );
 
       final user = userCredential.user;
 
       if (user != null) {
         // optional: save user in Firestore
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .set({
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'uid': user.uid,
           'email': user.email,
           'name': user.displayName,
@@ -139,8 +154,8 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  String _mapFirebaseError(String code){
-    switch (code){
+  String _mapFirebaseError(String code) {
+    switch (code) {
       case 'email-already-in-use':
         return 'Email already in use';
 
@@ -163,6 +178,7 @@ class AuthCubit extends Cubit<AuthState> {
         return 'Authentication error';
     }
   }
+
   @override
   Future<void> close() {
     _authSubscription?.cancel();

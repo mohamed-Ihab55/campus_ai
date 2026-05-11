@@ -6,7 +6,6 @@ import 'package:campus_ai/features/chat_bot_feature/data/services/chat_service.d
 import 'package:campus_ai/features/chat_bot_feature/presentation/widgets/chat_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:uuid/uuid.dart';
 
 part 'chat_state.dart';
 
@@ -14,14 +13,14 @@ class ChatCubit extends Cubit<ChatState> {
   final ChatRepository _repository;
   final ChatRemoteService _remoteService;
 
-  final String _sessionId = const Uuid().v4();
-
   final String _userId = FirebaseAuth.instance.currentUser!.uid;
 
-  ChatCubit({ChatRepository? repository, ChatRemoteService? remoteService})
-    : _repository = repository ?? ChatRepository(),
-      _remoteService = remoteService ?? ChatRemoteService(),
-      super(const ChatInitial());
+  ChatCubit({
+    ChatRepository? repository,
+    ChatRemoteService? remoteService,
+  })  : _repository = repository ?? ChatRepository(),
+        _remoteService = remoteService ?? ChatRemoteService(),
+        super(const ChatInitial());
 
   StreamSubscription<List<ChatMessage>>? _messagesSubscription;
 
@@ -35,15 +34,18 @@ class ChatCubit extends Cubit<ChatState> {
           .getMessages(userId: _userId)
           .listen(
             (messages) {
-              emit(ChatSuccess(messages));
-            },
-            onError: (error) {
-              emit(ChatError(state.messages, error.toString()));
-            },
-          );
+          emit(ChatSuccess(messages));
+        },
+        onError: (error) {
+          emit(ChatError(state.messages, error.toString()));
+        },
+      );
     } catch (e) {
       emit(
-        ChatError(state.messages, 'Failed to load messages: ${e.toString()}'),
+        ChatError(
+          state.messages,
+          'Failed to load messages: ${e.toString()}',
+        ),
       );
     }
   }
@@ -67,7 +69,13 @@ class ChatCubit extends Cubit<ChatState> {
       userId: _userId,
     );
 
-    emit(ChatLoading([...currentMessages, userMessage, streamingMessage]));
+    emit(
+      ChatLoading([
+        ...currentMessages,
+        userMessage,
+        streamingMessage,
+      ]),
+    );
 
     try {
       await _repository.saveMessage(
@@ -83,7 +91,6 @@ class ChatCubit extends Cubit<ChatState> {
 
       await _remoteService.sendMessageStreaming(
         message: trimmedMessage,
-        sessionId: _sessionId,
         userId: _userId,
 
         onMessageId: (messageId) {
@@ -94,14 +101,18 @@ class ChatCubit extends Cubit<ChatState> {
           responseBuffer.write(token);
 
           final updatedMessages =
-              List<ChatMessage>.from([...currentMessages, userMessage])..add(
-                ChatMessage(
-                  id: apiMessageId,
-                  content: responseBuffer.toString(),
-                  role: MessageRole.assistant,
-                  userId: _userId,
-                ),
-              );
+          List<ChatMessage>.from([
+            ...currentMessages,
+            userMessage,
+          ])
+            ..add(
+              ChatMessage(
+                id: apiMessageId,
+                content: responseBuffer.toString(),
+                role: MessageRole.assistant,
+                userId: _userId,
+              ),
+            );
 
           emit(ChatStreaming(updatedMessages));
         },
@@ -125,7 +136,11 @@ class ChatCubit extends Cubit<ChatState> {
           );
 
           emit(
-            ChatSuccess([...currentMessages, userMessage, assistantMessage]),
+            ChatSuccess([
+              ...currentMessages,
+              userMessage,
+              assistantMessage,
+            ]),
           );
         },
 
@@ -133,7 +148,8 @@ class ChatCubit extends Cubit<ChatState> {
           final errorMessage = ChatMessage(
             role: MessageRole.assistant,
             userId: _userId,
-            isError: true, content:error.toString(),
+            isError: true,
+            content: error.toString(),
           );
 
           await _repository.saveMessage(
@@ -144,7 +160,14 @@ class ChatCubit extends Cubit<ChatState> {
           );
 
           emit(
-            ChatError([...currentMessages, userMessage, errorMessage], error),
+            ChatError(
+              [
+                ...currentMessages,
+                userMessage,
+                errorMessage,
+              ],
+              error,
+            ),
           );
         },
       );
@@ -152,15 +175,19 @@ class ChatCubit extends Cubit<ChatState> {
       final errorMessage = ChatMessage(
         role: MessageRole.assistant,
         userId: _userId,
-        isError: true, content: e.toString(),
+        isError: true,
+        content: e.toString(),
       );
 
       emit(
-        ChatError([
-          ...currentMessages,
-          userMessage,
-          errorMessage,
-        ], e.toString()),
+        ChatError(
+          [
+            ...currentMessages,
+            userMessage,
+            errorMessage,
+          ],
+          e.toString(),
+        ),
       );
     }
   }
