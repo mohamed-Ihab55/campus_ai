@@ -226,13 +226,17 @@ class _TableWidget extends StatelessWidget {
                     (h) => DataColumn(
                   label: SizedBox(
                     width: 100,
-                    child: Text(
-                      _forceEn(h),
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Text(
+                        _forceEn(h),
+                        textAlign: TextAlign.right,
+                        softWrap: true,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ),
@@ -256,13 +260,17 @@ class _TableWidget extends StatelessWidget {
                         (c) => DataCell(
                       SizedBox(
                         width: 100,
-                        child: Text(
-                          _forceEn(c),
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textPrimary,
-                            height: 1.4,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text(
+                            _forceEn(c),
+                            textAlign: TextAlign.right,
+                            softWrap: true,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textPrimary,
+                              height: 1.4,
+                            ),
                           ),
                         ),
                       ),
