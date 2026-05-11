@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:campus_ai/core/theme/app_colors.dart';
 import 'package:campus_ai/features/chat_bot_feature/data/model/chat_model.dart';
 
@@ -15,8 +16,9 @@ class MessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
-        mainAxisAlignment:
-        isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
@@ -31,10 +33,10 @@ class MessageBubble extends StatelessWidget {
             ),
             const SizedBox(width: 8),
           ],
+
           Flexible(
             child: Container(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: isUser
                     ? AppColors.primary
@@ -46,6 +48,7 @@ class MessageBubble extends StatelessWidget {
                   bottomRight: Radius.circular(isUser ? 4 : 20),
                 ),
               ),
+
               child: isUser
                   ? Text(
                 message.content,
@@ -54,7 +57,45 @@ class MessageBubble extends StatelessWidget {
                   fontSize: 14,
                 ),
               )
-                  : _AssistantContent(content: message.content),
+                  : Directionality(
+                textDirection: TextDirection.rtl,
+                child: MarkdownBody(
+                  data: message.content.replaceAll("\u200B", ''),
+                  selectable: true,
+
+                  builders: {'table': _ProTableBuilder()},
+
+                  styleSheet: MarkdownStyleSheet(
+                    tableCellsPadding: const EdgeInsets.all(12),
+                    tableBorder: TableBorder.all(
+                      color: AppColors.textTertiary,
+                    ),
+                    p: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.color,
+                      height: 1.5,
+                    ),
+
+                    code: TextStyle(
+                      fontSize: 13,
+                      backgroundColor: Colors.grey.shade200,
+                      fontFamily: 'monospace',
+                    ),
+
+                    codeblockDecoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+
+                    listBullet: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -63,224 +104,107 @@ class MessageBubble extends StatelessWidget {
   }
 }
 
-class _AssistantContent extends StatelessWidget {
-  final String content;
-
-  const _AssistantContent({required this.content});
-
-  List<_Segment> _parse(String text) {
-    final segments = <_Segment>[];
-    final lines = text.split('\n');
-    final buffer = StringBuffer();
-    final tableBuffer = StringBuffer();
-    bool inTable = false;
-
-    for (final line in lines) {
-      final isTableLine = line.trimLeft().startsWith('|');
-
-      if (isTableLine) {
-        if (!inTable) {
-          if (buffer.isNotEmpty) {
-            segments.add(_Segment.markdown(buffer.toString()));
-            buffer.clear();
-          }
-          inTable = true;
-        }
-        tableBuffer.writeln(line);
-      } else {
-        if (inTable) {
-          segments.add(_Segment.table(tableBuffer.toString()));
-          tableBuffer.clear();
-          inTable = false;
-        }
-        buffer.writeln(line);
-      }
-    }
-
-    if (inTable) segments.add(_Segment.table(tableBuffer.toString()));
-    if (buffer.isNotEmpty) segments.add(_Segment.markdown(buffer.toString()));
-
-    return segments;
-  }
-
+class _ProTableBuilder extends MarkdownElementBuilder {
   @override
-  Widget build(BuildContext context) {
-    final segments = _parse(content.replaceAll('\u200B', ''));
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    if (element.tag != 'table') return null;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: segments.map((seg) {
-        if (seg.isTable) {
-          return _TableWidget(raw: seg.text);
-        }
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: MarkdownBody(
-            data: seg.text,
-            selectable: true,
-            styleSheet: MarkdownStyleSheet(
-              p: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-                height: 1.5,
-              ),
-              code: TextStyle(
-                fontSize: 13,
-                backgroundColor: Colors.grey.shade200,
-                fontFamily: 'monospace',
-              ),
-              codeblockDecoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              listBullet: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textPrimary,
-              ),
-            ),
+    final rows =
+        element.children
+            ?.whereType<md.Element>()
+            .where((e) => e.tag == 'tr')
+            .toList() ??
+            [];
+
+    if (rows.isEmpty) return const SizedBox();
+    final headerCells =
+        rows.first.children
+            ?.whereType<md.Element>()
+            .where((e) => e.tag == 'th' || e.tag == 'td')
+            .toList() ??
+            [];
+
+    final bodyRows = rows.skip(1).toList();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.textTertiary),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        );
-      }).toList(),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Column(
+            children: [
+              Container(
+                color: Colors.blueGrey.shade50,
+                child: Row(
+                  children: headerCells.map((cell) {
+                    return _buildCell(
+                      text: cell.textContent.trim(),
+                      isHeader: true,
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              ...bodyRows.asMap().entries.map((entry) {
+                final index = entry.key;
+                final row = entry.value;
+
+                final cells =
+                    row.children
+                        ?.whereType<md.Element>()
+                        .where((e) => e.tag == 'td')
+                        .toList() ??
+                        [];
+
+                return Container(
+                  color: index.isEven ? Colors.white : Colors.grey.shade50,
+                  child: Row(
+                    children: cells.map((cell) {
+                      return _buildCell(
+                        text: cell.textContent.trim(),
+                        isHeader: false,
+                      );
+                    }).toList(),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
     );
   }
-}
 
-class _Segment {
-  final String text;
-  final bool isTable;
-
-  _Segment.markdown(this.text) : isTable = false;
-  _Segment.table(this.text) : isTable = true;
-}
-
-class _TableWidget extends StatelessWidget {
-  final String raw;
-
-  const _TableWidget({required this.raw});
-
-  String _forceEn(String text) {
-    const Map<String, String> map = {
-      '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
-      '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
-    };
-    String result = text;
-    map.forEach((k, v) => result = result.replaceAll(k, v));
-    return result;
-  }
-
-  List<List<String>> _parseRows(String raw) {
-    final lines = raw
-        .split('\n')
-        .map((l) => l.trim())
-        .where((l) => l.startsWith('|') && !_isSeparator(l))
-        .toList();
-
-    return lines.map((line) {
-      return line
-          .split('|')
-          .where((cell) => cell.isNotEmpty)
-          .map((cell) => cell.trim())
-          .toList();
-    }).toList();
-  }
-
-  bool _isSeparator(String line) {
-    return RegExp(r'^\|[\s\-:|]+\|$').hasMatch(line.trim()) ||
-        line.replaceAll(RegExp(r'[\|\-\s:]'), '').isEmpty;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final rows = _parseRows(raw);
-    if (rows.isEmpty) return const SizedBox();
-
-    final headers = rows.first;
-    final body = rows.skip(1).toList();
-
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.textTertiary, width: 0.8),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: DataTable(
-              headingRowColor:
-              WidgetStateProperty.all(Colors.blueGrey.shade50),
-              border: TableBorder.all(
-                color: AppColors.textTertiary,
-                width: 0.8,
-              ),
-              columnSpacing: 24,
-              horizontalMargin: 16,
-              headingRowHeight: 52,
-              dataRowMinHeight: 48,
-              dataRowMaxHeight: double.infinity,
-              columns: headers
-                  .map(
-                    (h) => DataColumn(
-                  label: SizedBox(
-                    width: 100,
-                    child: Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: Text(
-                        _forceEn(h),
-                        textAlign: TextAlign.right,
-                        softWrap: true,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              )
-                  .toList(),
-              rows: body.asMap().entries.map((entry) {
-                final cells = entry.value;
-                final paddedCells = List.generate(
-                  headers.length,
-                      (i) => i < cells.length ? cells[i] : '',
-                );
-                return DataRow(
-                  color: WidgetStateProperty.resolveWith(
-                        (states) => entry.key.isEven
-                        ? Colors.white
-                        : Colors.grey.shade50,
-                  ),
-                  cells: paddedCells
-                      .map(
-                        (c) => DataCell(
-                      SizedBox(
-                        width: 100,
-                        child: Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: Text(
-                            _forceEn(c),
-                            textAlign: TextAlign.right,
-                            softWrap: true,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textPrimary,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                      .toList(),
-                );
-              }).toList(),
-            ),
-          ),
+  Widget _buildCell({required String text, required bool isHeader}) {
+    return Container(
+      width: 160,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          right: BorderSide(color: AppColors.textTertiary, width: 0.8),
+          bottom: BorderSide(color: AppColors.textTertiary, width: 0.8),
+        ),
+      ),
+      child: Text(
+        text,
+        textAlign: isHeader ? TextAlign.center : TextAlign.start,
+        style: TextStyle(
+          fontSize: 13.5,
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.w500,
+          color: isHeader ? AppColors.textPrimary : AppColors.textPrimary,
         ),
       ),
     );
