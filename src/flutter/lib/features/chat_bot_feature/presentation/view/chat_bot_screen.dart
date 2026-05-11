@@ -8,11 +8,6 @@ class ChatBotScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocProvider(
-        create: (_) => ChatCubit(),
-        child: const ChatBotScreenBody(),
-      ),
-    );
+    return Scaffold(body: const ChatBotScreenBody());
   }
 }
