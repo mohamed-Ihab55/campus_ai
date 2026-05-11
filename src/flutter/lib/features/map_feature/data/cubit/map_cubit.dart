@@ -1,56 +1,51 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:campus_ai/features/map_feature/data/model/campus_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-
-import '../model/compus_data.dart';
-import 'map_state.dart';
+import 'package:campus_ai/features/map_feature/data/cubit/map_state.dart';
 
 class MapCubit extends Cubit<MapState> {
   MapCubit() : super(MapState(locations: campusLocations));
 
+  Timer? _debounce;
+
+  // ── Selection ──────────────────────────────────────────────────────────────
+
   void selectLocation(CampusLocation location) {
     if (state.selected?.id == location.id) return;
-
-    emit(state.copyWith(
-      selected: location,
-      clearError: true,
-    ));
+    emit(state.copyWith(selected: location, clearError: true));
   }
 
   void clearSelection() {
     if (state.selected == null) return;
-
     emit(state.copyWith(clearSelected: true));
   }
 
+  // ── Filter & Search ────────────────────────────────────────────────────────
+
   void setFilter(LocationCategory? category) {
     if (state.filter == category) return;
-
-    emit(state.copyWith(
-      filter: category,
-      clearFilter: category == null,
-    ));
+    emit(state.copyWith(filter: category, clearFilter: category == null));
   }
-
-  Timer? _debounce;
 
   void search(String text) {
     if (state.search == text) return;
-
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
       emit(state.copyWith(search: text));
     });
   }
 
+  // ── GPS ────────────────────────────────────────────────────────────────────
+
   Future<void> locateUser() async {
     try {
       final hasService = await Geolocator.isLocationServiceEnabled();
       if (!hasService) {
-        _emitError('Please enable GPS.');
+        _emitError('الرجاء تفعيل GPS.');
         return;
       }
 
@@ -61,39 +56,32 @@ class MapCubit extends Cubit<MapState> {
         locationSettings: _settings,
       );
 
-      final newLocation = LatLng(
-        position.latitude,
-        position.longitude,
+      emit(
+        state.copyWith(
+          userLocation: LatLng(position.latitude, position.longitude),
+          clearError: true,
+        ),
       );
-
-      if (state.userLocation == newLocation) return;
-
-      emit(state.copyWith(
-        userLocation: newLocation,
-        clearError: true,
-      ));
-    } catch (e) {
-      _emitError('Failed to get location.');
+    } catch (_) {
+      _emitError('تعذّر تحديد الموقع.');
     }
   }
 
   Future<bool> _handlePermission() async {
-    LocationPermission permission =
-    await Geolocator.checkPermission();
+    var permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
 
     if (permission == LocationPermission.denied) {
-      _emitError('Location permission denied.');
+      _emitError('تم رفض إذن الموقع.');
       return false;
     }
 
     if (permission == LocationPermission.deniedForever) {
       await Geolocator.openAppSettings();
-
-      _emitError('Permission denied forever. Open settings.');
+      _emitError('الإذن مرفوض دائماً. افتح الإعدادات.');
       return false;
     }
 
@@ -102,27 +90,19 @@ class MapCubit extends Cubit<MapState> {
 
   LocationSettings get _settings {
     if (Platform.isAndroid) {
-      return  AndroidSettings(
+      return AndroidSettings(
         accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 5,
       );
     }
-
     if (Platform.isIOS) {
-      return  AppleSettings(
-        accuracy: LocationAccuracy.best,
-        distanceFilter: 5,
-      );
+      return AppleSettings(accuracy: LocationAccuracy.best, distanceFilter: 5);
     }
-
-    return const LocationSettings(
-      accuracy: LocationAccuracy.high,
-    );
+    return const LocationSettings(accuracy: LocationAccuracy.high);
   }
 
   void _emitError(String message) {
     if (state.error == message) return;
-
     emit(state.copyWith(error: message));
   }
 

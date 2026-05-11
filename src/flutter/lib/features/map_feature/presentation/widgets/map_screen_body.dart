@@ -1,16 +1,40 @@
-﻿import 'package:campus_ai/core/theme/app_colors.dart';
+﻿import 'dart:async';
+
 import 'package:campus_ai/features/map_feature/data/cubit/map_cubit.dart';
 import 'package:campus_ai/features/map_feature/data/cubit/map_state.dart';
-import 'package:campus_ai/features/map_feature/data/model/compus_data.dart';
+import 'package:campus_ai/features/map_feature/data/model/campus_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
-
-import 'dart:async';
 import 'package:latlong2/latlong.dart';
 
-import '../../../../core/helper/search_text_field.dart';
-import 'horizonatal_filter.dart';
+// ─────────────────────────────────────────────────────────────────────────────
+// Helper: point-in-polygon (ray casting)
+// ─────────────────────────────────────────────────────────────────────────────
+
+bool _pointInPolygon(LatLng point, List<LatLng> polygon) {
+  bool inside = false;
+  int j = polygon.length - 1;
+
+  for (int i = 0; i < polygon.length; i++) {
+    final xi = polygon[i].longitude;
+    final yi = polygon[i].latitude;
+    final xj = polygon[j].longitude;
+    final yj = polygon[j].latitude;
+
+    final intersect =
+        ((yi > point.latitude) != (yj > point.latitude)) &&
+        (point.longitude < (xj - xi) * (point.latitude - yi) / (yj - yi) + xi);
+
+    if (intersect) inside = !inside;
+    j = i;
+  }
+  return inside;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Widget
+// ─────────────────────────────────────────────────────────────────────────────
 
 class MapScreenBody extends StatefulWidget {
   const MapScreenBody({super.key});
@@ -20,34 +44,170 @@ class MapScreenBody extends StatefulWidget {
 }
 
 class _MapScreenBodyState extends State<MapScreenBody> {
-  late final MapController mapController;
-  late final TextEditingController searchController;
-
+  late final MapController _mapController;
+  late final TextEditingController _searchController;
   Timer? _debounce;
-
+  double _currentZoom = 17.5;
   @override
   void initState() {
     super.initState();
-    mapController = MapController();
-    searchController = TextEditingController();
+    _mapController = MapController();
+    _searchController = TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      mapController.move(const LatLng(30.0777111, 31.283907), 18);
+      _mapController.move(campusCenter, 18);
     });
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
-    searchController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   void _onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
       context.read<MapCubit>().search(value);
     });
+  }
+
+  // ── hit-test: أي polygon تم الضغط عليه؟ ─────────────────────────────────
+
+  void _onMapTap(TapPosition _, LatLng tapped) {
+    final cubit = context.read<MapCubit>();
+    final locations = cubit.state.filtered;
+
+    // ابحث بالـ polygons أولاً
+    for (final loc in locations) {
+      if (loc.polygon != null && _pointInPolygon(tapped, loc.polygon!)) {
+        cubit.selectLocation(loc);
+        return;
+      }
+    }
+
+    // لو مفيش polygon اتلمس، امسح الاختيار
+    cubit.clearSelection();
+  }
+
+  // ── يبني Polygon widgets من الـ locations ─────────────────────────────────
+
+  List<Polygon> _buildPolygons(
+    List<CampusLocation> locations,
+    CampusLocation? selected,
+  ) {
+    return locations.where((loc) => loc.polygon != null).map((loc) {
+      final isSelected = selected?.id == loc.id;
+      return Polygon(
+        points: loc.polygon!,
+        color: isSelected ? loc.fillColor.withOpacity(0.55) : loc.fillColor,
+        borderColor: isSelected ? loc.color : loc.color.withOpacity(0.7),
+        borderStrokeWidth: isSelected ? 2.5 : 1.5,
+        label: loc.name,
+        labelStyle: TextStyle(
+          color: loc.color,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          shadows: const [
+            Shadow(color: Colors.white, blurRadius: 4),
+            Shadow(color: Colors.white, blurRadius: 8),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  // ── يبني Markers للنقاط (بدون polygon) ───────────────────────────────────
+
+  List<Marker> _buildPointMarkers(
+    List<CampusLocation> locations,
+    CampusLocation? selected,
+  ) {
+    return locations.where((loc) => loc.polygon == null).map((loc) {
+      final isSelected = selected?.id == loc.id;
+      final size = isSelected ? 52.0 : 40.0;
+
+      return Marker(
+        point: loc.center,
+        width: size,
+        height: size,
+        child: GestureDetector(
+          onTap: () => context.read<MapCubit>().selectLocation(loc),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: loc.color,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white,
+                width: isSelected ? 3 : 2,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: loc.color.withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                  : [],
+            ),
+            child: Center(
+              child: Text(
+                loc.emoji,
+                style: TextStyle(fontSize: isSelected ? 22 : 17),
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
+  }
+
+  List<Marker> _buildAllAsMarkers(
+    List<CampusLocation> locations,
+    CampusLocation? selected,
+  ) {
+    return locations.map((loc) {
+      final isSelected = selected?.id == loc.id;
+      final size = isSelected ? 52.0 : 40.0;
+
+      return Marker(
+        point: loc.center,
+        width: size,
+        height: size,
+        child: GestureDetector(
+          onTap: () => context.read<MapCubit>().selectLocation(loc),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: loc.color,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white,
+                width: isSelected ? 3 : 2,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: loc.color.withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                  : [],
+            ),
+            child: Center(
+              child: Text(
+                loc.emoji,
+                style: TextStyle(fontSize: isSelected ? 22 : 17),
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
   }
 
   @override
@@ -56,245 +216,181 @@ class _MapScreenBodyState extends State<MapScreenBody> {
 
     return Scaffold(
       body: BlocListener<MapCubit, MapState>(
-        listener: (context, state) {
+        listenWhen: (prev, curr) => prev.selected != curr.selected,
+        listener: (_, state) {
           if (state.selected != null) {
-            mapController.move(state.selected!.position, 18);
+            _mapController.move(state.selected!.center, 19);
           }
         },
         child: Stack(
           children: [
-            FlutterMap(
-              mapController: mapController,
-              options: MapOptions(
-                initialCenter: campusCenter,
-                initialZoom: 17,
-                onTap: (_, _) => cubit.clearSelection(),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate:
-                      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-                  subdomains: const ['a', 'b', 'c', 'd'],
-                ),
+            // ── الخريطة ────────────────────────────────────────────────────
+            BlocBuilder<MapCubit, MapState>(
+              builder: (context, state) {
+                return FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter: campusCenter,
+                    initialZoom: 17.5,
+                    minZoom: 15,
+                    maxZoom: 20,
+                    onTap: _onMapTap,
+                    onMapEvent: (event) {
+                      // ← أضف ده
+                      if (event is MapEventMove) {
+                        setState(() {
+                          _currentZoom = event.camera.zoom;
+                        });
+                      }
+                    },
+                  ),
+                  children: [
+                    // طبقة الخريطة الأساسية
+                    TileLayer(
+                      urlTemplate:
+                          'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                      subdomains: const ['a', 'b', 'c', 'd'],
+                      userAgentPackageName: 'com.example.campus_ai',
+                    ),
 
-                BlocSelector<MapCubit, MapState, LatLng?>(
-                  selector: (state) => state.userLocation,
-                  builder: (_, userLocation) {
-                    if (userLocation == null) return const SizedBox();
-
-                    return MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: userLocation,
-                          width: 40,
-                          height: 40,
-                          child: const Icon(
-                            Icons.person_pin_circle,
-                            color: AppColors.primary,
-                            size: 40,
-                          ),
+                    // طبقة الـ Polygons (المباني والساحات)
+                    if (_currentZoom >= 17.5)
+                      PolygonLayer(
+                        polygons: _buildPolygons(
+                          state.filtered,
+                          state.selected,
                         ),
-                      ],
-                    );
-                  },
-                ),
+                      ),
 
-                /// MARKERS
-                BlocBuilder<MapCubit, MapState>(
-                  buildWhen: (prev, curr) =>
-                      prev.filtered != curr.filtered ||
-                      prev.selected != curr.selected,
-                  builder: (context, state) {
-                    return MarkerLayer(
-                      markers: state.filtered.map((loc) {
-                        final selected = state.selected?.id == loc.id;
-
-                        return Marker(
-                          point: loc.position,
-                          width: selected ? 60 : 45,
-                          height: selected ? 60 : 45,
-                          child: GestureDetector(
-                            onTap: () => cubit.selectLocation(loc),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 150),
+                    // طبقة موقع المستخدم
+                    if (state.userLocation != null)
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: state.userLocation!,
+                            width: 44,
+                            height: 44,
+                            child: Container(
                               decoration: BoxDecoration(
-                                color: loc.color,
+                                color: const Color(0xFF185FA5),
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white,
-                                  width: selected ? 3 : 2,
+                                  width: 3,
                                 ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  loc.emoji,
-                                  style: TextStyle(
-                                    fontSize: selected ? 24 : 18,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF185FA5,
+                                    ).withOpacity(0.4),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
                                   ),
-                                ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 22,
                               ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    );
-                  },
-                ),
-              ],
-            ),
+                        ],
+                      ),
 
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 10,
-              left: 16,
-              right: 16,
-              child: Column(
-                children: [
-                  _searchBar(),
-                  const SizedBox(height: 10),
-                  _filters(),
-                ],
-              ),
-            ),
-
-            BlocBuilder<MapCubit, MapState>(
-              buildWhen: (prev, curr) => prev.selected != curr.selected,
-              builder: (context, state) {
-                if (state.selected == null) return const SizedBox();
-
-                return Positioned(
-                  left: 16,
-                  right: 16,
-                  bottom: 100,
-                  child: _detailsCard(state.selected!),
+                    // طبقة الـ Markers للنقاط
+                    MarkerLayer(
+                      markers: _currentZoom < 17.5
+                          ? _buildAllAsMarkers(state.filtered, state.selected)
+                          : _buildPointMarkers(state.filtered, state.selected),
+                    ),
+                  ],
                 );
               },
             ),
 
+            // ── شريط البحث والفلاتر ────────────────────────────────────────
             Positioned(
-              right: 16,
-              bottom: 30,
-              child: FloatingActionButton(
-                backgroundColor: AppColors.primary,
-                onPressed: () async {
-                  await cubit.locateUser();
-                  final user = cubit.state.userLocation;
-
-                  if (user != null) {
-                    mapController.move(user, 17);
-                  }
-                },
-                child: const Icon(Icons.gps_fixed, color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _searchBar() {
-    return SearchTextField(
-      fillColor: Colors.transparent,
-      hintText: 'Search',
-      onChanged: _onSearchChanged,
-      controller: searchController,
-      iconAndTextColor: AppColors.textPrimary,
-      border: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.border),
-      ),
-    );
-  }
-
-  Widget _filters() {
-    return BlocBuilder<MapCubit, MapState>(
-      buildWhen: (prev, curr) => prev.filter != curr.filter,
-      builder: (context, state) {
-        final cubit = context.read<MapCubit>();
-
-        return SizedBox(
-          height: 48,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: LocationCategory.values.map((category) {
-              final selected = state.filter == category;
-
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: HorizontalFilter(
-                  scale: selected ? 1.03 : 1,
-                  text: category.label,
-                  gradient: selected
-                      ? LinearGradient(
-                          colors: [
-                            AppColors.primary,
-                            AppColors.primary.withValues(alpha: 0.75),
-                          ],
-                        )
-                      : null,
-                  color: selected
-                      ? null
-                      : Theme.of(context).colorScheme.surface,
-                  border: Border.all(
-                    color: selected
-                        ? Colors.transparent
-                        : AppColors.primary.withValues(alpha: 0.25),
-                    width: 1.2,
-                  ),
-                  boxShadow: [
-                    if (selected)
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.28),
-                        blurRadius: 14,
-                        spreadRadius: 1,
-                        offset: const Offset(0, 5),
-                      ),
-                  ],
-                  onTap: () {
-                    cubit.setFilter(selected ? null : category);
-                  },
-                  animatedColor: selected ? Colors.white : AppColors.primary,
-                  textColor:selected ? Colors.white : AppColors.textSecondary,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                ),
-              );
-            }).toList(),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _detailsCard(CampusLocation location) {
-    return Card(
-      color: AppColors.bgColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: location.color,
-              child: Text(location.emoji),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 12,
+              right: 12,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    location.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold,color: AppColors.textPrimary),
+                  _SearchBar(
+                    controller: _searchController,
+                    onChanged: _onSearchChanged,
                   ),
-                  Text('Floor: ${location.floor}',style: TextStyle(color: AppColors.textSecondary),),
+                  const SizedBox(height: 8),
+                  _FiltersRow(),
                 ],
               ),
             ),
-            IconButton(
-              onPressed: () {
-                context.read<MapCubit>().clearSelection();
+
+            // ── بطاقة التفاصيل ─────────────────────────────────────────────
+            BlocBuilder<MapCubit, MapState>(
+              buildWhen: (prev, curr) => prev.selected != curr.selected,
+              builder: (_, state) {
+                if (state.selected == null) return const SizedBox.shrink();
+                return Positioned(
+                  left: 12,
+                  right: 12,
+                  bottom: 110,
+                  child: _DetailsCard(
+                    location: state.selected!,
+                    onClose: cubit.clearSelection,
+                  ),
+                );
               },
-              icon: const Icon(Icons.close,color: AppColors.textSecondary,),
+            ),
+
+            // ── زر GPS ─────────────────────────────────────────────────────
+            Positioned(
+              right: 16,
+              bottom: 36,
+              child: FloatingActionButton(
+                backgroundColor: const Color(0xFF185FA5),
+                elevation: 4,
+                onPressed: () async {
+                  await cubit.locateUser();
+                  final user = cubit.state.userLocation;
+                  if (user != null) _mapController.move(user, 18);
+                },
+                child: const Icon(Icons.my_location, color: Colors.white),
+              ),
+            ),
+
+            // ── رسالة الخطأ ────────────────────────────────────────────────
+            BlocBuilder<MapCubit, MapState>(
+              buildWhen: (prev, curr) => prev.error != curr.error,
+              builder: (_, state) {
+                if (state.error == null) return const SizedBox.shrink();
+                return Positioned(
+                  bottom: 110,
+                  left: 24,
+                  right: 24,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFA32D2D),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        state.error!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -303,3 +399,213 @@ class _MapScreenBodyState extends State<MapScreenBody> {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Search Bar
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _SearchBar extends StatelessWidget {
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  const _SearchBar({required this.controller, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        onChanged: onChanged,
+        textDirection: TextDirection.rtl,
+        decoration: const InputDecoration(
+          hintText: 'ابحث عن مبنى أو مكان...',
+          hintTextDirection: TextDirection.rtl,
+          prefixIcon: Icon(Icons.search, color: Color(0xFF185FA5)),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Filters Row
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _FiltersRow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MapCubit, MapState>(
+      buildWhen: (prev, curr) => prev.filter != curr.filter,
+      builder: (context, state) {
+        final cubit = context.read<MapCubit>();
+
+        return SizedBox(
+          height: 42,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: LocationCategory.values.map((cat) {
+              final selected = state.filter == cat;
+
+              return GestureDetector(
+                onTap: () => cubit.setFilter(selected ? null : cat),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: selected ? cat.color : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: selected ? cat.color : cat.color.withOpacity(0.4),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(cat.emoji, style: const TextStyle(fontSize: 13)),
+                      const SizedBox(width: 6),
+                      Text(
+                        cat.label,
+                        style: TextStyle(
+                          color: selected ? Colors.white : cat.color,
+                          fontSize: 13,
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Details Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _DetailsCard extends StatelessWidget {
+  final CampusLocation location;
+  final VoidCallback onClose;
+
+  const _DetailsCard({required this.location, required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            // أيقونة المكان
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: location.fillColor,
+                shape: BoxShape.circle,
+                border: Border.all(color: location.color, width: 1.5),
+              ),
+              child: Center(
+                child: Text(
+                  location.emoji,
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // الاسم والتفاصيل
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    location.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      color: location.color,
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
+                  if (location.floor != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      location.floor!,
+                      style: const TextStyle(fontSize: 13, color: Colors.grey),
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ],
+                  if (location.description != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      location.description!,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                      textDirection: TextDirection.rtl,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            // زر الإغلاق
+            IconButton(
+              onPressed: onClose,
+              icon: const Icon(Icons.close, color: Colors.black38),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
