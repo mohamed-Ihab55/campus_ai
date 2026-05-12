@@ -103,6 +103,11 @@ class ChatRemoteService {
             if (data['token'] != null) {
               onToken(data['token'].toString());
             }
+          } else {
+            // jsonDecode succeeded but returned a non-Map value
+            // (e.g. int 402, double 3.0, bool, etc.)
+            // These are raw LLM tokens, not API messages — forward as text
+            onToken(cleaned);
           }
         } catch (_) {
           onToken(cleaned);
