@@ -1,156 +1,46 @@
-# ── RERANKER DISABLED ──────────────────────────────────────────────────────────
-# Currently using Groq API instead of local HuggingFace reranker.
-# Will be re-enabled and upgraded before discussion day.
-# ──────────────────────────────────────────────────────────────────────────────
-import os
+"""
+reranker.py — Groq LLM-based reranker
+======================================================================
+
+Role in the RAG pipeline
+-------------------------
+                    Query
+                      │
+          ┌───────────▼────────────┐
+          │  Hybrid Search (RRF)   │  ← retriever.py (fast, recall-focused)
+          │  returns 8+ candidates │
+          └───────────┬────────────┘
+                      │
+          ┌───────────▼────────────┐
+          │  Groq LLM Reranker     │  ← THIS FILE (precision-focused)
+          │  Uses LLM in JSON mode │
+          │  to rank candidates    │
+          │  returns best 5        │
+          └───────────┬────────────┘
+                      │
+          ┌───────────▼────────────┐
+          │   Groq LLM (answer)    │  ← groq_client.py
+          └────────────────────────┘
+
+Graceful degradation
+--------------------
+If the model fails to load or score, chunks are returned in their
+original RRF order — the pipeline keeps working without reranking.
+"""
+
+import json
+import time
 import asyncio
-import math
-import httpx
-from dotenv import load_dotenv
+from groq import AsyncGroq
 
-load_dotenv()
+from app.core.config import settings
+from app.core.logging_setup import get_logger
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-HF_API_TOKEN    = os.getenv("HF_API_TOKEN", "")
-RERANKER_MODEL  = os.getenv("RERANKER_MODEL", "Qwen/Qwen3-Reranker-0.6B")
-HF_API_BASE     = "https://api-inference.huggingface.co/models"
-HF_API_URL      = f"{HF_API_BASE}/{RERANKER_MODEL}"
+logger = get_logger(__name__)
 
-# Max parallel calls to the HF Inference API.
-# The free tier has a rate limit (~10 req/s); keep this at 4-5 to stay safe.
-_CONCURRENCY    = int(os.getenv("RERANKER_CONCURRENCY", "4"))
-
-# Instruction that tells the model what "relevant" means in this domain.
-_INSTRUCTION_AR = (
-    "بناءً على سؤال الطالب، حدد ما إذا كان المقطع التالي من دليل الطالب "
-    "يحتوي على إجابة مفيدة ومباشرة للسؤال"
-)
-_INSTRUCTION_EN = (
-    "Given a student's question about Faculty of Science at Ain Shams University, "
-    "determine whether the following passage from the student guide contains "
-    "a relevant and direct answer"
-)
-
-
-# ── Prompt formatter ──────────────────────────────────────────────────────────
-
-def _format_prompt(query: str, passage: str, instruction: str) -> str:
-    return (
-        "<|im_start|>system\n"
-        "Judge whether the Document meets the requirements based on the Query "
-        "and the Instruct provided. "
-        "Note that the answer can only be \"yes\" or \"no\"."
-        "<|im_end|>\n"
-        "<|im_start|>user\n"
-        f"<Instruct>: {instruction}\n"
-        f"<Query>: {query}\n"
-        f"<Document>: {passage}"
-        "<|im_end|>\n"
-        "<|im_start|>assistant\n"
-        "<think>\n\n</think>\n"
-    )
-
-
-# ── Single-pair scorer ────────────────────────────────────────────────────────
-
-async def _score_pair(
-    client: httpx.AsyncClient,
-    semaphore: asyncio.Semaphore,
-    headers: dict,
-    query: str,
-    passage: str,
-    instruction: str,
-) -> float:
-    """
-    Score one (query, passage) pair via the HF Inference API.
-
-    Returns a float in [0, 1]:
-      - Uses log-probability of the "yes" token when details=True is available
-        (continuous score — ideal for ranking).
-      - Falls back to binary 1.0 / 0.0 if logprobs are unavailable.
-      - Returns 0.5 on any API error (neutral score — preserves original order).
-
-    بالعربي: يرجع رقم بين 0 و 1 يمثل مدى صلة الـ passage بالسؤال.
-    """
-    prompt = _format_prompt(query, passage, instruction)
-
-    async with semaphore:
-        try:
-            resp = await client.post(
-                HF_API_URL,
-                headers=headers,
-                json={
-                    "inputs": prompt,
-                    "parameters": {
-                        "max_new_tokens": 1,
-                        "return_full_text": False,
-                        "details": True,         # request logprobs for continuous score
-                    },
-                },
-                timeout=30.0,
-            )
-
-            if resp.status_code == 503:
-                # Model is loading (cold start) — wait and retry once
-                print(f"[RERANKER] Model loading (503), waiting 20s...")
-                await asyncio.sleep(20)
-                resp = await client.post(
-                    HF_API_URL,
-                    headers=headers,
-                    json={
-                        "inputs": prompt,
-                        "parameters": {
-                            "max_new_tokens": 1,
-                            "return_full_text": False,
-                            "details": True,
-                        },
-                    },
-                    timeout=30.0,
-                )
-
-            if resp.status_code != 200:
-                print(f"[RERANKER] API error {resp.status_code}: {resp.text[:120]}")
-                return 0.5   # neutral fallback
-
-            data = resp.json()
-
-            # ── Try to extract log-probability of "yes" token ──────────────
-            # HF API response structure when details=True:
-            # [{"generated_text": "yes", "details": {"tokens": [{"id":..., "logprob":...}]}}]
-            try:
-                token_details = data[0]["details"]["tokens"][0]
-                generated_token = token_details.get("text", "").strip().lower()
-                logprob         = token_details.get("logprob", None)
-
-                if logprob is not None:
-                    # Convert logprob to probability: p = exp(logprob)
-                    prob = math.exp(logprob)
-                    # If token is "no", invert: score = 1 - P(no)
-                    score = prob if generated_token.startswith("yes") else 1.0 - prob
-                    return round(max(0.0, min(1.0, score)), 4)
-
-                # logprob not available — fall back to binary
-                generated_text = data[0].get("generated_text", "").strip().lower()
-                return 1.0 if "yes" in generated_text else 0.0
-
-            except (KeyError, IndexError, TypeError):
-                # Unexpected response format — binary fallback
-                generated_text = ""
-                if isinstance(data, list) and data:
-                    item = data[0]
-                    generated_text = (
-                        item.get("generated_text", "")
-                        if isinstance(item, dict)
-                        else str(item)
-                    )
-                return 1.0 if "yes" in generated_text.lower() else 0.0
-
-        except asyncio.TimeoutError:
-            print("[RERANKER] Timeout on one pair — using neutral score 0.5")
-            return 0.5
-        except Exception as exc:
-            print(f"[RERANKER] Unexpected error: {exc}")
-            return 0.5
+# Re-use the existing Groq client setup
+_client = AsyncGroq(api_key=settings.groq_api_key)
+_reranker_available: bool | None = None
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -161,57 +51,132 @@ async def rerank_chunks(
     top_k: int = 5,
     lang: str = "ar",
 ) -> list[dict]:
+    """
+    Rerank a list of retrieved chunks using the Groq LLM.
 
+    Parameters
+    ----------
+    query  : the user's question
+    chunks : list of dicts with at least {"text": str, "source": str}
+    top_k  : number of chunks to return after reranking
+    lang   : "ar" or "en" (not used)
+
+    Returns
+    -------
+    list[dict] — same schema as input chunks, with an added "rerank_score" key,
+    sorted by rerank_score descending.
+    """
     if not chunks:
         return []
 
-    # ── Graceful degradation: no token → skip reranking ──────────────────────
-    if not HF_API_TOKEN:
-        print("[RERANKER] HF_API_TOKEN not set — skipping reranking (using RRF order)")
+    # ── No need to rerank if candidates ≤ top_k ──────────────────────────────
+    if len(chunks) <= top_k:
+        logger.info("[RERANKER] %d مقطع فقط ≤ top_k=%d — لا حاجة لإعادة الترتيب", len(chunks), top_k)
+        return [{**c, "rerank_score": c.get("rrf_score", 0.0)} for c in chunks]
+
+    # ── Skip if model unavailable ─────────────────────────────────────────────
+    if _reranker_available is False:
+        logger.info("[RERANKER] النموذج غير متاح — استخدام ترتيب RRF الأصلي")
         return [
             {**c, "rerank_score": c.get("rrf_score", 0.0)}
             for c in chunks[:top_k]
         ]
 
-    # ── No need to rerank if candidates ≤ top_k ──────────────────────────────
-    if len(chunks) <= top_k:
-        print(f"[RERANKER] Only {len(chunks)} candidates ≤ top_k={top_k} — skipping")
-        return [{**c, "rerank_score": c.get("rrf_score", 0.0)} for c in chunks]
-
-    instruction = _INSTRUCTION_AR if lang == "ar" else _INSTRUCTION_EN
-    headers = {
-        "Authorization": f"Bearer {HF_API_TOKEN}",
-        "Content-Type": "application/json",
-    }
-
-    semaphore = asyncio.Semaphore(_CONCURRENCY)
-
-    print(
-        f"[RERANKER] Scoring {len(chunks)} candidates with "
-        f"{RERANKER_MODEL} (concurrency={_CONCURRENCY})..."
+    # ── Score all chunks via Groq ─────────────────────────────────────────────
+    logger.info(
+        "[RERANKER] إعادة ترتيب %d مقطع بواسطة Groq (%s)...",
+        len(chunks), settings.groq_model,
     )
 
-    async with httpx.AsyncClient() as client:
-        score_tasks = [
-            _score_pair(client, semaphore, headers, query, c["text"], instruction)
-            for c in chunks
+    chunk_map = {f"chunk_{i}": c for i, c in enumerate(chunks)}
+    
+    prompt = f"""You are a relevance ranking assistant.
+Rank the following document chunks based on their relevance to the user's query.
+
+User Query: "{query}"
+
+Chunks:
+"""
+    for chunk_id, chunk in chunk_map.items():
+        text = chunk.get("text", "").strip()[:500] 
+        prompt += f"\n--- {chunk_id} ---\n{text}\n"
+
+    prompt += f"""
+Return ONLY a valid JSON object containing a single key "ranked_ids" which is a list of the chunk IDs ordered from most relevant to least relevant. Provide up to {top_k} IDs. Do not include markdown formatting or explanations.
+Example: {{"ranked_ids": ["chunk_3", "chunk_0", "chunk_1"]}}
+"""
+
+    t = time.time()
+    try:
+        response = await _client.chat.completions.create(
+            model=settings.groq_model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+            response_format={"type": "json_object"}
+        )
+        content = response.choices[0].message.content.strip()
+        elapsed = time.time() - t
+        
+        data = json.loads(content)
+        ranked_ids = data.get("ranked_ids", [])
+        
+        # Build the final ordered list
+        result = []
+        score = 1.0
+        step = 1.0 / len(ranked_ids) if ranked_ids else 0.1
+        
+        for cid in ranked_ids:
+            if cid in chunk_map:
+                c = chunk_map[cid]
+                result.append({**c, "rerank_score": round(score, 4)})
+                score -= step
+                
+        # Fill in any missing ones from original chunks if top_k is not reached
+        if len(result) < top_k:
+            existing_texts = {r["text"] for r in result}
+            for c in chunks:
+                if len(result) >= top_k:
+                    break
+                if c["text"] not in existing_texts:
+                    result.append({**c, "rerank_score": 0.0})
+                    existing_texts.add(c["text"])
+
+        logger.info(
+            "[RERANKER] تم التقييم بواسطة Groq في %.2f ثانية", elapsed
+        )
+        return result[:top_k]
+
+    except Exception as exc:
+        logger.warning("[RERANKER] فشل التقييم: %s — استخدام ترتيب RRF", exc, exc_info=True)
+        return [
+            {**c, "rerank_score": c.get("rrf_score", 0.0)}
+            for c in chunks[:top_k]
         ]
-        scores = await asyncio.gather(*score_tasks)
 
-    # ── Pair chunks with scores, sort, return top_k ───────────────────────────
-    ranked = sorted(
-        zip(chunks, scores),
-        key=lambda x: x[1],
-        reverse=True,
-    )
 
-    result = [
-        {**chunk, "rerank_score": score}
-        for chunk, score in ranked[:top_k]
-    ]
+# ── Startup verification ──────────────────────────────────────────────────────
 
-    print(
-        f"[RERANKER] Done — top score={result[0]['rerank_score']:.4f}  "
-        f"bottom score={result[-1]['rerank_score']:.4f}"
-    )
-    return result
+async def warmup_reranker() -> bool:
+    """Check Groq API connection at startup.
+    Sets ``_reranker_available`` so subsequent calls can skip if it fails.
+    Returns True if reranking works.
+    """
+    global _reranker_available
+
+    try:
+        await _client.chat.completions.create(
+            model=settings.groq_model,
+            messages=[{"role": "user", "content": 'Return {"test": 1} in JSON format'}],
+            temperature=0.0,
+            max_tokens=10,
+            response_format={"type": "json_object"}
+        )
+        
+        logger.info("[RERANKER] ✅ Warmup OK — Groq API ready for reranking")
+        _reranker_available = True
+        return True
+
+    except Exception as exc:
+        logger.warning("[RERANKER] ❌ Warmup FAILED — %s", exc)
+        _reranker_available = False
+        return False

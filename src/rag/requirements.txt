@@ -12,6 +12,7 @@ sentence-transformers==3.0.1
 chromadb==0.5.3
 
 # LLM + Reranker HTTP client
+groq==0.9.0
 # httpx is used for:
 #   1. Streaming Ollama responses
 #   2. Reranker API calls (currently Groq — HuggingFace disable for now)

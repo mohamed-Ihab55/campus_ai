@@ -5,7 +5,9 @@ from langdetect import detect as detect_lang, LangDetectException
 
 from app.core.config import settings
 from app.core.logging_setup import get_logger
-from app.retrieval import get_retriever # rerank_chunks DISABLED: using Groq API
+from app.retrieval import get_retriever
+# from app.retrieval import get_retriever # rerank_chunks DISABLED: using Groq API
+from app.retrieval.reranker import rerank_chunks
 from app.pipeline.query_handler import is_followup_question, rewrite_query
 from app.pipeline.context_builder import build_context, extract_sources
 from app.pipeline.prompt_builder import build_system_prompt
@@ -55,8 +57,8 @@ async def run(
 
     # ── الخطوة 4: إعادة الترتيب بالـ Reranker ─────────────────────────────────
     # DISABLED: local HuggingFace reranker replaced by Groq API before discussion day.
-    # chunks = await rerank_chunks(search_query, chunks, top_k=5, lang=lang)
-    chunks = chunks[:5]  # fallback: take top 5 from RRF order
+    chunks = await rerank_chunks(search_query, chunks, top_k=5, lang=lang)
+    # chunks = chunks[:5]  # fallback: take top 5 from RRF order
     
     # ── الخطوة 5: بناء السياق ─────────────────────────────────────────────────
     context = build_context(chunks)

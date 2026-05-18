@@ -9,6 +9,10 @@ class Settings:
     ollama_model: str = os.getenv("OLLAMA_MODEL", "gemma3")
     ollama_url: str   = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/chat")
 
+    # ── نموذج اللغة (Groq) ──────────────────────────────────────────────────
+    groq_api_key: str = os.getenv("GROQ_API_KEY", "")
+    groq_model: str   = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+
     # ── الاسترجاع والتضمين ───────────────────────────────────────────────────
     embed_model: str      = os.getenv("EMBED_MODEL", "paraphrase-multilingual-mpnet-base-v2")
     chroma_path: str      = os.getenv("CHROMA_PATH", "vectorstore")

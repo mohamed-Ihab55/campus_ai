@@ -26,7 +26,9 @@ logger = get_logger("startup")
 async def lifespan(app: FastAPI):
     from pathlib import Path
     from app.retrieval import get_retriever
-    from app.llm.ollama_client import warmup_model
+    # from app.llm.ollama_client import warmup_model
+    from app.llm.groq_client import warmup_model
+    from app.retrieval.reranker import warmup_reranker
 
     Path(settings.data_dir).mkdir(parents=True, exist_ok=True)
     Path("data/pdfs").mkdir(parents=True, exist_ok=True)
@@ -37,15 +39,19 @@ async def lifespan(app: FastAPI):
         if retriever.collection.count() == 0:
             logger.info("قاعدة البيانات المتجهية فارغة — بدء الاستيعاب التلقائي...")
             from app.ingestion import ingest_all_markdown
+            from app.retrieval import reset_retriever
             ingest_all_markdown(settings.data_dir)
+            reset_retriever()
 
     retriever = get_retriever()
     retriever.embed_model.encode(["warm up"], normalize_embeddings=True)
     logger.info("تم تسخين نموذج التضمين")
 
     await warmup_model()
+    await warmup_reranker()
 
-    logger.info("التطبيق جاهز — %s", settings.ollama_model)
+    # logger.info("التطبيق جاهز — %s", settings.ollama_model)
+    logger.info("التطبيق جاهز — %s", settings.groq_model)
     yield
     logger.info("التطبيق يُغلق...")
 

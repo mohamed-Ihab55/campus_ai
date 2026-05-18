@@ -41,7 +41,9 @@ The Flutter app provides students with a comprehensive university companion:
 - **UMS Integration** — University Management System access
 - **News Feed** — Campus announcements and updates
 
-The RAG backend answers academic questions by retrieving relevant sections from the Faculty of Science student guide using hybrid search (semantic + keyword) and a local LLM — no cloud AI dependencies.
+The RAG backend answers academic questions by retrieving relevant sections from the Faculty of Science student guide using hybrid search (semantic + keyword). 
+
+> **Important Note:** Currently, the system is configured to use the **Groq API** for LLM generation and reranking. This is designed for rapid presentation and cloud deployment on Hugging Face Spaces. However, the system is fully capable of running **100% locally and offline** using Ollama and local Hugging Face models by simply uncommenting the local configuration lines in the source code.
 
 ---
 
@@ -100,11 +102,11 @@ The repository consists of **multiple programming languages** optimized for thei
 │                   │                                      │
 │              RRF Fusion                                  │
 │                   │                                      │
-│           Reranker (Qwen3 / HuggingFace) [optional]      │
+│           Reranker (Groq API) [optional]                 │
 │                   │                                      │
 │           Build Prompt + Context                         │
 │                   │                                      │
-│           Ollama + Gemma3 (local LLM)                    │
+│           Groq API (llama-3.3-70b-versatile)             │
 │                   │                                      │
 │           Stream tokens → Flutter                        │
 └──────────────────────────────────────────────────────────┘
@@ -119,9 +121,9 @@ The repository consists of **multiple programming languages** optimized for thei
 4.  RAG detects language (Arabic / English)
 5.  RAG runs Vector Search + BM25 Search
 6.  RRF Fusion combines and ranks both result sets
-7.  Optional: Qwen3 Reranker re-scores top candidates
+7.  Optional: Groq API Reranker re-scores top candidates
 8.  RAG builds system prompt with context + conversation history
-9.  Ollama (Gemma3) generates response token-by-token
+9.  Groq API generates response token-by-token
 10. RAG streams tokens to Flutter via Server-Sent Events
 11. Flutter emits ChatStreaming state — UI updates in real-time
 12. When complete, message is saved to Firestore
@@ -212,11 +214,9 @@ campus_ai/
 |-------------|-------|-------|
 | **Python** | 3.10 – 3.12 | 3.11 recommended for compatibility |
 | **pip** | Latest | Python package manager |
-| **Ollama** | Latest | [ollama.com](https://ollama.com) — **must be running** |
-| **Gemma3 Model** | via Ollama | ~4 GB VRAM download (first run only) |
-| **CUDA Toolkit** | 12.1 (optional) | For GPU acceleration (RTX 3050+) |
+| **Groq API Key** | — | Required for LLM and Reranking |
 | **RAM** | 8 GB minimum | 16 GB recommended |
-| **Disk Space** | 5 GB free | Models + vectorstore storage |
+| **Disk Space** | 2 GB free | Vectorstore storage |
 | **OS** | Linux, macOS, Windows | Any modern OS with Python 3.10+ |
 
 #### Python Packages
@@ -227,7 +227,8 @@ campus_ai/
 | **uvicorn[standard]** | 0.29.0 | ASGI server |
 | **sentence-transformers** | 3.0.1 | Multilingual embeddings (Arabic support) |
 | **chromadb** | 0.5.3 | Vector database |
-| **httpx** | 0.27.0 | Async HTTP client (Ollama + HuggingFace) |
+| **groq** | 0.9.0 | Groq Cloud API Client |
+| **httpx** | 0.27.0 | Async HTTP client |
 | **langdetect** | 1.0.9 | Language detection |
 | **langchain-text-splitters** | 0.2.4 | Markdown-aware text chunking |
 | **rank-bm25** | 0.2.2 | BM25 keyword retrieval |
@@ -294,9 +295,13 @@ Create a `.env` file in the `src/rag/` directory with the following configuratio
 # LLM Configuration
 # ════════════════════════════════════════════════════════════
 
-# Ollama model name and endpoint
-OLLAMA_MODEL=gemma3
-OLLAMA_URL=http://127.0.0.1:11434/api/chat
+# Groq API Configuration
+GROQ_API_KEY=gsk_your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
+
+# Ollama local configuration (commented out by default)
+# OLLAMA_MODEL=gemma3
+# OLLAMA_URL=http://127.0.0.1:11434/api/chat
 
 # ════════════════════════════════════════════════════════════
 # Retrieval Configuration
@@ -322,23 +327,26 @@ SESSION_TTL=3600
 # Reranker Configuration (Optional)
 # ════════════════════════════════════════════════════════════
 
-# HuggingFace API token for Qwen3 reranking
-# Get a free token at: https://huggingface.co/settings/tokens
-# Without this token, system gracefully falls back to RRF ranking
-HF_API_TOKEN=hf_your_token_here
-
-# Reranker model identifier
-RERANKER_MODEL=Qwen/Qwen3-Reranker-0.6B
-
-# Concurrency limit for HuggingFace API calls
-RERANKER_CONCURRENCY=4
+# Local HuggingFace fallback settings (commented out by default)
+# HF_API_TOKEN=hf_your_token_here
+# RERANKER_MODEL=Qwen/Qwen3-Reranker-0.6B
+# RERANKER_CONCURRENCY=4
 ```
 
 **Key Notes:**
-- **OLLAMA_URL**: Must match your Ollama server location (default: `http://127.0.0.1:11434`)
-- **TOP_K**: Balanced at 8 to accommodate full academic tables
-- **SESSION_TTL**: 3600 seconds (1 hour) prevents session bloat
-- **HF_API_TOKEN**: Optional — improves accuracy by 20–30% if provided
+- **GROQ_API_KEY**: Required for cloud-based inference and reranking.
+- **TOP_K**: Balanced at 8 to accommodate full academic tables.
+- **SESSION_TTL**: 3600 seconds (1 hour) prevents session bloat.
+
+---
+
+### Switching to Local Offline Mode (Ollama)
+
+If you wish to run the project entirely offline (without Groq API), the codebase retains all the necessary components. To revert:
+1. **Uncomment Ollama usage**: In `src/rag/app/api/routes_chat.py`, switch the import from `groq_client` to `ollama_client`.
+2. **Update pipeline**: In `src/rag/app/pipeline/chat_pipeline.py`, comment out the `rerank_chunks` function call (or replace it with the HuggingFace local reranker).
+3. **Restore startup logic**: In `src/rag/main.py`, restore the `warmup_model` import from `ollama_client` and remove `warmup_reranker`.
+4. **Environment Variables**: Uncomment the `OLLAMA_MODEL` and `OLLAMA_URL` lines in your `.env` file, and ensure Ollama is running locally.
 
 ---
 
@@ -436,11 +444,8 @@ bash setup.sh
 **What the script does:**
 1. Creates Python virtual environment (`.venv`)
 2. Installs all dependencies from `requirements.txt`
-3. Verifies Ollama installation
-4. Starts Ollama server (if not running)
-5. Pulls Gemma3 model (~4 GB, first run only)
-6. Indexes `data/markdown/guide.md` into ChromaDB
-7. Starts FastAPI server at `http://0.0.0.0:8000`
+3. Indexes `data/markdown/guide.md` into ChromaDB
+4. Starts FastAPI server at `http://0.0.0.0:8000`
 
 #### Step 2 — Manual Setup (Alternative)
 
@@ -469,31 +474,22 @@ pip install torch==2.3.1+cpu --extra-index-url https://download.pytorch.org/whl/
 pip install -r requirements.txt
 ```
 
-**Step 2c — Install and Start Ollama**
+**Step 2c — Set Up Groq API Key**
 
-```bash
-# 1. Download and install from https://ollama.com
-# 2. Start the Ollama server (keep running in background)
-ollama serve
-
-# 3. In a new terminal, pull Gemma3 model (~4 GB, run once)
-ollama pull gemma3
-```
+1. Go to [console.groq.com](https://console.groq.com)
+2. Generate a new API Key.
 
 **Step 2d — Create Environment Configuration**
 
 ```bash
 # Create .env in src/rag/ with content from "Environment Setup & Configuration" section above
 cat > .env << 'EOF'
-OLLAMA_MODEL=gemma3
-OLLAMA_URL=http://127.0.0.1:11434/api/chat
+GROQ_API_KEY=gsk_your_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
 TOP_K=8
 MAX_TURNS=6
 MAX_SESSIONS=200
 SESSION_TTL=3600
-HF_API_TOKEN=hf_your_token_here
-RERANKER_MODEL=Qwen/Qwen3-Reranker-0.6B
-RERANKER_CONCURRENCY=4
 EOF
 ```
 
@@ -628,10 +624,7 @@ flutter build ios --release
 ```bash
 # From src/rag/ directory (with virtual environment activated)
 
-# Terminal 1: Start Ollama (keep running)
-ollama serve
-
-# Terminal 2: Start FastAPI server
+# Start FastAPI server
 python main.py
 ```
 
@@ -647,9 +640,10 @@ curl http://localhost:8000/health
 # Expected response:
 # {
 #   "status": "ok",
-#   "ollama_connected": true,
-#   "chunks_indexed": 1247,
-#   "sessions_active": 0
+#   "groq_connected": true,
+#   "chunks_indexed": 363,
+#   "sessions_active": 0,
+#   "reranker_available": true
 # }
 ```
 

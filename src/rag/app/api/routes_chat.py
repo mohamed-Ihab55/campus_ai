@@ -7,7 +7,8 @@ from pydantic import BaseModel, Field
 
 from app.memory import memory
 from app.pipeline import chat_pipeline
-from app.llm.ollama_client import stream_response
+# from app.llm.ollama_client import stream_response
+from app.llm.groq_client import stream_response
 from app.core.logging_setup import get_logger
 
 logger = get_logger(__name__)
