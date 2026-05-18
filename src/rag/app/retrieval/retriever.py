@@ -1,20 +1,3 @@
-"""
-retriever.py — Hybrid retriever with weighted RRF fusion (CPU-only production)
-==============================================================================
-  - CPU-only embedding (GPU reserved for Ollama LLM)
-  - Arabic-aware BM25 tokenizer (diacritics, prefix stripping, alef normalization)
-  - BM25 index persisted via joblib — skips rebuild if collection unchanged
-  - top_k hard-capped at 8 (raised from 5) to give LLM enough rows to
-    reconstruct multi-row academic tables without OOM risk on CPU
-  - fetch_k = top_k × 4 — wide candidate pool for fragmented tables
-  - Weighted RRF: structural queries (level/dept/course) get 2× vector weight
-    and 0.5× BM25 weight to suppress noise from ubiquitous terms like "ساعة"
-  - BM25 score threshold: skip BM25 results when max raw score < 0.1
-    (query has no meaningful keyword match — prevents random noise from
-     contaminating the fusion ranking)
-  - reset_retriever() holds _init_lock to prevent concurrent partial-reset reads
-"""
-
 import re
 import time
 import joblib
@@ -193,16 +176,6 @@ def _is_structural_query(query: str) -> bool:
 
 
 def _build_metadata_filter(query: str) -> dict | None:
-    """Build a ChromaDB `where` filter from the query's level/semester mentions.
-
-    When a user asks about "المستوى الأول الفصل الثاني", this returns a filter
-    that restricts vector search to chunks whose `level_number` = "1" AND
-    `semester` = "الثاني".  This prevents Level-2/3/4 chunks (which may be
-    semantically closer due to course-code overlap) from outranking the
-    actually-requested Level-1 chunks.
-
-    Returns None if no level/semester can be extracted (general query).
-    """
     level = _extract_level_number(query)
     semester = _extract_semester(query)
 
@@ -221,7 +194,11 @@ def _build_metadata_filter(query: str) -> dict | None:
 
 
 def _select_device() -> str:
-    return "cpu"   # GPU reserved for Ollama/gemma3
+    try:
+        import torch
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    except ImportError:
+        return "cpu"   
 
 
 # ── Retriever ─────────────────────────────────────────────────────────────────
@@ -229,8 +206,8 @@ def _select_device() -> str:
 class Retriever:
     def __init__(self):
         device = _select_device()
-        logger.info("[INIT] Embedding device: {device}")
-        self.embed_model = SentenceTransformer(settings.embed_model, ...)
+        logger.info("[INIT] Embedding device: %s", device)
+        self.embed_model = SentenceTransformer(settings.embed_model, device=device)
         self.client     = chromadb.PersistentClient(path=settings.chroma_path)
         self.collection = self.client.get_or_create_collection(name=settings.chroma_collection)
         
@@ -255,7 +232,7 @@ class Retriever:
                     print(f"[CACHE] BM25 loaded ({len(self.documents)} docs)")
                     return
             except Exception as e:
-                logger.warning("[WARN] BM25 cache invalid: {e}")
+                logger.warning("[WARN] BM25 cache invalid: %s", e)
 
         print("[BUILD] Building BM25 index...")
         all_docs       = self.collection.get()

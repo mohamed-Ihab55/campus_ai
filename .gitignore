@@ -38,3 +38,9 @@ src/flutter/.flutter-plugins-dependencies
 .DS_Store
 *.log
 *.swp
+
+# Claude Code
+.claude/
+
+# Environment secrets
+src/rag/.env

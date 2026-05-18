@@ -2,19 +2,7 @@ from app.core.config import settings
 
 
 def format_chunk(index: int, chunk: dict) -> str:
-    """
-    نسّق chunk واحد مع ترويسة تحتوي على معلومات السياق.
-
-    المدخل:
-        index: رقم الـ chunk (0-based)
-        chunk: dict يحتوي على "text" و "metadata"
-
-    المخرج:
-        نص منسّق مع ترويسة بين أقواس مربعة
-        مثال:
-        [مقتطف 1 — السياق: برنامج الرياضيات — المستوى 3 — الفصل: الأول]
-        ... نص الـ chunk ...
-    """
+   
     meta       = chunk.get("metadata", {})
     article    = meta.get("article_number", "")
     breadcrumb = (

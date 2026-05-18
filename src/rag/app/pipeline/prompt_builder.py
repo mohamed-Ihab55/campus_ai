@@ -7,15 +7,7 @@ _PROMPTS_DIR = Path(__file__).resolve().parent.parent.parent / "prompts"
 
 
 def build_system_prompt(language: str) -> str:
-    """
-    ارجع الـ system prompt المناسب حسب اللغة.
 
-    المعاملات:
-        language: "ar" للعربية، "en" للإنجليزية
-
-    الإرجاع:
-        نص الـ prompt الكامل
-    """
     filename = "system_ar.txt" if language == "ar" else "system_en.txt"
     prompt_path = _PROMPTS_DIR / filename
 

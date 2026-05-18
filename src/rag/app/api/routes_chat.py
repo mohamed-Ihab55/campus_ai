@@ -1,7 +1,7 @@
 import uuid
 import json
 import time
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 

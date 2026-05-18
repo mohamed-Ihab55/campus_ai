@@ -16,25 +16,7 @@ async def stream_response(
     session_id: str,
     original_question: str,
 ):
-    """
-    بث الرد من Ollama مع حفظ المحادثة في الذاكرة.
 
-    كيف يعمل الـ Streaming؟
-    ─────────────────────────
-    بدلاً من الانتظار حتى تكتمل الإجابة كاملاً (قد يستغرق 200 ثانية)،
-    نفتح اتصالاً مستمراً ونُرسل كل كلمة فور إنتاجها.
-    المستخدم يرى الرد يظهر تدريجياً كأن شخصاً يكتب.
-
-    Heartbeat (نبضة القلب):
-    ─────────────────────────
-    إذا لم يأتِ توكن لـ 20 ثانية، نُرسل مسافة صغيرة (zero-width space).
-    هذا يمنع المتصفح أو الشبكة من اعتبار الاتصال "مات" وقطعه.
-
-    الحفظ في الذاكرة:
-    ─────────────────────────
-    عند اكتمال الإجابة، نحفظ السؤال والإجابة في ConversationMemory
-    حتى يعمل الـ follow-up في الرسائل التالية.
-    """
     full_answer      = ""
     stream_completed = False
     logger.info("بدء توليد الإجابة | session=%s", session_id)
@@ -120,12 +102,7 @@ async def stream_response(
 
 
 async def warmup_model() -> bool:
-    """
-    حمّل النموذج في ذاكرة Ollama عند بدء التطبيق.
-    يمنع التأخير الكبير في أول طلب.
 
-    يُعاد True إذا نجح، False إذا فشل.
-    """
     try:
         async with httpx.AsyncClient(timeout=httpx.Timeout(300.0)) as client:
             await client.post(

@@ -9,17 +9,6 @@ _OLLAMA_TIMEOUT = httpx.Timeout(settings.ollama_timeout)
 
 
 def is_followup_question(question: str) -> bool:
-    """
-    اكشف ما إذا كان السؤال يعتمد على context سابق.
-
-    يعتمد على 4 إشارات:
-    - قصير (≤8 كلمات)
-    - يحتوي على كلمة استفهام غير محددة
-    - يحتوي على ضمير إشاري (ده/هذا)
-    - يبدأ بحرف عطف (و/ف/لكن)
-
-    إذا توفّرت إشارتان أو أكثر → سؤال متابِع.
-    """
     followup_keywords = [
         "لماذا", "كيف", "ماذا", "وضح", "اشرح", "يعني", "طيب", "وإيه",
         "why", "how", "what do you mean", "explain", "elaborate",
@@ -37,12 +26,6 @@ def is_followup_question(question: str) -> bool:
 
 
 async def rewrite_query(question: str, history: list[dict]) -> str:
-    """
-    أعد صياغة السؤال ليكون مستقلاً باستخدام الـ LLM.
-
-    إذا فشل الـ LLM لأي سبب → يُعاد السؤال الأصلي بدون تغيير.
-    هذا يضمن أن الفشل لا يوقف المحادثة.
-    """
     if not history:
         return question
 

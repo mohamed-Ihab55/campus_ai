@@ -1,71 +1,7 @@
-"""
-reranker.py — Qwen/Qwen3-Reranker-0.6B via HuggingFace Inference API
-======================================================================
-
-Role in the RAG pipeline
--------------------------
-                    Query
-                      │
-          ┌───────────▼────────────┐
-          │  Hybrid Search (RRF)   │  ← retriever.py (fast, recall-focused)
-          │  returns 15 candidates │
-          └───────────┬────────────┘
-                      │
-          ┌───────────▼────────────┐
-          │  Qwen3-Reranker-0.6B  │  ← THIS FILE (slow, precision-focused)
-          │  scores each pair      │
-          │  (query, candidate)    │
-          │  returns best 5        │
-          └───────────┬────────────┘
-                      │
-          ┌───────────▼────────────┐
-          │   Ollama / LLM         │  ← main.py
-          └────────────────────────┘
-
-Why a Reranker?
----------------
-The embedding model (bi-encoder) compares query and document SEPARATELY —
-it cannot see both at the same time, so its similarity score is approximate.
-
-The reranker (cross-encoder) reads query + document TOGETHER, allowing deep
-token-level interaction.  This makes it ~20-30% more accurate for relevance
-judgement, at the cost of being slower (one forward pass per candidate pair).
-
-The two-stage design gives us the best of both worlds:
-  Stage 1 (retriever)  — fast, recalls 15 good candidates from thousands
-  Stage 2 (reranker)   — slow but precise, picks the best 5 from those 15
-
-How Qwen3-Reranker-0.6B works
-------------------------------
-The model expects a special prompt format:
-  <|im_start|>system
-  Judge whether the Document meets the requirements based on the Query and
-  the Instruct provided.  Answer only "yes" or "no".
-  <|im_end|>
-  <|im_start|>user
-  <Instruct>: {instruction}
-  <Query>: {query}
-  <Document>: {document}
-  <|im_end|>
-  <|im_start|>assistant
-  <think>
-
-  </think>
-
-The model then generates a single token: "yes" (relevant) or "no" (not).
-We use the HuggingFace text-generation Inference API with max_new_tokens=1
-and details=True to obtain log-probabilities for a continuous ranking score.
-
-Configuration (in .env)
-------------------------
-  HF_API_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  RERANKER_MODEL=Qwen/Qwen3-Reranker-0.6B   (optional override)
-
-If HF_API_TOKEN is not set, rerank_chunks() is a transparent no-op:
-it returns the first top_k candidates in their original RRF order so the
-rest of the pipeline keeps working without reranking.
-"""
-
+# ── RERANKER DISABLED ──────────────────────────────────────────────────────────
+# Currently using Groq API instead of local HuggingFace reranker.
+# Will be re-enabled and upgraded before discussion day.
+# ──────────────────────────────────────────────────────────────────────────────
 import os
 import asyncio
 import math
@@ -99,11 +35,6 @@ _INSTRUCTION_EN = (
 # ── Prompt formatter ──────────────────────────────────────────────────────────
 
 def _format_prompt(query: str, passage: str, instruction: str) -> str:
-    """
-    Build the exact prompt format required by Qwen3-Reranker models.
-    The assistant turn ends with the <think> block so the model generates
-    its "yes"/"no" decision immediately after.
-    """
     return (
         "<|im_start|>system\n"
         "Judge whether the Document meets the requirements based on the Query "
@@ -230,27 +161,7 @@ async def rerank_chunks(
     top_k: int = 5,
     lang: str = "ar",
 ) -> list[dict]:
-    """
-    Rerank a list of retrieved chunks and return the best top_k.
 
-    Parameters
-    ----------
-    query  : the user's question (after optional query rewriting)
-    chunks : list of dicts with at least {"text": str, "source": str}
-             (may also contain "rrf_score" from the hybrid retriever)
-    top_k  : number of chunks to return after reranking
-    lang   : "ar" or "en" — selects the Arabic or English instruction
-
-    Returns
-    -------
-    list[dict] — same schema as input chunks, with an added "rerank_score" key,
-    sorted by rerank_score descending.
-
-    Graceful degradation
-    --------------------
-    If HF_API_TOKEN is not configured, returns chunks[:top_k] unchanged
-    (original RRF order) so the pipeline keeps working without the reranker.
-    """
     if not chunks:
         return []
 

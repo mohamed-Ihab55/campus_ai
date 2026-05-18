@@ -10,7 +10,6 @@ class Settings:
     ollama_url: str   = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/chat")
 
     # ── الاسترجاع والتضمين ───────────────────────────────────────────────────
-    # نموذج التضمين — يجب أن يكون نفسه في الاستيعاب والاسترجاع دائماً
     embed_model: str      = os.getenv("EMBED_MODEL", "paraphrase-multilingual-mpnet-base-v2")
     chroma_path: str      = os.getenv("CHROMA_PATH", "vectorstore")
     chroma_collection: str = os.getenv("CHROMA_COLLECTION", "rag_docs")
@@ -18,9 +17,9 @@ class Settings:
     max_context_chars: int = int(os.getenv("MAX_CONTEXT_CHARS", "10000"))
 
     # ── Reranker (HuggingFace) ────────────────────────────────────────────────
-    hf_api_token: str       = os.getenv("HF_API_TOKEN", "")
-    reranker_model: str     = os.getenv("RERANKER_MODEL", "Qwen/Qwen3-Reranker-0.6B")
-    reranker_concurrency: int = int(os.getenv("RERANKER_CONCURRENCY", "4"))
+    #hf_api_token: str       = os.getenv("HF_API_TOKEN", "")
+    #reranker_model: str     = os.getenv("RERANKER_MODEL", "Qwen/Qwen3-Reranker-0.6B")
+    #reranker_concurrency: int = int(os.getenv("RERANKER_CONCURRENCY", "4"))
 
     # ── ذاكرة المحادثة ────────────────────────────────────────────────────────
     max_turns: int    = int(os.getenv("MAX_TURNS", "6"))

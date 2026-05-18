@@ -1,20 +1,14 @@
-"""
-memory.py — Production conversation store with TTL eviction.
-Keeps the last N turns per session so "why?" follow-ups work correctly.
-Evicts sessions older than TTL and caps total sessions to prevent OOM.
-"""
-
 import time
 import threading
 from collections import OrderedDict, deque
 from dataclasses import dataclass
 from typing import Literal
-import os
 
 from app.core.config import settings
 from app.core.logging_setup import get_logger
 
 logger = get_logger(__name__)
+
 @dataclass
 class Turn:
     role: Literal["user", "assistant"]
@@ -108,13 +102,8 @@ class ConversationMemory:
     def session_count(self) -> int:
         return len(self._sessions)
 
-
-# Global singleton shared across all requests
-MAX_TURNS    = int(os.getenv("MAX_TURNS", "6"))
-MAX_SESSIONS = int(os.getenv("MAX_SESSIONS", "200"))
-SESSION_TTL  = int(os.getenv("SESSION_TTL", "3600"))
 memory = ConversationMemory(
-    max_turns=MAX_TURNS,
-    max_sessions=MAX_SESSIONS,
-    ttl_seconds=SESSION_TTL,
+    max_turns=settings.max_turns,
+    max_sessions=settings.max_sessions,
+    ttl_seconds=settings.session_ttl,
 )

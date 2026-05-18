@@ -1,11 +1,3 @@
-"""
-app/api/routes_health.py
-=========================
-Endpoints للمراقبة والتشخيص.
-
-/health   → هل الـ server يعمل؟ هل Ollama متصل؟
-/retrieve → أداة debug للتحقق من جودة الاسترجاع
-"""
 
 import httpx
 from fastapi import APIRouter
